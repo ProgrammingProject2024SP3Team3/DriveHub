@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35219.272
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveHub", "DriveHub\DriveHub.csproj", "{FE6FD3EB-2978-4012-8C87-2A307B92829B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin", "Admin\Admin.csproj", "{C135B0D1-9748-40FC-9FD1-EBB7DDC0BD95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveHubModels", "DriveHubModel\DriveHubModels.csproj", "{657117D3-98B6-4B4B-8025-9B295BAA420C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE6FD3EB-2978-4012-8C87-2A307B92829B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE6FD3EB-2978-4012-8C87-2A307B92829B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE6FD3EB-2978-4012-8C87-2A307B92829B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE6FD3EB-2978-4012-8C87-2A307B92829B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C135B0D1-9748-40FC-9FD1-EBB7DDC0BD95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C135B0D1-9748-40FC-9FD1-EBB7DDC0BD95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C135B0D1-9748-40FC-9FD1-EBB7DDC0BD95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C135B0D1-9748-40FC-9FD1-EBB7DDC0BD95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{657117D3-98B6-4B4B-8025-9B295BAA420C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{657117D3-98B6-4B4B-8025-9B295BAA420C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{657117D3-98B6-4B4B-8025-9B295BAA420C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{657117D3-98B6-4B4B-8025-9B295BAA420C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {97D617E2-E3ED-418B-98CA-FA3A80D0753D}
+	EndGlobalSection
+EndGlobal
