@@ -8,10 +8,6 @@
       "type": "storage",
       "connectionId": "VehiclePhotos"
     },
-    "secrets1": {
-      "type": "secrets",
-      "connectionId": "VaultUri"
-    },
     "mssql2": {
       "type": "mssql",
       "connectionId": "DriveHubDb",
