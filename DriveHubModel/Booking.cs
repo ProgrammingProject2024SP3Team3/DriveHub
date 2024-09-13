@@ -15,11 +15,11 @@ namespace DriveHubModel
         [ForeignKey("Vehicle")]
         public Guid VehicleID { get; set; }
 
-        [ForeignKey("Location")]
-        public Guid StartLocationID { get; set; }
+        [ForeignKey("Pod")]
+        public Guid StartPodID { get; set; }
 
-        [ForeignKey("Location")]
-        public Guid EndLocationID { get; set; }
+        [ForeignKey("Pod")]
+        public Guid EndPodID { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -28,10 +28,13 @@ namespace DriveHubModel
         // Navigation properties
         public AspNetUser User { get; set; }
         public Vehicle Vehicle { get; set; }
-        public Location StartLocation { get; set; }
-        public Location EndLocation { get; set; }
-        
+        public Pod StartPod { get; set; }
+        public Pod EndPod { get; set; }
+
         // One-to-One relationship: A Booking generates one Receipt
         public Receipt Receipt { get; set; }
+
+        // One-to-One relationship: A Booking generates one Journey
+        public Journey Journey { get; set; }
     }
 }

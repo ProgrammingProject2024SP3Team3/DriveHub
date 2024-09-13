@@ -22,12 +22,12 @@ namespace DriveHubModel
         public int Year { get; set; }
         public int Mileage { get; set; }
 
-        [ForeignKey("Location")]
-        public Guid LocationID { get; set; }
+        [ForeignKey("Pod")]
+        public Guid PodID { get; set; }
         public bool IsAvailable { get; set; }
 
         // Navigation properties
-        public Location Location { get; set; }
+        public Pod Pod { get; set; }
 
         // One-to-Many relationship: A Vehicle can have many Bookings
         public ICollection<Booking> Bookings { get; set; }
