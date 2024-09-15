@@ -1,25 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DriveHubModel
 {
     public class Location
     {
         [Key]
-        public Guid LocationID { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string LocationID { get; set; }
 
         [Required]
         public string Address { get; set; }
-        public string City { get; set; }
-        public string PostalCode { get; set; }
-        public decimal GPSLatitude { get; set; }
-        public decimal GPSLongitude { get; set; }
 
-        // One-to-Many relationship: A Location can have many Vehicles
-        public ICollection<Vehicle> Vehicles { get; set; }
-        
-        // One-to-Many relationship: A Location can have many Bookings (start and end locations)
-        public ICollection<Booking> Bookings { get; set; }
+        [Required]
+        public string City { get; set; }
+
+        [Required]
+        public string PostalCode { get; set; }
+
+        [Required]
+        public double GPSLatitude { get; set; }
+
+        [Required]
+        public double GPSLongitude { get; set; }
+
+        // One-to-Many relationship: A Location can have many Pods
+        //public virtual IList<Pod> Pods { get; set; } = new List<Pod>();
+
+
+
     }
 }
