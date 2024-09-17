@@ -1,5 +1,5 @@
-/**
- * Pod.cs 17/09/2024
+﻿/**
+ * VehicleRate.cs 17/09/2024
  *
  * author: Ian McElwaine s3863018@rmit.student.edu.au
  * author: Sean Atherton s3893785@student.rmit.edu.au
@@ -9,33 +9,29 @@
  * as assessment work for COSC2650 Programming Project
  */
 
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 
 namespace DriveHubModels
 {
-    public class Pod
+    internal class VehicleRate
     {
         [Key]
-        [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string PodID { get; set; }
-
-        [ForeignKey(nameof(Location.LocationID))]
-        [Required]
-        public string LocationID { get; set; }
-
-        [ForeignKey("Vehicle")]
-        [MaybeNull]
-        public string? VehicleID { get; set; }
+        public required string VehicleRateID { get; set; }
 
         [Required]
-        public string PodName { get; set; }
+        public string Description { get; set; }
 
-        // Navigation properties
-        public virtual Location Location { get; set; }
+        [Required]
+        [DataType(DataType.Currency)]
+        public decimal PricePerHour { get; set; }
 
-        public virtual Vehicle? Vehicle { get; set; } = null;
+        [Required]
+        [DataType(DataType.Date)]
+        [DisplayName("Effective Date")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime EffectiveDate { get; set; }
     }
 }
