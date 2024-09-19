@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Let's find a car";
+}
+
+
+<h1>Booking Search</h1>
+
+<p>Select your car, time, and location to book now.</p>
+
+<div class="row">
+    <div class="col-md-3">
+        <input id="pac-input" class="controls w-100" type="text" placeholder="Location" />
+        <div class="card p-3 my-3">
+            <h6 class="text-orange">Refine Your Search</h6>
+            <div class="mb-3">
+                <select class="form-select">
+                    <option selected>CAR TYPE</option>
+                    <option value="sedan">Sedan</option>
+                    <option value="suv">SUV</option>
+                    <option value="truck">Truck</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <select class="form-select">
+                    <option selected>SPECIAL FEATURES</option>
+                    <option value="sunroof">Sunroof</option>
+                    <option value="navigation">Navigation System</option>
+                    <option value="heated-seats">Heated Seats</option>
+                </select>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="specialOffer">
+                <label class="form-check-label" for="specialOffer">
+                    Show me vehicles on special
+                </label>
+            </div>
+        </div>
+        <div class="p-3 mt-2 mb-2 bg-primary text-white border border-dark fw-bold">
+            <a class="temp-link" href="/Bookings/Make" style="color: white">TEMP link to new booking</a>
+        </div>
+    </div>
+    <div class=" col-md-9">
+        <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>
+    </div>
+</div>
+
+<div class="p-3 mt-3 mb-2 bg-primary text-white border border-dark fw-bold">TODO: car/time selector</div>
+
+<script src="/js/bookings.js"></script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAutocomplete&libraries=places&v=weekly&loading=async"
+    defer></script>
