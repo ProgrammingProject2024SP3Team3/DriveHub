@@ -12,17 +12,15 @@ namespace DriveHub.Data
         public DbSet<Site> Sites { get; set; }
         public DbSet<Pod> Pods { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
-
         public DbSet<VehicleRate> VehicleRates { get; set; }
-
         public DbSet<Booking> Bookings { get; set; }
-
         public DbSet<Journey> Journeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            // Define keys
             modelBuilder.Entity<Site>()
                .HasKey(c => c.SiteId);
 
@@ -35,19 +33,16 @@ namespace DriveHub.Data
             modelBuilder.Entity<VehicleRate>()
                 .HasKey(c => c.VehicleRateId);
 
+            // Set "geography" column type for spatial data in the Site entity
             modelBuilder.Entity<Site>()
                .Property(l => l.Location)
-               .HasColumnType("geography"); // Use "geography" instead of "geometry"
+               .HasColumnType("geography");
 
-            // Define spatial index for the Location property
-            //modelBuilder.Entity<Site>()
-            //    .HasIndex(l => l.Location)
-            //    .HasDatabaseName("IX_Locations_Location_Spatial");
-
+            // Define relationships
             modelBuilder.Entity<Site>()
                 .HasMany(c => c.Pods)
                 .WithOne(c => c.Site)
-                .HasForeignKey(c => c.PodId);
+                .HasForeignKey(c => c.SiteId);
 
             modelBuilder.Entity<Pod>()
                 .HasOne(c => c.Site)
