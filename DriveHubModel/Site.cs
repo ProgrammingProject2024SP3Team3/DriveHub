@@ -34,12 +34,6 @@ namespace DriveHubModel
         [Required]
         public string PostalCode { get; set; }
 
-        [Required]
-        public double GPSLatitude { get; set; }
-
-        [Required]
-        public double GPSLongitude { get; set; }
-
         // NetTopologySuite spatial data
         [Required]
         public Point Location { get; set; }
