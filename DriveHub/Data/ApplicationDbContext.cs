@@ -40,9 +40,9 @@ namespace DriveHub.Data
                .HasColumnType("geography"); // Use "geography" instead of "geometry"
 
             // Define spatial index for the Location property
-            modelBuilder.Entity<Site>()
-                .HasIndex(l => l.Location)
-                .HasDatabaseName("IX_Locations_Location_Spatial");
+            //modelBuilder.Entity<Site>()
+            //    .HasIndex(l => l.Location)
+            //    .HasDatabaseName("IX_Locations_Location_Spatial");
 
             modelBuilder.Entity<Site>()
                 .HasMany(c => c.Pods)
