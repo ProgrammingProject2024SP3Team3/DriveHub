@@ -59,7 +59,7 @@ namespace DriveHubModel
         public decimal PricePerHour { get; set; }
 
         [Required]
-        public int BookingStatus { get; set; }
+        public BookingStatus BookingStatus { get; set; }
 
         [JsonIgnore]
         public virtual ApplicationUser ApplicationUser { get; set; }

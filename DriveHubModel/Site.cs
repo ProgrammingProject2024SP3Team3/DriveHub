@@ -42,7 +42,7 @@ namespace DriveHubModel
 
         // NetTopologySuite spatial data
         [Required]
-        //public Point Point { get; set; }
+        public Point Location { get; set; }
 
         // One-to-Many relationship: A Location can have many Pods
         [JsonIgnore]

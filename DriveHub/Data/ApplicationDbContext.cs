@@ -35,19 +35,14 @@ namespace DriveHub.Data
             modelBuilder.Entity<VehicleRate>()
                 .HasKey(c => c.VehicleRateId);
 
-            //modelBuilder.Entity<Site>()
-            //   .Property(l => l.Point)
-            //   .HasColumnType("geography"); // Use "geography" instead of "geometry"
+            modelBuilder.Entity<Site>()
+               .Property(l => l.Location)
+               .HasColumnType("geography"); // Use "geography" instead of "geometry"
 
             // Define spatial index for the Location property
-            //modelBuilder.Entity<Site>()
-            //    .HasIndex(l => l.Point)
-            //    .HasDatabaseName("IX_Locations_Location_Spatial");
-
             modelBuilder.Entity<Site>()
-                .HasMany(c => c.Pods)
-                .WithOne(c => c.Site)
-                .HasForeignKey(c => c.PodId);
+                .HasIndex(l => l.Location)
+                .HasDatabaseName("IX_Locations_Location_Spatial");
 
             modelBuilder.Entity<Site>()
                 .HasMany(c => c.Pods)
@@ -85,6 +80,13 @@ namespace DriveHub.Data
             modelBuilder.Entity<Booking>()
                 .Property(c => c.PricePerHour)
                 .HasColumnType("Money");
+
+            modelBuilder
+                .Entity<Booking>()
+                .Property(e => e.BookingStatus)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
 
             modelBuilder.Entity<Journey>()
                 .HasOne(c => c.Booking)
