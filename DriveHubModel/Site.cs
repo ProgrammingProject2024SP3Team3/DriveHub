@@ -1,5 +1,5 @@
 /**
- * Location.cs 17/09/2024
+ * Site.cs 17/09/2024
  *
  * author: Ian McElwaine s3863018@rmit.student.edu.au
  * author: Sean Atherton s3893785@student.rmit.edu.au
@@ -19,8 +19,8 @@ namespace DriveHubModel
     public class Site
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string SiteId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // Auto-incrementing int
+        public int SiteId { get; set; }
 
         [Required]
         public string SiteName { get; set; }
@@ -36,9 +36,9 @@ namespace DriveHubModel
 
         // NetTopologySuite spatial data
         [Required]
-        public Point Location { get; set; }
+        public Point Location { get; set; }  // Spatial data
 
-        // One-to-Many relationship: A Location can have many Pods
+        // One-to-Many relationship: A Site can have many Pods
         [JsonIgnore]
         public virtual IList<Pod> Pods { get; set; } = new List<Pod>();
     }
