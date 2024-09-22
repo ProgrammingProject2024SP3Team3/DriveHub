@@ -1,7 +1,5 @@
 /**
- * Vehicle
- * 
- * Vehicle.cs 17/09/2024
+ * Location.cs 17/09/2024
  *
  * author: Ian McElwaine s3863018@rmit.student.edu.au
  * author: Sean Atherton s3893785@student.rmit.edu.au
@@ -11,46 +9,43 @@
  * as assessment work for COSC2650 Programming Project
  */
 
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using NetTopologySuite.Geometries;
 
 namespace DriveHubModel
 {
-    public class Vehicle
+    public class Site
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VehicleId { get; set; }
-
-        [ForeignKey("VehicleRate")]
-        [Required]
-        public string VehicleRateId { get; set; }
+        public string SiteId { get; set; }
 
         [Required]
-        public string Make { get; set; }
+        public string SiteName { get; set; }
 
         [Required]
-        public string Model { get; set; }
+        public string Address { get; set; }
 
         [Required]
-        [DisplayName("Registration Plate")]
-        public string RegistrationPlate { get; set; }
+        public string City { get; set; }
 
         [Required]
-        public string State { get; set; }
+        public string PostalCode { get; set; }
 
         [Required]
-        public int Year { get; set; }
+        public double GPSLatitude { get; set; }
 
         [Required]
-        public int Seats { get; set; }
+        public double GPSLongitude { get; set; }
 
+        // NetTopologySuite spatial data
+        [Required]
+        public Point Location { get; set; }
+
+        // One-to-Many relationship: A Location can have many Pods
         [JsonIgnore]
-        public virtual VehicleRate VehicleRate { get; set; }
-
-        [JsonIgnore]
-        public virtual IList<Booking> Bookings { get; set; } = new List<Booking>();
+        public virtual IList<Pod> Pods { get; set; } = new List<Pod>();
     }
 }
