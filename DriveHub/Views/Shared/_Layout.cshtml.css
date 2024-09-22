@@ -1,6 +1,34 @@
 ﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+
+
+@media (min-width: 768px) {
+  .showcase .showcase-text {
+      padding: 7rem;
+  }
+}
+
+.call-to-action {
+  position: relative;
+  background-color: #343a40;
+  background: url("../assets/img/bg-masthead.jpg") no-repeat center center;
+  background-size: cover;
+  padding-top: 7rem;
+  padding-bottom: 7rem;
+}
+
+  .call-to-action:before {
+      content: "";
+      position: absolute;
+      background-color: #1c375e;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0.5;
+  }
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -40,7 +68,6 @@ button.accept-policy {
 }
 
 .footer {
-  position: absolute;
   bottom: 0;
   width: 100%;
   white-space: nowrap;

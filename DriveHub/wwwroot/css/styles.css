@@ -12435,29 +12435,85 @@ textarea.form-control-lg {
                 font-size: 4.5rem;
             }
 
+/* Make the header full width */
 header.masthead {
     position: relative;
     background-color: #343a40;
-    background: url("../assets/img/bg-masthead-comingsoon.jpg") no-repeat center center;
+    background: url("https://drivehubstorage.blob.core.windows.net/website/bg-car.jpg") no-repeat center center;
     background-size: cover;
+    width: 100%;
     padding-top: 8rem;
     padding-bottom: 8rem;
-}
-
-    header.masthead:before {
-        content: "";
-        position: absolute;
-        background-color: #1c375e;
-        height: 100%;
-        width: 100%;
-        top: 0;
-        left: 0;
-        opacity: 0.5;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+  }
+  
+  /* Optional overlay effect */
+  header.masthead:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(28, 55, 94, 0.5); /* Semi-transparent overlay */
+    z-index: 0; /* Place behind content */
+  }
+  
+  /* Style for the header text and search bar */
+  header.masthead h1 {
+    font-size: 2.5rem;
+    z-index: 1; /* Ensure it appears above the overlay */
+    color: #fff;
+  }
+  
+  @media (min-width: 768px) {
+    header.masthead h1 {
+        font-size: 3.5rem;
     }
-
-    header.masthead h1, header.masthead .h1 {
-        font-size: 2rem;
-    }
+  }
+  
+  /* Search bar styling */
+  .search-bar {
+    max-width: 600px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    z-index: 1; /* Ensure the search bar is on top of overlay */
+  }
+  
+  .search-bar input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 1.1rem;
+    border-radius: 5px 0 0 5px;
+    border: 1px solid #00A8E8;
+  }
+  
+  .search-bar button {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border-radius: 0 5px 5px 0;
+    border: 1px solid #00A8E8;
+    background-color: #00A8E8;
+    color: white;
+  }
+  
+  .search-bar input:focus {
+    outline: none;
+  }
+  
+  .showcase .showcase-text {
+    padding: 3rem;
+  }
+  
+  .showcase .showcase-img {
+    min-height: 30rem;
+    background-size: cover;
+  }
 
 @media (min-width: 768px) {
     header.masthead {
@@ -12476,7 +12532,7 @@ header.masthead {
 
 .showcase .showcase-img {
     min-height: 30rem;
-    background-size: cover;
+    background: url("https://drivehubstorage.blob.core.windows.net/website/QR_image.png") no-repeat;
 }
 
 @media (min-width: 768px) {
