@@ -18,8 +18,5 @@ namespace DriveHubModel
     {
         [JsonIgnore]
         public virtual IList<Booking> Bookings { get; set; } = new List<Booking>();
-
-        [JsonIgnore]
-        public virtual IList<Journey> Journeys { get; set; } = new List<Journey>();
     }
 }
