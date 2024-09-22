@@ -58,6 +58,9 @@ namespace DriveHubModel
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal PricePerHour { get; set; }
 
+        [Required]
+        public int BookingStatus { get; set; }
+
         [JsonIgnore]
         public virtual ApplicationUser ApplicationUser { get; set; }
 
@@ -66,5 +69,11 @@ namespace DriveHubModel
 
         [JsonIgnore]
         public virtual Journey? Journey { get; set; }
+    }
+
+    public enum BookingStatus
+    {
+        InProgress,
+        Complete
     }
 }
