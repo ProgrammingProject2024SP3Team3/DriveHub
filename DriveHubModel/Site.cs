@@ -12,14 +12,18 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using NetTopologySuite.Geometries;
 
-namespace DriveHubModels
+namespace DriveHubModel
 {
-    public class Location
+    public class Site
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string LocationID { get; set; }
+        public string SiteId { get; set; }
+
+        [Required]
+        public string SiteName { get; set; }
 
         [Required]
         public string Address { get; set; }
@@ -35,6 +39,10 @@ namespace DriveHubModels
 
         [Required]
         public double GPSLongitude { get; set; }
+
+        // NetTopologySuite spatial data
+        [Required]
+        //public Point Point { get; set; }
 
         // One-to-Many relationship: A Location can have many Pods
         [JsonIgnore]

@@ -12,30 +12,34 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
-namespace DriveHubModels
+namespace DriveHubModel
 {
     public class Pod
     {
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string PodID { get; set; }
+        public string PodId { get; set; }
 
-        [ForeignKey(nameof(Location.LocationID))]
+        [ForeignKey("Site")]
         [Required]
-        public string LocationID { get; set; }
+        public string SiteId { get; set; }
 
         [ForeignKey("Vehicle")]
         [MaybeNull]
-        public string? VehicleID { get; set; }
+        public string? VehicleId { get; set; }
 
         [Required]
         public string PodName { get; set; }
 
         // Navigation properties
-        public virtual Location Location { get; set; }
+        [JsonIgnore]
+        public virtual Site Site { get; set; }
 
+        [JsonIgnore]
+        [MaybeNull]
         public virtual Vehicle? Vehicle { get; set; } = null;
     }
 }

@@ -11,20 +11,22 @@
  * as assessment work for COSC2650 Programming Project
  */
 
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace DriveHubModels
+namespace DriveHubModel
 {
     public class Vehicle
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VehicleID { get; set; }
+        public string VehicleId { get; set; }
 
-        [ForeignKey(nameof(VehicleRate.VehicleRateID))]
+        [ForeignKey("VehicleRate")]
         [Required]
-        public string VehicleRateID { get; set; }
+        public string VehicleRateId { get; set; }
 
         [Required]
         public string Make { get; set; }
@@ -33,7 +35,8 @@ namespace DriveHubModels
         public string Model { get; set; }
 
         [Required]
-        public string LicensePlate { get; set; }
+        [DisplayName("Registration Plate")]
+        public string RegistrationPlate { get; set; }
 
         [Required]
         public string State { get; set; }
@@ -43,5 +46,11 @@ namespace DriveHubModels
 
         [Required]
         public int Seats { get; set; }
+
+        [JsonIgnore]
+        public virtual VehicleRate VehicleRate { get; set; }
+
+        [JsonIgnore]
+        public virtual IList<Booking> Bookings { get; set; } = new List<Booking>();
     }
 }

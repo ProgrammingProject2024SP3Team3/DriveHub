@@ -12,20 +12,22 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace DriveHubModels
+namespace DriveHubModel
 {
-    internal class VehicleRate
+    public class VehicleRate
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public required string VehicleRateID { get; set; }
+        public required string VehicleRateId { get; set; }
 
         [Required]
         public string Description { get; set; }
 
         [Required]
         [DataType(DataType.Currency)]
+        [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal PricePerHour { get; set; }
 
         [Required]
@@ -33,5 +35,8 @@ namespace DriveHubModels
         [DisplayName("Effective Date")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime EffectiveDate { get; set; }
+
+        [JsonIgnore]
+        public virtual IList<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
     }
 }
