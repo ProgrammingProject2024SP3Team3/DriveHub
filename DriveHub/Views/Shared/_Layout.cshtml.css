@@ -1,72 +1,6 @@
 ﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
-
-/* Styling for the Drive part */
-.navbar-brand .drive-text {
-  font-size: 2.5rem; /* Font size for "Drive" */
-  font-weight: bold; /* Bold for emphasis */
-  color: #00A8E8; /* Custom color for "Drive" */
-  font-family: "Protest Guerrilla", sans-serif;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-left: 1rem;
-}
-
-/* Styling for the Hub part */
-.navbar-brand .hub-text {
-  font-size: 2.5rem; /* Font size for "Hub" */
-  font-weight: bold;
-  color: #ffb300; /* Custom color for "Hub" */
-  font-family: 'Roboto', sans-serif; 
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-left: -0.2rem;
-}
-
-/* Hover effects if needed */
-.navbar-brand .drive-text:hover,
-.navbar-brand .hub-text:hover {
-  color: #1470b5;
-}
-
-/* Styling for the navbar */
-.navbar {
-  position: fixed; /* Fix the navbar at the top of the viewport */
-  top: 0; /* Align it to the top */
-  width: 100%; /* Ensure the navbar spans the full width of the page */
-  z-index: 1000; /* Ensure it's above other content */
-  background-color: #fff; /* Set a background color to make the navbar visible when fixed */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for visual clarity */
-}
-
-
-.navbar-nav .nav-link {
-  color: #343a40; /* Grey text for links */
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 0.75rem 1rem;
-}
-
-.navbar-nav .nav-link:hover {
-  color: #00A8E8; /* Color change on hover */
-  transition: color 0.3s ease;
-}
-
-
-/* Active state for the current page */
-.navbar-nav .nav-link.active {
-  color: #00A8E8;
-  font-weight: 700;
-  border-bottom: 2px solid #1b6ec2; /* Underline for active link */
-}
-
-.navbar-light .navbar-toggler {
-  color: rgba(255, 255, 255, 0.5);
-  border-color: #1b6ec2;
-}
-
-
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -74,24 +8,19 @@ a.navbar-brand {
 }
 
 a {
-  color: #00A8E8;
+  color: #0077cc;
 }
 
 .btn-primary {
   color: #fff;
-  background-color: #00A8E8;
-  border-color: #00A8E8;
-}
-
-.btn-primary:hover {
-  background-color: #1470b5;
-  border-color: #1470b5;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
   color: #fff;
-  background-color: #00A8E8;
-  border-color: #00A8E8;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
 }
 
 .border-top {
@@ -105,34 +34,9 @@ a {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
-/* Specificity targeting the Register button */
-.navbar-nav .nav-item .btn-primary {
-  background-color: #00A8E8 !important; /* Force color */
-  border-color: #00A8E8 !important; /* Force border color */
-  color: white !important; /* Ensure text color is white */
-  font-weight: 600;
-  padding: 0.5rem 1.5rem;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-  background-color: #1470b5 !important;
-  border-color: #1470b5 !important;
-}
-
-.navbar-nav .btn-dark {
-  background-color: #343a40;
-  border-color: #343a40;
-  color: white;
-  font-weight: 600;
-  padding: 0.5rem 1.5rem;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.navbar-nav .btn-dark:hover {
-  background-color: #23272b;
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
 }
 
 .footer {
