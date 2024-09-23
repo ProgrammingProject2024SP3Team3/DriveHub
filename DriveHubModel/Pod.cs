@@ -25,7 +25,8 @@ namespace DriveHubModel
 
         [ForeignKey("Site")]
         [Required]
-        public string SiteId { get; set; }
+        public int SiteId { get; set; }
+
 
         [ForeignKey("Vehicle")]
         [MaybeNull]
