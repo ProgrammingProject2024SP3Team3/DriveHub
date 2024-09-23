@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveHub", "DriveHub\DriveHub.csproj", "{FE6FD3EB-2978-4012-8C87-2A307B92829B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveHub", "DriveHub\DriveHub.csproj", "{FE6FD3EB-2978-4012-8C87-2A307B92829B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin", "Admin\Admin.csproj", "{C135B0D1-9748-40FC-9FD1-EBB7DDC0BD95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin", "Admin\Admin.csproj", "{C135B0D1-9748-40FC-9FD1-EBB7DDC0BD95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveHubModels", "DriveHubModel\DriveHubModels.csproj", "{657117D3-98B6-4B4B-8025-9B295BAA420C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveHubModel", "DriveHubModel\DriveHubModel.csproj", "{657117D3-98B6-4B4B-8025-9B295BAA420C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
