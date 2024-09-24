@@ -19,4 +19,11 @@ html {
 
 body {
   margin-bottom: 60px;
+  padding-top: 150px;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 150px; /* Add padding equal to the navbar height */
+  }
 }
