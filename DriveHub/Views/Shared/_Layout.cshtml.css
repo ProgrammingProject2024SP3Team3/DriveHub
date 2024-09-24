@@ -32,10 +32,6 @@ for details on configuring this project to bundle and minify static web assets. 
 
 /* Styling for the navbar */
 .navbar {
-  position: fixed; /* Fix the navbar at the top of the viewport */
-  top: 0; /* Align it to the top */
-  width: 100%; /* Ensure the navbar spans the full width of the page */
-  z-index: 1000; /* Ensure it's above other content */
   background-color: #fff; /* Set a background color to make the navbar visible when fixed */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for visual clarity */
 }
