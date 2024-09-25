@@ -2,84 +2,80 @@
     ViewData["Title"] = "DriveHub";
 }
 
-<!-- Start of the Header Section -->
-<header class="masthead">
-    <div class="container position-relative">
+<!-- Hero Section -->
+<header class="hero-section">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-xl-8">
-                <div class="text-center text-white">
-                    <!-- Page heading -->
-                    <h1 class="mb-5">Find, Book, and Drive – Anytime, Anywhere!</h1>
-                </div>
-                <div class="search-bar">
-                    <input type="text" class="form-control-lg" placeholder="Search for a car">
-                    <button class="btn btn-primary btn-lg">Search</button>
-                </div>
+         <div class="col-xl-8">
+        <div class="text-center text-white">
+            <h1 class="hero-heading mb-5">Find, Book, and Drive – Anytime, Anywhere!</h1>
+            </div>
+            <div class="hero-search-bar">
+                <input type="text" class="form-control-lg" placeholder="Search for a car">
+                <button class="btn btn-primary btn-lg">Search</button>
+                    </div>
             </div>
         </div>
     </div>
 </header>
-<!-- End of the Header Section -->
 
- <!-- Icons Grid-->
-<section class="features-icons bg-light text-center">
+ <!-- Services Section -->
+<section class="services-section text-center">
     <div class="container">
         <div class="row">
             <div class="col-lg-4">
-                <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
-                    <div class="features-icons-icon d-flex"><i class="bi-person-check m-auto text-primary"></i></div>
-                    <h3>Register & Verify</h3>
-                    <p class="lead mb-0">Create an account and verify your identity.</p>
+                <div class="service-item mx-auto">
+                    <i class="bi bi-person-check"></i>
+                    <h3 class="service-heading">Register & Verify</h3>
+                    <p class="service-description lead">Create an account and verify your identity.</p>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
-                    <div class="features-icons-icon d-flex"><i class="bi-calendar-check m-auto text-primary"></i></div>
-                    <h3>Book a Car</h3>
-                    <p class="lead mb-0">Choose a nearby location and pick a car for the time you need.</p>
+                <div class="service-item mx-auto">
+                    <i class="bi bi-calendar-check"></i>
+                    <h3 class="service-heading">Book a Car</h3>
+                    <p class="service-description lead">Choose a nearby location and pick a car for the time you need.</p>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="features-icons-item mx-auto mb-0 mb-lg-3">
-                    <div class="features-icons-icon d-flex"><i class="bi-geo-alt m-auto text-primary"></i></div>
-                    <h3>Drive & Return</h3>
-                    <p class="lead mb-0">Drive to your destination and return the car to any available location.</p>
+                <div class="service-item mx-auto">
+                    <i class="bi bi-geo-alt"></i>
+                    <h3 class="service-heading">Drive & Return</h3>
+                    <p class="service-description lead">Drive to your destination and return the car to any available location.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
-<!-- Image Showcases-->
-<section class="showcase">
+
+<!-- QR Code Section -->
+<section class="qr-section bg-white text-center">
     <div class="container-fluid p-0">
         <div class="row g-0">
-            <div class="col-lg-6 order-lg-2 text-white showcase-img"></div>
-            <div class="col-lg-6 order-lg-1 my-auto showcase-text">
+            <div class="col-lg-6 order-lg-2 qr-image" style="background-image: url('https://drivehubstorage.blob.core.windows.net/website/QR_image.png');"></div>
+            <div class="col-lg-6 order-lg-1 my-auto qr-text">
                 <h2>Effortless Booking with a QR Code</h2>
-                <p class="lead mb-0">Experience seamless car booking with our QR code feature. Simply scan the code, reserve your vehicle, and get on the road in seconds. It's quick, secure, and hassle-free!</p>
+                <p class="lead">Experience seamless car booking with our QR code feature. Simply scan the code, reserve your vehicle, and get on the road in seconds.</p>
             </div>
         </div>
+    </div>
 </section>
 
-<!-- Call to Action-->
-<section class="call-to-action text-white text-center" id="signup">
-    <div class="container position-relative">
+<!-- Call to Action -->
+<section class="call-to-action bg-dark text-white text-center py-5" id="signup">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-xl-6">
-                <h2 class="mb-4">Subscribe to Our Newsletter!</h2>
-
+            <div class="col-lg-6">
+                <h2 class="mb-4">Subscribe to Our Newsletter for Latest Offer!</h2>
                 <form asp-action="Subscribe" method="post" class="form-subscribe">
-                    <div class="row">
-                        <div class="col">
-                            <input class="form-control form-control-lg" id="emailAddressBelow" name="emailAddressBelow" type="email" placeholder="Email Address" required />
-                            <div class="invalid-feedback text-white">Please enter a valid email address.</div>
-                        </div>
-                        <div class="col-auto">
-                            <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Subscribe</button>
-                        </div>
+                    <div class="input-group">
+                        <input type="email" class="form-control form-control-lg" id="emailAddressBelow" name="emailAddressBelow" placeholder="Email Address" required>
+                        <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Subscribe</button>
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </section>
+

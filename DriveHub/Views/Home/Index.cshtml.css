@@ -1,0 +1,199 @@
+
+
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    background-color: #343a40;
+    background: url("https://drivehubstorage.blob.core.windows.net/website/bg-car.jpg") no-repeat center center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hero-section::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(28, 55, 94, 0.5); /* Semi-transparent overlay */
+    z-index: 0;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 1; /* Ensure content is above the overlay */
+}
+
+
+
+.hero-heading {
+    color: white;
+    font-size: 3rem;
+    font-weight: bolder;
+}
+
+.hero-search-bar {
+    max-width: 600px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    padding-bottom: 12%;
+}
+
+.hero-search-bar input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 1.1rem;
+    border-radius: 5px 0 0 5px;
+    border: 1px solid #00A8E8
+}
+
+.hero-search-bar button {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border-radius: 0 5px 5px 0;
+    border: 1px solid #00A8E8;
+    background-color: #00A8E8;
+    color: white;
+}
+
+.hero-search-bar input:focus{
+    outline: none;
+}
+
+@media (min-width: 768px) {
+    .hero-heading{
+        padding-top: 8rem;
+    }
+    .hero-heading h1{
+        font-size: 2rem;
+    }
+
+    /* Adjust the padding of the search bar */
+    .hero-search-bar input {
+        width: 75%; /* Wider input field for larger screens */
+        padding: 15px; /* More padding for a more comfortable UI */
+    }
+
+    .hero-search-bar button {
+        width: 25%; /* Slightly smaller button compared to the input field */
+        padding: 15px; /* Match padding with input */
+    }
+
+    /* Ensure the hero section maintains a good layout */
+    .hero-section {
+        justify-content: center; /* Ensure the content stays centered */
+    }
+}
+
+/* Services Section */
+.services-section {
+    padding: 60px 0;
+    background-color:rgba(242, 240, 240, 0.66) ;
+    margin-top: 90px;
+}
+
+.service-item i {
+    font-size: 3rem;
+    margin-bottom: 60px;
+    color:#00A8E8 !important;
+}
+
+.service-heading {
+    font-size: 1.5rem;
+    margin-top: 15px;
+}
+
+.service-description {
+    font-size: 1rem;
+}
+
+/* QR Code Section */
+.qr-section {
+    padding: 40px 0;
+}
+
+.qr-image {
+    min-height: 30rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.qr-text {
+    padding: 40px;
+}
+
+.qr-text h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.qr-text p {
+    font-size: 1rem;
+}
+
+/* Call to Action Section */
+.call-to-action {
+    background-image: url('https://drivehubstorage.blob.core.windows.net/website/subscribe.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    z-index: 1;
+}
+
+
+/* Custom overlay effect */
+.call-to-action::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: 0;
+}
+
+/* Adjusting the position of the content */
+.call-to-action .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Custom styles for the form and input fields */
+.form-subscribe .form-control {
+    border-radius: 0.25rem; /* Slight rounding for input field */
+    padding: 15px;
+    font-size: 1.2rem;
+}
+
+.form-subscribe .btn {
+    background-color: #00A8E8;
+    padding: 15px 30px; /* Make button bigger to stand out */
+    font-size: 1.2rem;
+    border-radius: 0.25rem; /* Matching border radius */
+    border: none;
+}
+
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .call-to-action h2 {
+        font-size: 2.5rem;
+    }
+
+    .form-subscribe .form-control {
+        font-size: 1.3rem;
+    }
+
+    .form-subscribe .btn {
+        font-size: 1.3rem;
+    }
+}
