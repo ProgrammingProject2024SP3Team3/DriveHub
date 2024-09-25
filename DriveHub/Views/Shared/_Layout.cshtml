@@ -54,14 +54,46 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer bg-dark text-white pt-4">
         <div class="container">
-            &copy; 2024 - DriveHub - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+                <!-- Social Media Icons -->
+                <div class="col-lg-6 mb-4">
+                    <h5>Follow Us</h5>
+                    <a href="https://facebook.com" target="_blank" class="socialmedia me-3">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="https://twitter.com" target="_blank" class="socialmedia me-3">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                    <a href="https://instagram.com" target="_blank" class="socialmedia me-3">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" class="socialmedia">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                </div>
+
+                <!-- Footer Links -->
+                <div class="col-lg-6 text-lg-end mb-4">
+                    <h5>Quick Links</h5>
+                    <a class="text-white me-3" asp-area="" asp-controller="Home" asp-action="ListPages">Page List</a>
+                    <a class="text-white me-3" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                    <a class="text-white" asp-area="" asp-controller="Home" asp-action="Contact">Contact Us</a>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="copyR text-center pt-3">
+                &copy; 2024 - DriveHub. All Rights Reserved.
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

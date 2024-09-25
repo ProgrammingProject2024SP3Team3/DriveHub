@@ -4,6 +4,7 @@ html {
   position: relative;
   min-height: 100%;
   scroll-behavior: smooth; /* Smooth scrolling for better UX */
+  margin: 0;
 }
 
 @media (min-width: 768px) {
@@ -17,10 +18,14 @@ body {
   line-height: 1.6; /* Improve readability with comfortable line spacing */
   font-family: 'Roboto', sans-serif; /* Consistent font family across the app */
   color: #343a40; /* Text color for readability */
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 main{
   padding: 20px;
+  flex-grow: 1;
 }
 
 /* Universal Box Sizing */
@@ -92,3 +97,6 @@ a:hover {
   padding: 0 15px;
 }
 
+footer {
+  margin-top: auto;
+}
