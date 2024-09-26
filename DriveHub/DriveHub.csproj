@@ -28,6 +28,7 @@
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.5" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
 		<PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -35,6 +36,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Update="Views\Bookings\Create.cshtml">
+		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
 		<Content Update="wwwroot\favicon.ico">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
