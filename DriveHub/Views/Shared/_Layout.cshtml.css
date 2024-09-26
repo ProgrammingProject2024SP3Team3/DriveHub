@@ -38,7 +38,6 @@ for details on configuring this project to bundle and minify static web assets. 
   margin: 20px;
 }
 
-
 /* Add smooth hover effect to list item */
 .navbar-nav .nav-item:hover {
   background-color: #00A8E8;
@@ -78,20 +77,6 @@ for details on configuring this project to bundle and minify static web assets. 
 .navbar-toggler {
   border:#00A8E8;
 }
-
-/* Navbar button colors */
-.btn-primary {
-  background-color: #00A8E8;
-  border-color: #00A8E8;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-  background-color: #1470b5;
-  border-color: #1470b5;
-}
-
 
 /* Footer Styles */
 .footer {
