@@ -1,22 +1,102 @@
+/* Global Font Settings */
 html {
-  font-size: 14px;
+  font-size: 14px; /* Base font size for small screens */
+  position: relative;
+  min-height: 100%;
+  scroll-behavior: smooth; /* Smooth scrolling for better UX */
+  margin: 0;
 }
 
 @media (min-width: 768px) {
   html {
-    font-size: 16px;
+    font-size: 16px; /* Larger font size for bigger screens */
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* Body and Layout */
 body {
-  margin-bottom: 60px;
+  line-height: 1.6; /* Improve readability with comfortable line spacing */
+  font-family: 'Roboto', sans-serif; /* Consistent font family across the app */
+  color: #343a40; /* Text color for readability */
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+main{
+  padding: 20px;
+  flex-grow: 1;
+}
+
+/* Universal Box Sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 5px; /* Consistent button shape */
+  padding: 10px 20px; /* Comfortable button size */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for hover and focus */
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb; /* Focus shadow for accessibility */
+}
+
+/* Form Controls */
+.form-control {
+  border-radius: 5px; /* Consistent rounded corners */
+  padding: 0.5rem; /* Comfortable padding */
+  border: 1px solid #ced4da; /* Subtle border for inputs */
+  transition: box-shadow 0.3s ease, border-color 0.3s ease; /* Smooth transitions */
+}
+
+.form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb; /* Focus state */
+}
+
+/* Custom Table Styles */
+.table {
+  margin-bottom: 1rem;
+  color: #212529;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 168, 232, 0.075); /* Light hover effect on rows */
+}
+
+/* Media Queries for Responsive Layout */
+@media (max-width: 768px) {
+  .container, .main-content {
+    padding-top: 90px; /* Adjust padding for smaller screens */
+  }
+
+  .btn {
+    padding: 8px 16px; /* Smaller padding for mobile buttons */
+  }
+}
+
+/* Links */
+a {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.2s ease; /* Smooth hover transition */
+}
+
+a:hover {
+  color: #0056b3; /* Slightly darker blue on hover */
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+footer {
+  margin-top: auto;
 }
