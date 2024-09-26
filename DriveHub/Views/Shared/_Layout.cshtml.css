@@ -3,132 +3,127 @@ for details on configuring this project to bundle and minify static web assets. 
 
 /* Styling for the Drive part */
 .navbar-brand .drive-text {
-  font-size: 2.5rem; /* Font size for "Drive" */
-  font-weight: bold; /* Bold for emphasis */
-  color: #00A8E8; /* Custom color for "Drive" */
-  font-family: "Protest Guerrilla", sans-serif;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-left: 1rem;
+    font-size: 2.5rem; /* Font size for "Drive" */
+    font-weight: bold; /* Bold for emphasis */
+    color: #00A8E8; /* Custom color for "Drive" */
+    font-family: "Protest Guerrilla", sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 1rem;
 }
 
 /* Styling for the Hub part */
 .navbar-brand .hub-text {
-  font-size: 2.5rem; /* Font size for "Hub" */
-  font-weight: bold;
-  color: #ffb300; /* Custom color for "Hub" */
-  font-family: 'Roboto', sans-serif; 
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-left: -0.2rem;
+    font-size: 2.5rem; /* Font size for "Hub" */
+    font-weight: bold;
+    color: #ffb300; /* Custom color for "Hub" */
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: -0.2rem;
 }
 
-/* Hover effects */
-.navbar-brand .drive-text:hover,
-.navbar-brand .hub-text:hover {
-  color: #1470b5;
-}
+    /* Hover effects */
+    .navbar-brand .drive-text:hover,
+    .navbar-brand .hub-text:hover {
+        color: #1470b5;
+    }
 
 /* Style for the nav links */
 .navbar-nav .nav-item {
-  font-size: 1.1rem;
-  font-weight: 500; 
-  padding: 0.75rem; /* Padding around the links */
-  transition: color 0.3s ease, text-decoration 0.3s ease; /* Smooth transition */
-  margin: 20px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 0.75rem; /* Padding around the links */
+    transition: color 0.3s ease, text-decoration 0.3s ease; /* Smooth transition */
+    margin: 20px;
 }
 
-/* Add smooth hover effect to list item */
-.navbar-nav .nav-item:hover {
-  background-color: #00A8E8;
-  border-radius: 5px; /* Optional rounded corners for the hover effect */
-  transition: color 0.3s ease, text-decoration 0.3s ease;
-}
+    /* Add smooth hover effect to list item */
+    .navbar-nav .nav-item:hover {
+        background-color: #00A8E8;
+        border-radius: 5px; /* Optional rounded corners for the hover effect */
+        transition: color 0.3s ease, text-decoration 0.3s ease;
+    }
 
 /* Media query for devices with max width of 768px (tablets and smaller) */
 @media (max-width: 768px) {
-  .navbar-nav .nav-item {
-    font-size: 1rem; 
-    margin: 10px; 
-    padding: 0.5rem;
-  }
+    .navbar-nav .nav-item {
+        font-size: 1rem;
+        margin: 10px;
+        padding: 0.5rem;
+    }
 
-  /* Add hover effect for smaller devices */
-  .navbar-nav .nav-item:hover {
-    background-color: #00A8E8; 
-    background-color: transparent; 
-  }
+        /* Add hover effect for smaller devices */
+        .navbar-nav .nav-item:hover {
+            background-color: #00A8E8;
+            background-color: transparent;
+        }
 }
 
 /* Media query for very small devices (max-width: 576px, such as small phones) */
 @media (max-width: 576px) {
-  .navbar-nav .nav-item {
-    font-size: 0.9rem; 
-    margin: 5px; 
-    padding: 0.5rem;
-  }
-  .navbar-nav .nav-item:hover {
-    background-color: #00A8E8;
-    background-color: transparent;
-  }
+    .navbar-nav .nav-item {
+        font-size: 0.9rem;
+        margin: 5px;
+        padding: 0.5rem;
+    }
+
+        .navbar-nav .nav-item:hover {
+            background-color: #00A8E8;
+            background-color: transparent;
+        }
 }
 
 /* Mobile toggle button */
 .navbar-toggler {
-  border:#00A8E8;
+    border: #00A8E8;
 }
 
 /* Footer Styles */
 .footer {
-  background-color: #343a40;
-  color: white;
-  padding: 20px 0;
-  width: 100%;
-  position:static;
-  bottom: 0;
+    background-color: #343a40;
+    color: white;
+    padding: 20px 0;
+    width: 100%;
+    position: static;
+    bottom: 0;
 }
 
-.footer h5 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
+    .footer h5 {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
 
-.footer a {
-  color: white;
-  text-decoration: none;
-}
+    .footer a {
+        color: white;
+        text-decoration: none;
+    }
 
-.footer a:hover {
-  color: #00A8E8 !important; /* Change color on hover */
-}
+        .footer a:hover {
+            color: #00A8E8 !important;
+        }
 
-.footer .bi {
-  font-size: 1.5rem; /* Icon size */
-  margin-right: 1rem;
-}
+    .footer .bi {
+        font-size: 1.5rem; /* Icon size */
+        margin-right: 1rem;
+    }
 
-.footer .copyR {
-  border-top: 1px solid #e5e5e5;
-  margin-top: 20px;
-  padding-top: 15px;
-  font-size: 0.9rem;
-}
+    .footer .copyR {
+        border-top: 1px solid #e5e5e5;
+        margin-top: 20px;
+        padding-top: 15px;
+        font-size: 0.9rem;
+    }
 
-/* Footer social icon hover effect */
-.footer a i {
-  font-size: 1.5rem; /* Set icon size */
-  transition: color 0.3s ease, background-color 0.3s ease; /* Add smooth transition */
-}
-
-/* Hover effect for social media icons */
-.footer .socialmedia:hover i {
-  color: #00A8E8; /* Change icon color on hover */
-  padding: 5px;
-}
+    /* Footer social icon hover effect */
+    .footer a i {
+        font-size: 1.5rem; /* Set icon size */
+        transition: color 0.3s ease, background-color 0.3s ease; /* Add smooth transition */
+    }
 
 @media (max-width: 768px) {
-  .footer .text-lg-end {
-      text-align: left !important;
-  }
+    .footer .text-lg-end {
+        text-align: left !important;
+    }
 }
