@@ -6,13 +6,19 @@ using Microsoft.Extensions.Azure;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var adminString = builder.Configuration.GetConnectionString("AdminConnection") ?? throw new InvalidOperationException("Connection string 'AdminConnection' not found.");
+var applicationString = builder.Configuration.GetConnectionString("ApplicationConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationConnection' not found.");
+
+builder.Services.AddDbContext<AdminDbContext>(options =>
+    options.UseSqlServer(adminString));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(applicationString, x => x.UseNetTopologySuite()));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<AdminDbContext>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAzureClients(clientBuilder =>
 {
@@ -27,6 +33,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
 }
+
 else
 {
     app.UseExceptionHandler("/Home/Error");
