@@ -1,6 +1,3 @@
-
-
-
 /* Hero Section */
 .hero-section {
     position: relative;
@@ -28,8 +25,6 @@
     position: relative;
     z-index: 1; /* Ensure content is above the overlay */
 }
-
-
 
 .hero-heading {
     color: white;
@@ -148,7 +143,6 @@
     z-index: 1;
 }
 
-
 /* Custom overlay effect */
 .call-to-action::before {
     content: "";
@@ -181,7 +175,6 @@
     border-radius: 0.25rem; /* Matching border radius */
     border: none;
 }
-
 
 /* Responsive adjustments */
 @media (min-width: 768px) {

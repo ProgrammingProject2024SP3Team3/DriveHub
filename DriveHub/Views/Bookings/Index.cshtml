@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Bookings";
+}
+
+<style>
+    a.booking-link :hover {
+        background-color: lightgray;
+    }
+</style>
+
+<h1 class="mb-6">Bookings</h1>
+
+<div class="row mt-6 text-center">
+    <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="Create">
+        <div>
+            <i class="bi bi-calendar-plus" style="color:#00A8E8; font-size:100px"></i>
+            <h3 class="service-heading">Book a Car</h3>
+        </div>
+    </a>
+    <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="CurrentBookings">
+        <div>
+            <i class="bi bi-calendar-check" style="color:#00A8E8; font-size:100px"></i>
+            <h3 class="service-heading">Your current bookings</h3>
+        </div>
+    </a>
+    <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="PastBookings">
+        <div>
+            <i class="bi bi-calendar-week" style="color:#00A8E8; font-size:100px"></i>
+            <h3 class="service-heading">Your previous bookings</h3>
+        </div>
+    </a>
+</div>
