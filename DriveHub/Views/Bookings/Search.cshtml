@@ -1,0 +1,156 @@
+@{
+    ViewData["Title"] = "Let's find a car";
+}
+
+<style>
+    .car-item {
+        padding: 10px;
+        background-color: #f8f9fa;
+        margin-bottom: 10px;
+    }
+</style>
+<h1 class="mb-6">Booking Search</h1>
+
+<p>Select a location and time to show available cars.</p>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <form>
+            <div class="mb-3">
+                <label for="pac-input" class="form-label">Location</label>
+                <input id="pac-input" class="controls w-100 form-control" type="text" placeholder="Location" />
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="bookingDate" class="form-label">Booking Start</label>
+                    <input type="date" class="form-control" id="bookingDate" value="2024-10-01">
+                </div>
+                <div class="col">
+                    <label for="bookingTime" class="form-label">&nbsp;</label>
+                    <input type="time" class="form-control" id="bookingTime" value="13:30">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="typeSelect" class="form-label">Car Type</label>
+                <select class="form-select" id="typeSelect">
+                    <option selected>Any</option>
+                    <option value="1">Sedan</option>
+                    <option value="2">SUV</option>
+                    <option value="3">Hatchback</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    <div class=" col-md-9">
+        <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>
+    </div>
+</div>
+
+<div class="car-list">
+    <div class="car-item d-flex align-items-center">
+        <div class="car-icon me-3">🚗</div>
+        <div>
+            <p class="mb-0"><strong>1 Mins away at 11 Main Rd, Melbourne CBD</strong></p>
+            <p class="mb-0">Terry the Tesla Model 3</p>
+        </div>
+        <a class="btn btn-primary ms-auto" href="/Booking/Create">></a>
+    </div>
+    <div class="car-item d-flex align-items-center">
+        <div class="car-icon me-3">🚗</div>
+        <div>
+            <p class="mb-0"><strong>5 Mins away at 1 Side Rd, Melbourne CBD</strong></p>
+            <p class="mb-0">Suzi the Suzuki Hatch</p>
+        </div>
+        <a class="btn btn-primary ms-auto" href="/Booking/Create">></a>
+    </div>
+    <div class="car-item d-flex align-items-center">
+        <div class="car-icon me-3">🚗</div>
+        <div>
+            <p class="mb-0"><strong>15 Mins away at 101 James St, Mulberry</strong></p>
+            <p class="mb-0">Tony the Toyota Celica</p>
+        </div>
+        <a class="btn btn-primary ms-auto" href="/Booking/Create">></a>
+    </div>
+    <div class="car-item d-flex align-items-center">
+        <div class="car-icon me-3">🚗</div>
+        <div>
+            <p class="mb-0"><strong>16 Mins away at 17 Frank St, Guilford</strong></p>
+            <p class="mb-0">Harrold the Holden</p>
+        </div>
+        <a class="btn btn-primary ms-auto" href="/Booking/Create">></a>
+    </div>
+</div>
+
+<script>
+    const cars = [
+        { name: "Tim the Tesla", lat: -37.8167399, long: 144.9612497 },
+        { name: "Tony the Tesla", lat: -37.8073874, long: 144.974175 },
+        { name: "Marco the Mazda", lat: -37.8195234, long: 144.9668658 },
+        { name: "Terry the Toyota", lat: -37.8066475, long: 144.9647881 },
+        { name: "Bob the BYD", lat: -37.7981268, long: 144.9513347 }
+    ];
+
+    function initAutocomplete() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: -37.8083331, lng: 144.9639386 },
+            zoom: 13,
+            mapTypeId: "roadmap",
+        });
+        // Create the search box and link it to the UI element.
+        const input = document.getElementById("pac-input");
+        const searchBox = new google.maps.places.SearchBox(input);
+
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener("bounds_changed", () => {
+            searchBox.setBounds(map.getBounds());
+        });
+
+        // Add all pods and cars as markers
+        for (let car of cars) {
+            let marker = new google.maps.Marker({
+                map,
+                title: car.name,
+                position: { lat: car.lat, lng: car.long },
+            })
+            const infowindow = new google.maps.InfoWindow({
+                content: `<strong>${car.name}</strong><br><a href="/Booking/Create">Book</a>`,
+            });
+
+            marker.addListener("click", () => {
+                infowindow.open(map, marker);
+            });
+        }
+
+        // Respond to user searches and move the map there
+        searchBox.addListener("places_changed", () => {
+            const places = searchBox.getPlaces();
+
+            if (places.length == 0) {
+                return;
+            }
+
+            const bounds = new google.maps.LatLngBounds();
+            console.log(places);
+
+            places.forEach((place) => {
+                if (!place.geometry || !place.geometry.location) {
+                    console.log("Returned place contains no geometry");
+                    return;
+                }
+
+                if (place.geometry.viewport) {
+                    // Only geocodes have viewport.
+                    bounds.union(place.geometry.viewport);
+                } else {
+                    bounds.extend(place.geometry.location);
+                }
+            });
+            map.fitBounds(bounds);
+        });
+    }
+
+    window.initAutocomplete = initAutocomplete;
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAutocomplete&libraries=places&v=weekly&loading=async"
+        defer></script>
