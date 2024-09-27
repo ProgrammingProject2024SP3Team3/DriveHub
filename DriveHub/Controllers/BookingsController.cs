@@ -21,6 +21,11 @@ namespace DriveHub.Controllers
             return View();
         }
 
+        public IActionResult Search()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> CurrentBookings()
         {
             var applicationDbContext = _context.Bookings.Include(b => b.ApplicationUser).Include(b => b.Vehicle);
