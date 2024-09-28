@@ -1,5 +1,7 @@
 ﻿using DriveHubModel;
+using CsvHelper;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace DriveHub.Data
 {
@@ -9,39 +11,70 @@ namespace DriveHub.Data
         {
             var context = services.GetRequiredService<ApplicationDbContext>();
             context.Database.Migrate();
+
             var scope = services.CreateScope();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-            if (context.Vehicles.Any()) { return; }
+            if (context.Users.Any()) { return; }
 
-            // TODO Write seed data method
+            foreach (var vehicleRate in GetVehicleRates())
+            {
+                context.Add(vehicleRate);
+            }
+            context.SaveChanges();
+
+            foreach (var vehicle in GetVehicles())
+            {
+                context.Add(vehicle);
+            }
+            context.SaveChanges();
         }
 
-        private static ICollection<Vehicle> GetVehicles()
+        private static IList<VehicleRate> GetVehicleRates()
+        {
+            IList<VehicleRate> vehicleRates;
+            using (var reader = new StreamReader($"{Directory.GetCurrentDirectory()}/Data/VehicleRates.csv"))
+            using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
+            {
+                vehicleRates = csv.GetRecords<VehicleRate>().ToList();
+                reader.Close();
+            }
+
+            return vehicleRates;
+        }
+
+        private static IList<Vehicle> GetVehicles()
+        {
+            IList<Vehicle> vehicles;
+            using (var reader = new StreamReader($@"{Directory.GetCurrentDirectory()}/Data/Vehicles.csv"))
+            using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
+            {
+                vehicles = csv.GetRecords<Vehicle>().ToList();
+                reader.Close();
+            }
+
+            return vehicles ?? throw new AggregateException("Unable to contact web service");
+        }
+
+        private static IList<Site> GetSites()
         {
             // TODO Write get data from csv method
             throw new NotImplementedException();
         }
 
-        private static ICollection<VehicleRate> GetVehicleRates()
+        private static IList<Pod> GetPods()
         {
             // TODO Write get data from csv method
             throw new NotImplementedException();
         }
 
-        private static ICollection<Site> GetSites()
+        private static IList<ApplicationUser> GetUsers()
         {
             // TODO Write get data from csv method
             throw new NotImplementedException();
         }
 
-        private static ICollection<Pod> GetPods()
-        {
-            // TODO Write get data from csv method
-            throw new NotImplementedException();
-        }
-
-        private static ICollection<ApplicationUser> GetUsers()
+        private static IList<Booking> GetBookings()
         {
             // TODO Write get data from csv method
             throw new NotImplementedException();

@@ -20,7 +20,7 @@ namespace DriveHubModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public required string VehicleRateId { get; set; }
+        public string VehicleRateId { get; set; }
 
         [Required]
         public string Description { get; set; }

@@ -25,6 +25,7 @@ namespace DriveHubModel
         public string VehicleId { get; set; }
 
         [ForeignKey("VehicleRate")]
+        [DisplayName("Rate")]
         [Required]
         public string VehicleRateId { get; set; }
 
@@ -42,10 +43,16 @@ namespace DriveHubModel
         public string State { get; set; }
 
         [Required]
-        public int Year { get; set; }
+        public string Year { get; set; }
 
         [Required]
         public int Seats { get; set; }
+
+        [Required]
+        public string Colour { get; set; }
+
+        [Required]
+        public string Name { get; set; }
 
         [JsonIgnore]
         public virtual VehicleRate VehicleRate { get; set; }
