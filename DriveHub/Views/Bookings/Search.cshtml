@@ -1,5 +1,23 @@
+@using System.Text.Json
 @{
     ViewData["Title"] = "Let's find a car";
+
+    // Mock Object of all sites, their pods, and what cars are currently rentable
+    if (ViewData["SearchData"] == null) {
+        ViewData["SearchData"] = new {
+            Sites = new[] {
+                new { SiteName = "RMIT Snooze Lounge", Address = "445 SWANSTON ST", City = "MELBOURNE", Location = new {longitude = 144.96297733436015, latitude = -37.808207787152966}, Cars = new[] {
+                    new { VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545", Make = "Tesla", Model = "Model Y", Name = "The Silver Bullet", Seats = 5 },
+                    new { VehicleId = "0fbbd18e-bd5b-4f99-a00b-29533d26c3ad", Make = "Toyota", Model = "RAV4", Name = "Thunderbolt", Seats = 5 },
+                    new { VehicleId = "0e1769a3-c277-462f-a448-830b76328285", Make = "Toyota", Model = "Hilux", Name = "Vroominator", Seats = 2 }
+                }},
+                new { SiteName = "United Petroleum West Gate North", Address = "2 WEST GATE FREEWAY", City = "PORT MELBOURNE", Location = new {longitude = 144.95097561347418, latitude = -37.81833347027388}, Cars = new[] {
+                    new { VehicleId = "36d4bc1e-6159-46df-ad98-da93a38bcc82", Make = "Toyota", Model = "Hilux", Name = "Shadow Cruiser", Seats = 2 },
+                    new { VehicleId = "417b7216-6148-4a40-9458-99db17987790", Make = "Hyundai", Model = "i30", Name = "Stealth Rocket", Seats = 5 }
+                }}
+            }
+        };
+    }
 }
 
 <style>
@@ -20,24 +38,13 @@
                 <label for="pac-input" class="form-label">Location</label>
                 <input id="pac-input" class="controls w-100 form-control" type="text" placeholder="Location" />
             </div>
-            <div class="row mb-3">
-                <div class="col">
-                    <label for="bookingDate" class="form-label">Booking Start</label>
-                    <input type="date" class="form-control" id="bookingDate" value="2024-10-01">
-                </div>
-                <div class="col">
-                    <label for="bookingTime" class="form-label">&nbsp;</label>
-                    <input type="time" class="form-control" id="bookingTime" value="13:30">
-                </div>
-            </div>
 
             <div class="mb-3">
-                <label for="typeSelect" class="form-label">Car Type</label>
-                <select class="form-select" id="typeSelect">
+                <label for="seatCountSelect" class="form-label">Number of Seats</label>
+                <select class="form-select" id="seatCountSelect">
                     <option selected>Any</option>
-                    <option value="1">Sedan</option>
-                    <option value="2">SUV</option>
-                    <option value="3">Hatchback</option>
+                    <option value="2">2</option>
+                    <option value="5">5</option>
                 </select>
             </div>
         </form>
@@ -83,6 +90,7 @@
 </div>
 
 <script>
+    var searchData = @Html.Raw(JsonSerializer.Serialize(ViewData["SearchData"]));
     const cars = [
         { name: "Tim the Tesla", lat: -37.8167399, long: 144.9612497 },
         { name: "Tony the Tesla", lat: -37.8073874, long: 144.974175 },
@@ -96,6 +104,7 @@
             center: { lat: -37.8083331, lng: 144.9639386 },
             zoom: 13,
             mapTypeId: "roadmap",
+            mapId: "DRIVEHUB_MAP"
         });
         // Create the search box and link it to the UI element.
         const input = document.getElementById("pac-input");
@@ -107,19 +116,27 @@
         });
 
         // Add all pods and cars as markers
-        for (let car of cars) {
-            let marker = new google.maps.Marker({
+        for (let site of searchData.Sites) {
+            const marker = new google.maps.marker.AdvancedMarkerElement({
                 map,
-                title: car.name,
-                position: { lat: car.lat, lng: car.long },
+                title: site.SiteName,
+                position: { lat: site.Location.latitude, lng: site.Location.longitude }
+            });
+
+            console.log(site)
+            @* let marker = new google.maps.Marker({
+                map,
+                title: site.SiteName,
+                position: { lat: site.Location.latitude, lng: site.Location.longitude },
             })
+
             const infowindow = new google.maps.InfoWindow({
-                content: `<strong>${car.name}</strong><br><a href="/Booking/Create">Book</a>`,
+                content: `<strong>${site.name}</strong><br><a href="/Booking/Create">Book</a>`,
             });
 
             marker.addListener("click", () => {
                 infowindow.open(map, marker);
-            });
+            }); *@
         }
 
         // Respond to user searches and move the map there
@@ -152,5 +169,9 @@
 
     window.initAutocomplete = initAutocomplete;
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAutocomplete&libraries=places&v=weekly&loading=async"
-        defer></script>
+<script
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAutocomplete&v=weekly&libraries=marker,places&loading=async"
+defer
+></script>
+@* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAutocomplete&libraries=places&v=weekly&loading=async&libraries=marker&libraries=places"
+        defer></script> *@
