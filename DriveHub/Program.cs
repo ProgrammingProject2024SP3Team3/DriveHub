@@ -26,10 +26,25 @@ builder.Services.AddAzureClients(clientBuilder =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline and seed data if required
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
+
+    // Populate database with seed data
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            SeedData.Initialize(services);
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error has occurred while seeding the database.");
+        }
+    }
 }
 else
 {
@@ -38,20 +53,7 @@ else
     app.UseHsts();
 }
 
-// Populate database with seed data
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        SeedData.Initialize(services);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error has occurred while seeding the database.");
-    }
-}
+
 
 // Localise to AU
 app.UseRequestLocalization(new RequestLocalizationOptions
