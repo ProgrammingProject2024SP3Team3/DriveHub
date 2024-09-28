@@ -1,0 +1,11 @@
+VehicleID,Make,Model,Year,Type,Doors,Colour,Registration,State,Nickname
+236d7fac-7e6f-4856-9203-de65bc9e7545,Tesla,Model Y,2022,SUV,5,Silver,SLV001,VIC,The Silver Bullet
+4e0f6bb8-4835-4960-87ab-b89e21c78ab4,Tesla,Model Y,2023,SUV,5,Red,WAR001,VIC,Road Warrior
+0fbbd18e-bd5b-4f99-a00b-29533d26c3ad,Toyota,RAV4,2019,SUV,5,Blue,THU001,VIC,Thunderbolt
+5780bc06-a5e2-4598-9eea-7cb90b55e169,Toyota,RAV4,2021,SUV,5,White,RDR001,VIC,Night Rider
+0e1769a3-c277-462f-a448-830b76328285,Toyota,HiLux,2019,Ute,2,White,VRM001,VIC,Vroominator
+36d4bc1e-6159-46df-ad98-da93a38bcc82,Toyota,HiLux,2024,Ute,2,White,CRS001,VIC,Shadow Cruiser
+eeb7b72c-b362-4513-b84b-baa954c83ce0,Mazda,CX-5,2023,SUV,5,Red,MCS001,VIC,Lightning McSpeed
+3685eb7e-7cdc-4c5e-8980-a85ecaf62023,Mazda,CX-5,2019,SUV,5,Blue,BRN001,VIC,Blaze Runner
+417b7216-6148-4a40-9458-99db17987790,Hyundai,i30,2022,Hatch,3,Black,STH001,VIC,Stealth Rocket
+cac6a77c-59fd-4d0e-b557-9a3230a79e9a,Hyundai,i30,2023,Hatch,3,Silver,STA001,VIC,Iron Stallion
