@@ -35,4 +35,8 @@
 		<ProjectReference Include="..\DriveHubModel\DriveHubModel.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Migrations\ApplicationDb\" />
+	</ItemGroup>
+
 </Project>
