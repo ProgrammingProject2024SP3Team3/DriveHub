@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace DriveHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240926050751_Initial")]
+    [Migration("20240929043112_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -158,11 +158,19 @@ namespace DriveHub.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Colour")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Make")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -181,8 +189,9 @@ namespace DriveHub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
+                    b.Property<string>("Year")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VehicleId");
 

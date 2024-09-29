@@ -27,7 +27,6 @@ namespace DriveHubModel
         [Required]
         public int SiteId { get; set; }
 
-
         [ForeignKey("Vehicle")]
         [MaybeNull]
         public string? VehicleId { get; set; }

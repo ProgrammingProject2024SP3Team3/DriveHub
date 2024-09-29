@@ -48,6 +48,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Data\SeedData\" />
 		<Folder Include="Migrations\" />
 	</ItemGroup>
 

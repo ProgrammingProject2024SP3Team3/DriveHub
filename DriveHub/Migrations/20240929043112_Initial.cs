@@ -199,8 +199,10 @@ namespace DriveHub.Migrations
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RegistrationPlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Seats = table.Column<int>(type: "int", nullable: false)
+                    Year = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Seats = table.Column<int>(type: "int", nullable: false),
+                    Colour = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
