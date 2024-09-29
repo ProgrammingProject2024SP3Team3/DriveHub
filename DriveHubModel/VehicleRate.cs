@@ -12,15 +12,32 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
     public class VehicleRate
     {
+        public VehicleRate() { }
+
+        [SetsRequiredMembers]
+        public VehicleRate(
+            string vehicleRateId,
+            string description,
+            decimal pricePerHour,
+            DateTime effectiveDate
+            )
+        {
+            VehicleRateId = vehicleRateId;
+            Description = description;
+            PricePerHour = pricePerHour;
+            EffectiveDate = effectiveDate;
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public required string VehicleRateId { get; set; }
+        public string VehicleRateId { get; set; }
 
         [Required]
         public string Description { get; set; }

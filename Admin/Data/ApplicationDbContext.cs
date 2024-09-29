@@ -34,9 +34,9 @@ namespace Admin.Data
                 .HasKey(c => c.VehicleRateId);
 
             // Set "geography" column type for spatial data in the Site entity
-            modelBuilder.Entity<Site>()
-               .Property(l => l.Location)
-               .HasColumnType("geography");
+            //modelBuilder.Entity<Site>()
+            //   .Property(l => l.Location)
+            //   .HasColumnType("geography");
 
             // Define relationships
             modelBuilder.Entity<Site>()

@@ -18,6 +18,21 @@ namespace DriveHubModel
 {
     public class Pod
     {
+        public Pod() { }
+
+        [SetsRequiredMembers]
+        public Pod(
+            string podId,
+            int siteId,
+            string? vehicleId,
+            string podName)
+        {
+            PodId = podId;
+            SiteId = siteId;
+            VehicleId = vehicleId;
+            PodName = podName;
+        }
+
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,7 +41,6 @@ namespace DriveHubModel
         [ForeignKey("Site")]
         [Required]
         public int SiteId { get; set; }
-
 
         [ForeignKey("Vehicle")]
         [MaybeNull]

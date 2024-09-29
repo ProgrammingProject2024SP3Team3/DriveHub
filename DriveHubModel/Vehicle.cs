@@ -11,20 +11,51 @@
  * as assessment work for COSC2650 Programming Project
  */
 
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
     public class Vehicle
     {
+        public Vehicle() { }
+
+        [SetsRequiredMembers]
+        public Vehicle(
+            string vehicleId,
+            string vehicleRateId,
+            string make,
+            string model,
+            string registrationPlate,
+            string state,
+            string year,
+            int seats,
+            string colour,
+            string name
+            )
+        {
+            VehicleId = vehicleId;
+            VehicleRateId = vehicleRateId;
+            Make = make;
+            Model = model;
+            RegistrationPlate = registrationPlate;
+            State = state;
+            Year = year;
+            Seats = seats;
+            Colour = colour;
+            Name = name;
+        }
+         
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VehicleId { get; set; }
 
         [ForeignKey("VehicleRate")]
+        [DisplayName("Rate")]
         [Required]
         public string VehicleRateId { get; set; }
 
@@ -42,10 +73,16 @@ namespace DriveHubModel
         public string State { get; set; }
 
         [Required]
-        public int Year { get; set; }
+        public string Year { get; set; }
 
         [Required]
         public int Seats { get; set; }
+
+        [Required]
+        public string Colour { get; set; }
+
+        [Required]
+        public string Name { get; set; }
 
         [JsonIgnore]
         public virtual VehicleRate VehicleRate { get; set; }

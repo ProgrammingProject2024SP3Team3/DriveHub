@@ -13,6 +13,7 @@
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.22.0" />
 		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.20.0" />
 		<PackageReference Include="Azure.Storage.Queues" Version="12.20.0" />
+		<PackageReference Include="CsvHelper" Version="33.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.8" />
@@ -47,7 +48,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Migrations\" />
+		<Folder Include="Data\SeedData\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Data\Pods.csv">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Data\Sites.csv">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Data\VehicleRates.csv">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Data\Vehicles.csv">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>
