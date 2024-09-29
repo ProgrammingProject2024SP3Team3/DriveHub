@@ -21,22 +21,22 @@ namespace DriveHub.Controllers
             return View();
         }
 
-        public IActionResult Search()
+        public async Task<IActionResult> Search()
         {
-            var applicationDbContext = _context.Pods.Include(c => c.Vehicle).Include(c => c.Site).ToList();
+            var applicationDbContext = await _context.Pods.Include(c => c.Vehicle).Include(c => c.Site).ToListAsync();
             return View(applicationDbContext);
         }
 
         public async Task<IActionResult> CurrentBookings()
         {
-            var applicationDbContext = _context.Bookings.Include(b => b.ApplicationUser).Include(b => b.Vehicle);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = await _context.Bookings.Include(b => b.ApplicationUser).Include(b => b.Vehicle).ToListAsync();
+            return View(applicationDbContext);
         }
 
         public async Task<IActionResult> PastBookings()
         {
-            var applicationDbContext = _context.Bookings.Include(b => b.ApplicationUser).Include(b => b.Vehicle);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = await _context.Bookings.Include(b => b.ApplicationUser).Include(b => b.Vehicle).ToListAsync();
+            return View(applicationDbContext);
         }
 
         // GET: Bookings/Details/5
