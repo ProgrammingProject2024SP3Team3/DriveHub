@@ -23,7 +23,8 @@ namespace DriveHub.Controllers
 
         public IActionResult Search()
         {
-            return View();
+            var applicationDbContext = _context.Pods.Include(c => c.Vehicle).Include(c => c.Site).ToListAsync();
+            return View(applicationDbContext);
         }
 
         public async Task<IActionResult> CurrentBookings()
