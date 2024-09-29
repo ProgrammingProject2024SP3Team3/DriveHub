@@ -88,6 +88,9 @@ namespace DriveHubModel
         public virtual VehicleRate VehicleRate { get; set; }
 
         [JsonIgnore]
+        public virtual Pod Pod { get; set; }
+
+        [JsonIgnore]
         public virtual IList<Booking> Bookings { get; set; } = new List<Booking>();
     }
 }

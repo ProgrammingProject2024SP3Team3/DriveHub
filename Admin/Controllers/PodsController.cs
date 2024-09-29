@@ -86,7 +86,7 @@ namespace Admin.Controllers
                 return NotFound();
             }
             ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName", pod.SiteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", pod.VehicleId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles.Where(c => c.Pod == null), "VehicleId", "Name", pod.VehicleId);
             return View(pod);
         }
 

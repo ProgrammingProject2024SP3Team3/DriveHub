@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Admin.Data;
@@ -22,7 +18,7 @@ namespace Admin.Controllers
         // GET: Vehicles
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Vehicles.Include(v => v.VehicleRate);
+            var applicationDbContext = _context.Vehicles.Include(v => v.VehicleRate).Include(v => v.Pod);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -36,6 +32,7 @@ namespace Admin.Controllers
 
             var vehicle = await _context.Vehicles
                 .Include(v => v.VehicleRate)
+                .Include(v => v.Pod)
                 .FirstOrDefaultAsync(m => m.VehicleId == id);
             if (vehicle == null)
             {
@@ -48,7 +45,7 @@ namespace Admin.Controllers
         // GET: Vehicles/Create
         public IActionResult Create()
         {
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "VehicleRateId");
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description");
             return View();
         }
 
@@ -65,7 +62,7 @@ namespace Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "VehicleRateId", vehicle.VehicleRateId);
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description", vehicle.VehicleRateId);
             return View(vehicle);
         }
 
@@ -82,7 +79,7 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "VehicleRateId", vehicle.VehicleRateId);
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description", vehicle.VehicleRateId);
             return View(vehicle);
         }
 
