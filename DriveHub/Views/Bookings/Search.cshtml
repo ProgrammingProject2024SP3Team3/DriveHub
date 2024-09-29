@@ -7,13 +7,13 @@
         ViewData["SearchData"] = new {
             Sites = new[] {
                 new { SiteName = "RMIT Snooze Lounge", Address = "445 SWANSTON ST", City = "MELBOURNE", Location = new {longitude = 144.96297733436015, latitude = -37.808207787152966}, Cars = new[] {
-                    new { VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545", Make = "Tesla", Model = "Model Y", Name = "The Silver Bullet", Seats = 5 },
-                    new { VehicleId = "0fbbd18e-bd5b-4f99-a00b-29533d26c3ad", Make = "Toyota", Model = "RAV4", Name = "Thunderbolt", Seats = 5 },
-                    new { VehicleId = "0e1769a3-c277-462f-a448-830b76328285", Make = "Toyota", Model = "Hilux", Name = "Vroominator", Seats = 2 }
+                    new { VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545", Make = "Tesla", Model = "Model Y", Name = "The Silver Bullet", Seats = 5, Rate = 20.5 },
+                    new { VehicleId = "0fbbd18e-bd5b-4f99-a00b-29533d26c3ad", Make = "Toyota", Model = "RAV4", Name = "Thunderbolt", Seats = 5, Rate = 27.5 },
+                    new { VehicleId = "0e1769a3-c277-462f-a448-830b76328285", Make = "Toyota", Model = "Hilux", Name = "Vroominator", Seats = 2, Rate = 25.0 }
                 }},
                 new { SiteName = "United Petroleum West Gate North", Address = "2 WEST GATE FREEWAY", City = "PORT MELBOURNE", Location = new {longitude = 144.95097561347418, latitude = -37.81833347027388}, Cars = new[] {
-                    new { VehicleId = "36d4bc1e-6159-46df-ad98-da93a38bcc82", Make = "Toyota", Model = "Hilux", Name = "Shadow Cruiser", Seats = 2 },
-                    new { VehicleId = "417b7216-6148-4a40-9458-99db17987790", Make = "Hyundai", Model = "i30", Name = "Stealth Rocket", Seats = 5 }
+                    new { VehicleId = "36d4bc1e-6159-46df-ad98-da93a38bcc82", Make = "Toyota", Model = "Hilux", Name = "Shadow Cruiser", Seats = 2, Rate = 20.5 },
+                    new { VehicleId = "417b7216-6148-4a40-9458-99db17987790", Make = "Hyundai", Model = "i30", Name = "Stealth Rocket", Seats = 5, Rate = 20.0 }
                 }}
             }
         };
@@ -27,9 +27,9 @@
         margin-bottom: 10px;
     }
 </style>
-<h1 class="mb-6">Booking Search</h1>
+<h1 class="mb-6 text-center">Booking Search</h1>
 
-<p>Select a location and time to show available cars.</p>
+<p class="text-center">Select a location and time to show available cars.</p>
 
 <div class="row mb-3">
     <div class="col-md-3">
@@ -42,7 +42,7 @@
             <div class="mb-3">
                 <label for="seatCountSelect" class="form-label">Number of Seats</label>
                 <select class="form-select" id="seatCountSelect">
-                    <option selected>Any</option>
+                    <option value ="any" selected>Any</option>
                     <option value="2">2</option>
                     <option value="5">5</option>
                 </select>
@@ -90,64 +90,74 @@
 </div>
 
 <script>
-    var searchData = @Html.Raw(JsonSerializer.Serialize(ViewData["SearchData"]));
-    const cars = [
-        { name: "Tim the Tesla", lat: -37.8167399, long: 144.9612497 },
-        { name: "Tony the Tesla", lat: -37.8073874, long: 144.974175 },
-        { name: "Marco the Mazda", lat: -37.8195234, long: 144.9668658 },
-        { name: "Terry the Toyota", lat: -37.8066475, long: 144.9647881 },
-        { name: "Bob the BYD", lat: -37.7981268, long: 144.9513347 }
-    ];
+// Wrap with an Immediately Invoked Function Expression (IIFE) so we don't pollute the client
+(function() {
+    // The raw search data converted to JSON (there is no customer entered data in this)
+    let searchData = @Html.Raw(JsonSerializer.Serialize(ViewData["SearchData"]));
+    // The google map object
+    let map;
+    // All markers currently placed on the map
+    let markers = []
+    // The geolocation of the user
+    let geolocation = null
+    // The geolocation of the user's last location search or click on map
+    let searchLocation = null
 
-    function initAutocomplete() {
-        const map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: -37.8083331, lng: 144.9639386 },
-            zoom: 13,
-            mapTypeId: "roadmap",
-            mapId: "DRIVEHUB_MAP"
-        });
-        // Create the search box and link it to the UI element.
-        const input = document.getElementById("pac-input");
-        const searchBox = new google.maps.places.SearchBox(input);
+    function clearMarkers() {
+        console.log('Clear')
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].map = null;
+        }
+        markers = []
+    }
 
-        // Bias the SearchBox results towards current map's viewport.
-        map.addListener("bounds_changed", () => {
-            searchBox.setBounds(map.getBounds());
-        });
+    function updateMap() {
+        // Early return if map not yet initialized
+        if (!map) return;
+
+        console.log("Map update")
+        // The number of seats a user has selected in the drop down
+        let seatCount = document.getElementById('seatCountSelect').value
+        console.log("Seat Count: ", seatCount)
 
         // Add all pods and cars as markers
         for (let site of searchData.Sites) {
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-                map,
-                title: site.SiteName,
-                position: { lat: site.Location.latitude, lng: site.Location.longitude }
-            });
-
             console.log(site)
-            @* let marker = new google.maps.Marker({
+            let marker = new google.maps.marker.AdvancedMarkerElement({
                 map,
                 title: site.SiteName,
                 position: { lat: site.Location.latitude, lng: site.Location.longitude },
-            })
+            });
+            markers.push(marker)
 
-            const infowindow = new google.maps.InfoWindow({
-                content: `<strong>${site.name}</strong><br><a href="/Booking/Create">Book</a>`,
+            let infowindow = new google.maps.InfoWindow({
+                content: `<strong>${site.SiteName}</strong><br><a href="/Booking/Create">Book</a>`,
             });
 
             marker.addListener("click", () => {
                 infowindow.open(map, marker);
-            }); *@
+            });
         }
+    }
 
+    // Init the Location search bar for the map
+    function initSearchBar(map) {
+        // Create the search box and link it to the UI element.
+        let input = document.getElementById("pac-input");
+        let searchBox = new google.maps.places.SearchBox(input);
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener("bounds_changed", () => {
+            searchBox.setBounds(map.getBounds());
+        });
         // Respond to user searches and move the map there
         searchBox.addListener("places_changed", () => {
-            const places = searchBox.getPlaces();
+            let places = searchBox.getPlaces();
 
             if (places.length == 0) {
                 return;
             }
 
-            const bounds = new google.maps.LatLngBounds();
+            let bounds = new google.maps.LatLngBounds();
             console.log(places);
 
             places.forEach((place) => {
@@ -167,11 +177,57 @@
         });
     }
 
-    window.initAutocomplete = initAutocomplete;
+    // Init geolocation API that will give the user's current location
+    function initGeolocation() {
+        function updatePosition(position) {
+            console.log(position)
+        }
+        function handleError(error) {
+            console.log("Geolocation error: ", error)
+        }
+        if (navigator.geolocation) {
+            // Start watching the user's position
+            navigator.geolocation.getCurrentPosition(
+                updatePosition,
+                handleError,
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000, // Timeout in 5 seconds if geolocation doesn't work
+                    maximumAge: 1000 * 60 * 5 // cached results up to 5 minutes old is fine
+                }
+            );
+        } else {
+            console.log("Error: No geolocation API enabled in browser")
+        }
+    }
+
+    function initAll() {
+        // Init Google Map
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: -37.8083331, lng: 144.9639386 },
+            zoom: 13,
+            mapTypeId: "roadmap",
+            mapId: "DRIVEHUB_MAP"
+        });
+        // Init the search bar
+        initSearchBar(map)
+        // Init Geolocation
+        initGeolocation()
+
+        // Update the map whenever the user picks another seat count
+        document.getElementById('seatCountSelect').addEventListener('change', clearMarkers);
+
+        updateMap();
+
+        
+
+    }
+    
+
+    window.initAll = initAll;
+})()
 </script>
 <script
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAutocomplete&v=weekly&libraries=marker,places&loading=async"
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places&loading=async"
 defer
 ></script>
-@* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAutocomplete&libraries=places&v=weekly&loading=async&libraries=marker&libraries=places"
-        defer></script> *@
