@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using NetTopologySuite.Geometries;
 
-namespace DriveHub.Data
+namespace DriveHub.Data.SeedData
 {
     public class SeedData
     {
@@ -20,7 +20,7 @@ namespace DriveHub.Data
 
             foreach (var vehicleRate in GetVehicleRates())
             {
-                var vehicleRateDb = new DriveHubModel.VehicleRate(
+                var vehicleRateDb = new VehicleRate(
                     vehicleRate.VehicleRateId,
                     vehicleRate.Description,
                     vehicleRate.PricePerHour,
@@ -32,7 +32,7 @@ namespace DriveHub.Data
 
             foreach (var vehicle in GetVehicles(logger))
             {
-                var vehicleDb = new DriveHubModel.Vehicle(
+                var vehicleDb = new Vehicle(
                     vehicle.VehicleId,
                     vehicle.VehicleRateId,
                     vehicle.Make,
@@ -50,7 +50,7 @@ namespace DriveHub.Data
 
             foreach (var site in GetSites(logger))
             {
-                var siteDb = new DriveHubModel.Site(
+                var siteDb = new Site(
                     site.SiteName,
                     site.Address,
                     site.City,
@@ -65,7 +65,7 @@ namespace DriveHub.Data
             foreach (var pod in GetPods(logger))
             {
                 if (pod.VehicleId is "") pod.VehicleId = null;
-                var podDb = new DriveHubModel.Pod(
+                var podDb = new Pod(
                     pod.PodId,
                     pod.SiteId,
                     pod.VehicleId,
@@ -79,7 +79,7 @@ namespace DriveHub.Data
         private static IList<DriveHub.SeedData.VehicleRate> GetVehicleRates()
         {
             var vehicleRates = new List<DriveHub.SeedData.VehicleRate>();
-            using (var reader = new StreamReader($"Data/VehicleRates.csv"))
+            using (var reader = new StreamReader($"Data/SeedData/VehicleRates.csv"))
             using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
             {
                 vehicleRates = csv.GetRecords<DriveHub.SeedData.VehicleRate>().ToList();
@@ -92,7 +92,7 @@ namespace DriveHub.Data
             IList<DriveHub.SeedData.Vehicle> vehicles;
             logger.LogInformation("Loading vehicles data file.");
 
-            using (var reader = new StreamReader($"Data/Vehicles.csv"))
+            using (var reader = new StreamReader($"Data/SeedData/Vehicles.csv"))
             using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
             {
                 vehicles = csv.GetRecords<DriveHub.SeedData.Vehicle>().ToList();
@@ -106,7 +106,7 @@ namespace DriveHub.Data
             IList<DriveHub.SeedData.Site> sites;
             logger.LogInformation("Loading sites data file.");
 
-            using (var reader = new StreamReader($"Data/Sites.csv"))
+            using (var reader = new StreamReader($"Data/SeedData/Sites.csv"))
             using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
             {
                 sites = csv.GetRecords<DriveHub.SeedData.Site>().ToList();
@@ -120,7 +120,7 @@ namespace DriveHub.Data
             IList<DriveHub.SeedData.Pod> pods;
             logger.LogInformation("Loading pods data file.");
 
-            using (var reader = new StreamReader($"Data/Pods.csv"))
+            using (var reader = new StreamReader($"Data/SeedData/Pods.csv"))
             using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
             {
                 pods = csv.GetRecords<DriveHub.SeedData.Pod>().ToList();
