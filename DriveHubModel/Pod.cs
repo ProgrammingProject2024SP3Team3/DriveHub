@@ -24,7 +24,7 @@ namespace DriveHubModel
         public Pod(
             string podId,
             int siteId,
-            string vehicleId,
+            string? vehicleId,
             string podName)
         {
             PodId = podId;

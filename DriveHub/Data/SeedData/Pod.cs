@@ -17,7 +17,7 @@ namespace DriveHub.SeedData
 
         public int SiteId { get; set; }
 
-        public string VehicleId { get; set; }
+        public string? VehicleId { get; set; }
 
         public string PodName { get; set; }
     }

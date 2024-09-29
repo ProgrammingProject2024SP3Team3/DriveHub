@@ -64,6 +64,7 @@ namespace DriveHub.Data
 
             foreach (var pod in GetPods(logger))
             {
+                if (pod.VehicleId is "") pod.VehicleId = null;
                 var podDb = new DriveHubModel.Pod(
                     pod.PodId,
                     pod.SiteId,
