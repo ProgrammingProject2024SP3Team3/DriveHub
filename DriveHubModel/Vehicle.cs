@@ -15,12 +15,16 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
     public class Vehicle
     {
+        public Vehicle() { }
+
+        [SetsRequiredMembers]
         public Vehicle(
             string vehicleId,
             string vehicleRateId,
@@ -45,7 +49,7 @@ namespace DriveHubModel
             Colour = colour;
             Name = name;
         }
-
+         
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VehicleId { get; set; }

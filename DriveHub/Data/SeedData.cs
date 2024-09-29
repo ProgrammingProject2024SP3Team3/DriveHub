@@ -1,8 +1,8 @@
 ﻿using DriveHubModel;
-using DriveHub.SeedData;
 using CsvHelper;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using NetTopologySuite.Geometries;
 
 namespace DriveHub.Data
 {
@@ -48,26 +48,41 @@ namespace DriveHub.Data
             }
             context.SaveChanges();
 
+            foreach (var site in GetSites(logger))
+            {
+                var siteDb = new DriveHubModel.Site(
+                    site.SiteName,
+                    site.Address,
+                    site.City,
+                    site.PostCode,
+                    site.Latitude,
+                    site.Longitude
+                    );
+                context.Add(siteDb);
+            }
+            context.SaveChanges();
+
+            foreach (var pod in GetPods(logger))
+            {
+                var podDb = new DriveHubModel.Pod(
+                    pod.PodId,
+                    pod.SiteId,
+                    pod.VehicleId,
+                    pod.PodName
+                    );
+                context.Add(podDb);
+            }
+            context.SaveChanges();
         }
 
         private static IList<DriveHub.SeedData.VehicleRate> GetVehicleRates()
         {
             var vehicleRates = new List<DriveHub.SeedData.VehicleRate>();
-            //vehicleRates.Add(
-            //    new VehicleRate("798e5cce-92bb-493f-915c-f251c0dd674e", "Standard", 20, DateTime.Parse("2024-09-21 15:39:51")));
-            //vehicleRates.Add(
-            //    new VehicleRate("2452a253-031c-4de5-a6db-03691eac644b", "Electric", 20.5m, DateTime.Parse("2024-09-21 15:39:51")));
-            //vehicleRates.Add(
-            //    new VehicleRate("f11eec17-116c-4513-abe8-83049c0fa924", "Utility", 25, DateTime.Parse("2024-09-21 15:39:51")));
-            //vehicleRates.Add(
-            //    new VehicleRate("4f040b3d-f4a9-4b8a-95f7-ed06ea181c34", "SUV", 27.5m, DateTime.Parse("2024-09-21 15:39:51")));
-
             using (var reader = new StreamReader($"Data/VehicleRates.csv"))
             using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
             {
                 vehicleRates = csv.GetRecords<DriveHub.SeedData.VehicleRate>().ToList();
             }
-
             return vehicleRates;
         }
 
@@ -85,25 +100,41 @@ namespace DriveHub.Data
             return vehicles;
         }
 
-        private static IList<DriveHub.SeedData.Site> GetSites()
+        private static IList<DriveHub.SeedData.Site> GetSites(ILogger<Program> logger)
+        {
+            IList<DriveHub.SeedData.Site> sites;
+            logger.LogInformation("Loading sites data file.");
+
+            using (var reader = new StreamReader($"Data/Sites.csv"))
+            using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
+            {
+                sites = csv.GetRecords<DriveHub.SeedData.Site>().ToList();
+            }
+
+            return sites;
+        }
+
+        private static IList<DriveHub.SeedData.Pod> GetPods(ILogger<Program> logger)
+        {
+            IList<DriveHub.SeedData.Pod> pods;
+            logger.LogInformation("Loading pods data file.");
+
+            using (var reader = new StreamReader($"Data/Pods.csv"))
+            using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
+            {
+                pods = csv.GetRecords<DriveHub.SeedData.Pod>().ToList();
+            }
+
+            return pods;
+        }
+
+        private static IList<ApplicationUser> GetUsers(ILogger<Program> logger)
         {
             // TODO Write get data from csv method
             throw new NotImplementedException();
         }
 
-        private static IList<DriveHub.SeedData.Pod> GetPods()
-        {
-            // TODO Write get data from csv method
-            throw new NotImplementedException();
-        }
-
-        private static IList<ApplicationUser> GetUsers()
-        {
-            // TODO Write get data from csv method
-            throw new NotImplementedException();
-        }
-
-        private static IList<DriveHub.SeedData.Booking> GetBookings()
+        private static IList<DriveHub.SeedData.Booking> GetBookings(ILogger<Program> logger)
         {
             // TODO Write get data from csv method
             throw new NotImplementedException();

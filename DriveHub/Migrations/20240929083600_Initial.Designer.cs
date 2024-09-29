@@ -6,14 +6,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NetTopologySuite.Geometries;
 
 #nullable disable
 
 namespace DriveHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240929043112_Initial")]
+    [Migration("20240929083600_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -135,11 +134,13 @@ namespace DriveHub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Point>("Location")
-                        .IsRequired()
-                        .HasColumnType("geography");
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
 
-                    b.Property<string>("PostalCode")
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("PostCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

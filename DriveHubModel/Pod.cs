@@ -18,6 +18,21 @@ namespace DriveHubModel
 {
     public class Pod
     {
+        public Pod() { }
+
+        [SetsRequiredMembers]
+        public Pod(
+            string podId,
+            int siteId,
+            string vehicleId,
+            string podName)
+        {
+            PodId = podId;
+            SiteId = siteId;
+            VehicleId = vehicleId;
+            PodName = podName;
+        }
+
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

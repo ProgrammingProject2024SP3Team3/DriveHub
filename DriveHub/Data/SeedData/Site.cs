@@ -13,8 +13,6 @@ namespace DriveHub.SeedData
 {
     public class Site
     {
-        public int SiteId { get; set; }
-
         public string SiteName { get; set; }
 
         public string Address { get; set; }
@@ -23,6 +21,8 @@ namespace DriveHub.SeedData
 
         public string PostCode { get; set; }
 
-        public string Location { get; set; }
+        public double Latitude { get; set; }
+
+        public double Longitude { get; set; }
     }
 }

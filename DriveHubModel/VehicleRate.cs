@@ -19,6 +19,8 @@ namespace DriveHubModel
 {
     public class VehicleRate
     {
+        public VehicleRate() { }
+
         [SetsRequiredMembers]
         public VehicleRate(
             string vehicleRateId,

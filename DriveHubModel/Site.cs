@@ -18,6 +18,25 @@ namespace DriveHubModel
 {
     public class Site
     {
+        public Site() { }
+
+        public Site(
+            string siteName,
+            string address,
+            string city,
+            string postcode,
+            double latitude,
+            double longitude
+            )
+        {
+            SiteName = siteName;
+            Address = address;
+            City = city;
+            PostCode = postcode;
+            Latitude = latitude;
+            Longitude = longitude;
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // Auto-incrementing int
         public int SiteId { get; set; }
@@ -32,11 +51,15 @@ namespace DriveHubModel
         public string City { get; set; }
 
         [Required]
-        public string PostalCode { get; set; }
+        public string PostCode { get; set; }
+
+        public double Latitude { get; set; }
+
+        public double Longitude { get; set; }
 
         // NetTopologySuite spatial data
-        [Required]
-        public Point Location { get; set; }  // Spatial data
+        //[Required]
+        //public Point Location { get; set; }  // Spatial data
 
         // One-to-Many relationship: A Site can have many Pods
         [JsonIgnore]
