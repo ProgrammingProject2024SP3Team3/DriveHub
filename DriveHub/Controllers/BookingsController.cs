@@ -23,7 +23,7 @@ namespace DriveHub.Controllers
 
         public IActionResult Search()
         {
-            var applicationDbContext = _context.Pods.Include(c => c.Vehicle).Include(c => c.Site).ToListAsync();
+            var applicationDbContext = _context.Pods.Include(c => c.Vehicle).Include(c => c.Site).ToList();
             return View(applicationDbContext);
         }
 
