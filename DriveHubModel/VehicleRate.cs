@@ -45,6 +45,7 @@ namespace DriveHubModel
         [Required]
         [DataType(DataType.Currency)]
         [DisplayFormat(DataFormatString = "{0:C}")]
+        [DisplayName("Price per hour")]
         public decimal PricePerHour { get; set; }
 
         [Required]

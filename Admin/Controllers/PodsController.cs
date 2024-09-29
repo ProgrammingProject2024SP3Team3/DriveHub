@@ -22,7 +22,7 @@ namespace Admin.Controllers
         // GET: Pods
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Pods.Include(p => p.Site).Include(p => p.Vehicle);
+            var applicationDbContext = _context.Pods.Include(p => p.Site).Include(p => p.Vehicle).OrderBy(c => c.SiteId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -85,8 +85,8 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "Address", pod.SiteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", pod.VehicleId);
+            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName", pod.SiteId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", pod.VehicleId);
             return View(pod);
         }
 
@@ -122,8 +122,8 @@ namespace Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "Address", pod.SiteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", pod.VehicleId);
+            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName", pod.SiteId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", pod.VehicleId);
             return View(pod);
         }
 

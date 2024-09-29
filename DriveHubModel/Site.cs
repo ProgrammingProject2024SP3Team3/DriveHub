@@ -9,6 +9,7 @@
  * as assessment work for COSC2650 Programming Project
  */
 
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -42,6 +43,7 @@ namespace DriveHubModel
         public int SiteId { get; set; }
 
         [Required]
+        [DisplayName("Site name")]
         public string SiteName { get; set; }
 
         [Required]
