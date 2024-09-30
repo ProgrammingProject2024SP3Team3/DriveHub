@@ -25,7 +25,19 @@ namespace DriveHub.Models.Dto
 
         public string PostCode { get; set; }
 
+        public string? VehicleId { get; set; }
+
         public string? VehicleName { get; set; }
+
+        public string? Make { get; set; }
+
+        public string? Model { get; set; }
+
+        public string? RegistrationPlate { get; set; }
+
+        public int? Seats { get; set; }
+
+        public string? Colour { get; set; }
 
         public string? VehicleCategory { get; set; }
 

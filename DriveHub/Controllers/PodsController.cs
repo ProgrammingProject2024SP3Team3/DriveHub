@@ -62,7 +62,13 @@ namespace DriveHub.Controllers
             dto.Address = pod.Site.Address;
             dto.City = pod.Site.City;
             dto.PostCode = pod.Site.PostCode;
+            dto.VehicleId = pod.VehicleId;
             dto.VehicleName = pod.Vehicle?.Name;
+            dto.Make = pod.Vehicle?.Make;
+            dto.Model = pod.Vehicle?.Model;
+            dto.RegistrationPlate = pod.Vehicle?.RegistrationPlate;
+            dto.Seats = pod.Vehicle?.Seats;
+            dto.Colour = pod.Vehicle?.Colour;
             dto.VehicleCategory = pod.Vehicle?.VehicleRate.Description;
             dto.PricePerHour = pod.Vehicle?.VehicleRate.PricePerHour;
 
