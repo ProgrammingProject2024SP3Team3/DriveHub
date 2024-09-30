@@ -13,23 +13,12 @@
 
     /* Optional: Add some styling for the container */
     .hero-container {
+        position: relative;
         max-width: 100%; /* Ensures the image doesn't stretch beyond the viewport */
         overflow: hidden; /* Hides any overflow if the image is too large */
         padding: 40px;
     }
-    /* Transparent text box */
-    .text-box {
-        position: absolute;
-        top: 300px; /* Position it from the bottom of the image */
-        left: 50%;
-        right: 0;
-        transform: translateX(-50%);
-        background-color: rgba(0, 0, 0, 0.5); /* Black background with 50% transparency */
-        color: white;
-        padding: 30px;
-        text-align: center;
-        border-radius: 40px;
-    }
+    
 
     .smallhero-container {
         max-width: 50%;
@@ -43,15 +32,15 @@
     .subhero-section {
         padding: 40px;
     }
+    .lead{
+        padding: 20px;
+    }
 
 </style>
 <div class="hero-container">
-    <img src="https://drivehubstorage.blob.core.windows.net/website/About-birdseye-hero.jpg" alt="Responsive Image" class="responsive-image">
-    <div class="text-box">
-        <h1>About Us</h1>
-        <p>DriveHub is proudly Australian company that gives customers professional car booking service offering a range of on-demand vehicles located in hubs around Melbourne.</p>
-    </div>
+    <img src="https://drivehubstorage.blob.core.windows.net/website/about-hero-edit.png" alt="Responsive Image" class="responsive-image">
 </div>
+
 
 
 
@@ -111,4 +100,5 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
