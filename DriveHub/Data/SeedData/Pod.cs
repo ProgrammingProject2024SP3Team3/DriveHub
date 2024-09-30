@@ -1,5 +1,5 @@
 /**
- * PodDto.cs 17/09/2024
+ * Pod.cs 17/09/2024
  *
  * author: Ian McElwaine s3863018@rmit.student.edu.au
  * author: Sean Atherton s3893785@student.rmit.edu.au
