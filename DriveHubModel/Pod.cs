@@ -9,6 +9,7 @@
  * as assessment work for COSC2650 Programming Project
  */
 
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
@@ -40,10 +41,12 @@ namespace DriveHubModel
 
         [ForeignKey("Site")]
         [Required]
+        [DisplayName("Site")]
         public int SiteId { get; set; }
 
         [ForeignKey("Vehicle")]
         [MaybeNull]
+        [DisplayName("Vehicle")]
         public string? VehicleId { get; set; }
 
         [Required]

@@ -61,6 +61,10 @@ namespace DriveHub.Data
                 .WithMany(c => c.Pods)
                 .HasForeignKey(c => c.SiteId);
 
+            modelBuilder.Entity<Pod>()
+                .HasOne(c => c.Vehicle)
+                .WithOne(c => c.Pod);
+
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.ApplicationUser)
                 .WithMany(c => c.Bookings)

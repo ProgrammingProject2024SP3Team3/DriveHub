@@ -110,7 +110,9 @@ namespace Admin.Migrations.ApplicationDb
 
                     b.HasIndex("SiteId");
 
-                    b.HasIndex("VehicleId");
+                    b.HasIndex("VehicleId")
+                        .IsUnique()
+                        .HasFilter("[VehicleId] IS NOT NULL");
 
                     b.ToTable("Pods");
                 });
@@ -476,8 +478,8 @@ namespace Admin.Migrations.ApplicationDb
                         .IsRequired();
 
                     b.HasOne("DriveHubModel.Vehicle", "Vehicle")
-                        .WithMany()
-                        .HasForeignKey("VehicleId");
+                        .WithOne("Pod")
+                        .HasForeignKey("DriveHubModel.Pod", "VehicleId");
 
                     b.Navigation("Site");
 
@@ -559,6 +561,9 @@ namespace Admin.Migrations.ApplicationDb
             modelBuilder.Entity("DriveHubModel.Vehicle", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Pod")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DriveHubModel.VehicleRate", b =>

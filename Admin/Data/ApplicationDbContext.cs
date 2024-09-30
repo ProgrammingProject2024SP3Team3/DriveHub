@@ -21,38 +21,22 @@ namespace Admin.Data
             base.OnModelCreating(modelBuilder);
 
             // Define keys
+            modelBuilder.Entity<VehicleRate>()
+                .HasKey(c => c.VehicleRateId);
+
+            modelBuilder.Entity<Vehicle>()
+               .HasKey(c => c.VehicleId);
+
             modelBuilder.Entity<Site>()
                .HasKey(c => c.SiteId);
 
             modelBuilder.Entity<Pod>()
                .HasKey(c => c.PodId);
 
-            modelBuilder.Entity<Vehicle>()
-               .HasKey(c => c.VehicleId);
-
-            modelBuilder.Entity<VehicleRate>()
-                .HasKey(c => c.VehicleRateId);
-
-            // Set "geography" column type for spatial data in the Site entity
+            // TODO Set "geography" column type for spatial data in the Site entity
             //modelBuilder.Entity<Site>()
             //   .Property(l => l.Location)
             //   .HasColumnType("geography");
-
-            // Define relationships
-            modelBuilder.Entity<Site>()
-                .HasMany(c => c.Pods)
-                .WithOne(c => c.Site)
-                .HasForeignKey(c => c.SiteId);
-
-            modelBuilder.Entity<Pod>()
-                .HasOne(c => c.Site)
-                .WithMany(c => c.Pods)
-                .HasForeignKey(c => c.SiteId);
-
-            modelBuilder.Entity<Vehicle>()
-                .HasOne(c => c.VehicleRate)
-                .WithMany(c => c.Vehicles)
-                .HasForeignKey(c => c.VehicleRateId);
 
             modelBuilder.Entity<VehicleRate>()
                 .HasMany(c => c.Vehicles)
@@ -61,6 +45,25 @@ namespace Admin.Data
             modelBuilder.Entity<VehicleRate>()
                 .Property(c => c.PricePerHour)
                 .HasColumnType("Money");
+
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(c => c.VehicleRate)
+                .WithMany(c => c.Vehicles)
+                .HasForeignKey(c => c.VehicleRateId);
+
+            // Define relationships
+            modelBuilder.Entity<Site>()
+                .HasMany(c => c.Pods)
+                .WithOne(c => c.Site);
+
+            modelBuilder.Entity<Pod>()
+                .HasOne(c => c.Site)
+                .WithMany(c => c.Pods)
+                .HasForeignKey(c => c.SiteId);
+
+            modelBuilder.Entity<Pod>()
+                .HasOne(c => c.Vehicle)
+                .WithOne(c => c.Pod);
 
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.ApplicationUser)

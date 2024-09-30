@@ -354,7 +354,9 @@ namespace DriveHub.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Pods_VehicleId",
                 table: "Pods",
-                column: "VehicleId");
+                column: "VehicleId",
+                unique: true,
+                filter: "[VehicleId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_VehicleRateId",
