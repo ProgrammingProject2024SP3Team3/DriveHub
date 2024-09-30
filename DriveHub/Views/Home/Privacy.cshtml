@@ -1,9 +1,44 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
+<!--BODY STARTS HERE-->
+<style>
+    /* CSS to make the image responsive */
+    .responsive-image {
+        width: 100%; /* Make the image span the entire width of the page */
+        height: auto; /* Keep the aspect ratio */
+    }
 
-<div class="container-fluid">
+    /* Optional: Add some styling for the container */
+    .hero-container {
+        max-width: 100%; /* Ensures the image doesn't stretch beyond the viewport */
+        overflow: hidden; /* Hides any overflow if the image is too large */
+        padding: 40px;
+    }
+    /* Transparent text box */
+    .text-box {
+        position: absolute;
+        top: 300px; /* Position it from the bottom of the image */
+        left: 50%;
+        right: 0;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.5); /* Black background with 50% transparency */
+        color: white;
+        padding: 30px;
+        text-align: center;
+        border-radius: 40px;
+    }
+</style>
+
+
+<div class="privacy-hero">
+    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/privacy-hero.jpg" alt="privacy-hero" style="max-width:contain" />
+    <div class="text-box">
+        <h1>Privacy Policy</h1>    
+    </div>
+</div>
+
+@* <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12 col-md-6 pb-3">
             <h2>Privacy statement</h2>
@@ -27,3 +62,4 @@
         </div>
     </div>
 </div>
+ *@
