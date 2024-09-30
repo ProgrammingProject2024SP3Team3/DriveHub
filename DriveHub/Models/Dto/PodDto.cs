@@ -25,6 +25,10 @@ namespace DriveHub.Models.Dto
 
         public string PostCode { get; set; }
 
+        public double Longitude { get; set; }
+
+        public double Latitude { get; set; }
+
         public string? VehicleId { get; set; }
 
         public string? VehicleName { get; set; }

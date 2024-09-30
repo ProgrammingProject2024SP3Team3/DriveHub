@@ -62,6 +62,8 @@ namespace DriveHub.Controllers
             dto.Address = pod.Site.Address;
             dto.City = pod.Site.City;
             dto.PostCode = pod.Site.PostCode;
+            dto.Latitude = pod.Site.Latitude;
+            dto.Longitude = pod.Site.Longitude;
             dto.VehicleId = pod.VehicleId;
             dto.VehicleName = pod.Vehicle?.Name;
             dto.Make = pod.Vehicle?.Make;
