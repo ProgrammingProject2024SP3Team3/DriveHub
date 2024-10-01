@@ -30,7 +30,14 @@
     color: white;
     font-size: 3rem;
     font-weight: bolder;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.5s ease-out;
 }
+
+.hero-heading.scrolled {
+    opacity: 1;
+  }
 
 .hero-search-bar {
     max-width: 600px;
