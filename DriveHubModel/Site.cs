@@ -36,6 +36,7 @@ namespace DriveHubModel
             PostCode = postcode;
             Latitude = latitude;
             Longitude = longitude;
+            Location = new Point(longitude, latitude) { SRID = 4326 };
         }
 
         [Key]
@@ -60,8 +61,8 @@ namespace DriveHubModel
         public double Longitude { get; set; }
 
         // NetTopologySuite spatial data
-        //[Required]
-        //public Point Location { get; set; }  // Spatial data
+        [Required]
+        public Point Location { get; set; }  // Spatial data
 
         // One-to-Many relationship: A Site can have many Pods
         [JsonIgnore]

@@ -33,10 +33,10 @@ namespace DriveHub.Data
             modelBuilder.Entity<Pod>()
                .HasKey(c => c.PodId);
 
-            // TODO Set "geography" column type for spatial data in the Site entity
-            //modelBuilder.Entity<Site>()
-            //   .Property(l => l.Location)
-            //   .HasColumnType("geography");
+            // Set "geography" column type for spatial data in the Site entity
+            modelBuilder.Entity<Site>()
+               .Property(l => l.Location)
+               .HasColumnType("geography");
 
             modelBuilder.Entity<VehicleRate>()
                 .HasMany(c => c.Vehicles)
