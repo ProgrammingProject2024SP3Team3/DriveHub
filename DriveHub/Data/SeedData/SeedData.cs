@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using DriveHub.Data;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace DriveHub.SeedData
 {
@@ -60,6 +63,9 @@ namespace DriveHub.SeedData
                 context.Add(siteDb);
             }
             context.SaveChanges();
+
+            var stmt = context.Sites.FromSqlRaw
+                    ($"CREATE SPATIAL INDEX[IX_Sites_Location] ON [Sites]([Location]) WITH(BOUNDING_BOX = (144.3336, -38.4339, 145.8783, -37.4713));");
 
             foreach (var pod in GetPods(logger))
             {
