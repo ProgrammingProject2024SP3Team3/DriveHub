@@ -85,6 +85,7 @@ namespace DriveHubModel
         public string Name { get; set; }
 
         [JsonIgnore]
+        [DisplayName("Price Category")]
         public virtual VehicleRate VehicleRate { get; set; }
 
         [JsonIgnore]

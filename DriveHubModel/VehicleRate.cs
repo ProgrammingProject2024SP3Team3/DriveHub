@@ -51,7 +51,7 @@ namespace DriveHubModel
         [Required]
         [DataType(DataType.Date)]
         [DisplayName("Effective Date")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm:ss tt}", ApplyFormatInEditMode = true)]
         public DateTime EffectiveDate { get; set; }
 
         [JsonIgnore]
