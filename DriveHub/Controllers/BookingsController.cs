@@ -5,9 +5,11 @@ using DriveHub.Data;
 using DriveHubModel;
 using DriveHub.Models.Dto;
 using NetTopologySuite.Geometries;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DriveHub.Controllers
 {
+    [Authorize] // Require user authorization
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,11 +25,26 @@ namespace DriveHub.Controllers
             return View();
         }
 
-        // API: Get available pods and vehicles filtered by time and proximity
-        // This method fetches available pods and their associated vehicles based on user input for time and proximity
         [HttpGet("Search")]
+        [Produces("application/json")]
         public async Task<IActionResult> Search(DateTime startTime, DateTime endTime, double userLatitude, double userLongitude, double maxDistance = 5000)
         {
+            // Input validation
+            if (startTime >= endTime)
+            {
+                return BadRequest("Start time must be earlier than end time.");
+            }
+
+            if (maxDistance <= 0 || maxDistance > 10000)
+            {
+                return BadRequest("Invalid maxDistance. Please set a value between 0 and 10,000 meters.");
+            }
+
+            if (userLatitude < -90 || userLatitude > 90 || userLongitude < -180 || userLongitude > 180)
+            {
+                return BadRequest("Invalid coordinates. Latitude must be between -90 and 90, and longitude between -180 and 180.");
+            }
+
             // Define the user's location as a geographic point using latitude and longitude with SRID 4326 (WGS84 standard)
             var userLocation = new Point(userLongitude, userLatitude) { SRID = 4326 };
 
@@ -55,12 +72,16 @@ namespace DriveHub.Controllers
                     VehicleName = p.Vehicle.Name,         // Vehicle name
                     Make = p.Vehicle.Make,                // Vehicle make
                     Model = p.Vehicle.Model,              // Vehicle model
-                    RegistrationPlate = p.Vehicle.RegistrationPlate, // Vehicle registration plate
                     Seats = p.Vehicle.Seats,              // Number of seats in the vehicle
                     Colour = p.Vehicle.Colour,            // Vehicle colour
                     VehicleCategory = p.Vehicle.VehicleRate.Description, // Vehicle category
                     PricePerHour = p.Vehicle.VehicleRate.PricePerHour   // Hourly rate of the vehicle
+
+                    // Omitting RegistrationPlate for data privacy unless absolutely necessary.
+                    // Uncomment below if needed with authorization check
+                    // RegistrationPlate = p.Vehicle.RegistrationPlate  
                 })
+                .Take(100)  // Limit to 100 results to avoid excessive data load
                 .ToListAsync();  // Convert the query to a list asynchronously
 
             // Return the list of available pods and associated data as JSON for the frontend to consume
