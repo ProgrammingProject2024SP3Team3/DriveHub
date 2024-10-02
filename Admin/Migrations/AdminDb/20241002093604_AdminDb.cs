@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Admin.Migrations
+namespace Admin.Migrations.AdminDb
 {
     /// <inheritdoc />
-    public partial class Admin : Migration
+    public partial class AdminDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

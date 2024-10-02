@@ -13,6 +13,9 @@
     <thead>
         <tr>
             <th>
+                Photo
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
@@ -46,6 +49,9 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td class="img-fluid col-1">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@(@item.VehicleId).jpg" />
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
