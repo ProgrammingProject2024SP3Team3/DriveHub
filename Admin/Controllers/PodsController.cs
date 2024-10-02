@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Admin.Data;
@@ -13,10 +9,12 @@ namespace Admin.Controllers
     public class PodsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
-        public PodsController(ApplicationDbContext context)
+        public PodsController(ApplicationDbContext context, ILogger<PodsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Pods
@@ -82,11 +80,21 @@ namespace Admin.Controllers
 
             var pod = await _context.Pods.FindAsync(id);
             if (pod == null)
-            {
+            {                
                 return NotFound();
             }
+
+            var vehicles = new List<Vehicle>();
+            if (pod.VehicleId != null)
+            {
+                _logger.LogWarning($"Pod {id} has a vehicle");
+                var vehicle = await _context.Vehicles.FindAsync(pod.VehicleId);
+                vehicles.Add(vehicle);
+            }
+            vehicles.AddRange(await _context.Vehicles.Where(c => c.Pod == null).ToListAsync());
+
             ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName", pod.SiteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles.Where(c => c.Pod == null), "VehicleId", "Name", pod.VehicleId);
+            ViewData["VehicleId"] = new SelectList(vehicles, "VehicleId", "Name", pod.VehicleId);
             return View(pod);
         }
 
@@ -122,8 +130,18 @@ namespace Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            var vehicles = new List<Vehicle>();
+            if (pod.VehicleId != null)
+            {
+                _logger.LogWarning($"Pod {id} has a vehicle");
+                var vehicle = await _context.Vehicles.FindAsync(pod.VehicleId);
+                vehicles.Add(vehicle);
+            }
+            vehicles.AddRange(await _context.Vehicles.Where(c => c.Pod == null).ToListAsync());
+
             ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName", pod.SiteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", pod.VehicleId);
+            ViewData["VehicleId"] = new SelectList(vehicles, "VehicleId", "Name", pod.VehicleId);
             return View(pod);
         }
 

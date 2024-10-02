@@ -10,9 +10,12 @@ namespace Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public VehiclesController(ApplicationDbContext context)
+        private readonly ILogger _logger;
+
+        public VehiclesController(ApplicationDbContext context, ILogger<Controller> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Vehicles

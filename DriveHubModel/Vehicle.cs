@@ -11,7 +11,6 @@
  * as assessment work for COSC2650 Programming Project
  */
 
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -55,7 +54,7 @@ namespace DriveHubModel
         public string VehicleId { get; set; }
 
         [ForeignKey("VehicleRate")]
-        [DisplayName("Rate")]
+        [DisplayName("Price Category")]
         [Required]
         public string VehicleRateId { get; set; }
 
