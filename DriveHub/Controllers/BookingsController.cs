@@ -29,21 +29,29 @@ namespace DriveHub.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Search(DateTime startTime, DateTime endTime, double userLatitude, double userLongitude, double maxDistance = 5000)
         {
-            // Input validation
+            // Check if the start time is earlier than the end time. This ensures the user is selecting a valid time range.
+            // If the start time is greater than or equal to the end time, it's an invalid range, so we return a BadRequest.
             if (startTime >= endTime)
             {
                 return BadRequest("Start time must be earlier than end time.");
             }
 
+            // Validate the maxDistance parameter to ensure it falls within a reasonable range.
+            // The distance should be greater than 0 and less than or equal to 10,000 meters to prevent invalid or excessive distance values.
+            // If the distance is out of bounds, return a BadRequest.
             if (maxDistance <= 0 || maxDistance > 10000)
             {
                 return BadRequest("Invalid maxDistance. Please set a value between 0 and 10,000 meters.");
             }
 
+            // Validate the user’s latitude and longitude to ensure they are within valid geographical ranges.
+            // Latitude should be between -90 and 90 degrees, and longitude should be between -180 and 180 degrees.
+            // If the coordinates are outside these bounds, return a BadRequest.
             if (userLatitude < -90 || userLatitude > 90 || userLongitude < -180 || userLongitude > 180)
             {
                 return BadRequest("Invalid coordinates. Latitude must be between -90 and 90, and longitude between -180 and 180.");
             }
+
 
             // Define the user's location as a geographic point using latitude and longitude with SRID 4326 (WGS84 standard)
             var userLocation = new Point(userLongitude, userLatitude) { SRID = 4326 };
