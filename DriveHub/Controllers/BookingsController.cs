@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DriveHub.Data;
 using DriveHubModel;
+using DriveHub.Models.Dto;
+using NetTopologySuite.Geometries;
 
 namespace DriveHub.Controllers
 {
@@ -21,10 +23,48 @@ namespace DriveHub.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Search()
+        // API: Get available pods and vehicles filtered by time and proximity
+        // This method fetches available pods and their associated vehicles based on user input for time and proximity
+        [HttpGet("Search")]
+        public async Task<IActionResult> Search(DateTime startTime, DateTime endTime, double userLatitude, double userLongitude, double maxDistance = 5000)
         {
-            var applicationDbContext = await _context.Pods.Include(c => c.Vehicle).Include(c => c.Site).ToListAsync();
-            return View(applicationDbContext);
+            // Define the user's location as a geographic point using latitude and longitude with SRID 4326 (WGS84 standard)
+            var userLocation = new Point(userLongitude, userLatitude) { SRID = 4326 };
+
+            // Fetch pods that are available during the given time period and within the specified proximity to the user's location
+            var availablePods = await _context.Pods
+                .Include(p => p.Vehicle)  // Include vehicle details for each pod
+                .Include(p => p.Site)     // Include site details (location information) for each pod
+                .Where(p => !_context.Bookings.Any(b => 
+                    b.VehicleId == p.VehicleId && (
+                        (startTime >= b.StartTime && startTime < b.EndTime) ||  // Check if the start time conflicts with any existing booking
+                        (endTime > b.StartTime && endTime <= b.EndTime) ||      // Check if the end time conflicts with any existing booking
+                        (startTime < b.StartTime && endTime > b.EndTime))))     // Check if the new booking envelops an existing booking
+                .Where(p => p.Site.Location.Distance(userLocation) <= maxDistance) // Filter pods by proximity to the user's location using spatial distance
+                .Select(p => new PodDto
+                {
+                    PodId = p.PodId,                      // Pod identifier
+                    PodName = p.PodName,                  // Name of the pod
+                    SiteName = p.Site.SiteName,           // Name of the site
+                    Address = p.Site.Address,             // Address of the site
+                    City = p.Site.City,                   // City where the site is located
+                    PostCode = p.Site.PostCode,           // Post code of the site
+                    Latitude = p.Site.Location.Y,         // Latitude from the geographic location (spatial data)
+                    Longitude = p.Site.Location.X,        // Longitude from the geographic location (spatial data)
+                    VehicleId = p.Vehicle.VehicleId,      // Vehicle identifier
+                    VehicleName = p.Vehicle.Name,         // Vehicle name
+                    Make = p.Vehicle.Make,                // Vehicle make
+                    Model = p.Vehicle.Model,              // Vehicle model
+                    RegistrationPlate = p.Vehicle.RegistrationPlate, // Vehicle registration plate
+                    Seats = p.Vehicle.Seats,              // Number of seats in the vehicle
+                    Colour = p.Vehicle.Colour,            // Vehicle colour
+                    VehicleCategory = p.Vehicle.VehicleRate.Description, // Vehicle category
+                    PricePerHour = p.Vehicle.VehicleRate.PricePerHour   // Hourly rate of the vehicle
+                })
+                .ToListAsync();  // Convert the query to a list asynchronously
+
+            // Return the list of available pods and associated data as JSON for the frontend to consume
+            return Json(availablePods);
         }
 
         public async Task<IActionResult> CurrentBookings()
