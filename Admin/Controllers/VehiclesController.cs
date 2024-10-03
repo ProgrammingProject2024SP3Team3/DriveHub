@@ -165,6 +165,7 @@ namespace Admin.Controllers
             var vehicle = await _context.Vehicles
                 .Include(v => v.VehicleRate)
                 .FirstOrDefaultAsync(m => m.VehicleId == id);
+
             if (vehicle == null)
             {
                 return NotFound();
@@ -178,9 +179,17 @@ namespace Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var vehicle = await _context.Vehicles.FindAsync(id);
+            var vehicle = await _context.Vehicles.Where(c => c.VehicleId == id).Include(c => c.Pod).FirstOrDefaultAsync();
+
             if (vehicle != null)
             {
+                var podId = vehicle.Pod?.PodId;
+                var pod = await _context.Pods.FindAsync(podId);
+                if (pod != null)
+                {
+                    pod.VehicleId = null;
+                    _context.Pods.Update(pod);
+                }
                 _context.Vehicles.Remove(vehicle);
             }
 
