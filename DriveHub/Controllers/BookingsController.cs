@@ -268,6 +268,38 @@ namespace DriveHub.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Return(string id)
+        {
+            Console.WriteLine("=====");
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+            var pod = await _context.Pods.FindAsync(booking.EndPodId);
+            // This null check should not be necessary as endPodId is a Foreign-Key but the compiler complains (I think there's an underlying model problem here)
+            if (pod == null)
+            {
+                return NotFound();
+            }
+            // Prevent anyone returning an already returned car at a later date)
+            if (booking.BookingStatus == BookingStatus.Complete) {
+                return BadRequest("Can't return a completed Booking");
+            }
+
+            // TODO: need to check that the booking belongs to the logged in user before they can delete it
+
+            // Return the car
+            pod.VehicleId = booking.VehicleId;
+            // Mark the booking complete
+            booking.BookingStatus = BookingStatus.Complete;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id =  booking.BookingId });
+        }
+
         private bool BookingExists(string id)
         {
             return _context.Bookings.Any(e => e.BookingId == id);
