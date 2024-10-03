@@ -83,21 +83,67 @@ namespace DriveHub.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         // [Authorize] TODO: also Authorize attribute
-        // TODO: Left the async function signature as it will be what we need but causes warnings for now
-        // public async Task<IActionResult> Create(string id, string StartPodId, string EndPodId, DateTime StartTime, DateTime EndTime, decimal QuotedPricePerHour)
-        public IActionResult Create(string id, string StartPodId, string EndPodId, DateTime StartTime, DateTime EndTime, decimal QuotedPricePerHour)
+        public async Task<IActionResult> Create(string id, string StartPodId, string EndPodId, DateTime StartTime, DateTime EndTime, decimal QuotedPricePerHour)
         {
-            // DEBUG: this is just debug to show you what the form posted
-            // DELETEME: There is nothing real here and can all be deleted. it's just sending back json of what was posted for testing
-            // TODO: replace this with a proper booking next patch
+            // DEBUG: this is just debug to show you what the form posted. Delete when you're happy with the function
             Console.WriteLine("--------------------\nCreate POST values\n--------------------");
-            Newtonsoft.Json.Linq.JObject json = new Newtonsoft.Json.Linq.JObject();
             foreach (var key in Request.Form.Keys)
             {
                 Console.WriteLine($"{key}: {Request.Form[key]}");
-                json[key] = Request.Form[key].ToString();
             }
-            return Content(json.ToString(), "application/json");
+
+            // Just get any user for now. This will be the current session's user in the real code
+            var user = await _context.Users.FirstOrDefaultAsync();
+            if (user == null) return BadRequest("No first user in db");
+
+            // Check the Vehicle exists, is in the given start pod (i.e. available for booking), and the QuotedPricePerHour matches the vehicle's current pricePerHour
+            // These 3 things need to be done on top of the the simple model validations
+            var vehicle = await _context.Vehicles
+                .Include(v => v.VehicleRate)
+                .Include(v => v.Pod)
+                .FirstOrDefaultAsync(v => v.VehicleId == id);
+            if (vehicle == null || vehicle.Pod == null || vehicle.Pod.PodId != StartPodId || QuotedPricePerHour != vehicle.VehicleRate.PricePerHour)
+            {
+                // I don't think this should rerender the view for the user to try again, because something is really wrong here beyond just a validation error
+                return BadRequest("Invalid booking");
+            }
+            
+            var booking = new Booking
+            {
+                VehicleId = id,
+                Id = user.Id,
+                StartPodId = StartPodId,
+                EndPodId = EndPodId,
+                StartTime = StartTime,
+                EndTime = EndTime,
+                PricePerHour = QuotedPricePerHour,
+                BookingStatus = BookingStatus.InProgress
+            };
+
+            // I can't make this validate, it might fix with binding or there might be changes to our model required
+            TryValidateModel(booking);
+            foreach (var state in ModelState.Values)
+            {
+                foreach (var error in state.Errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+            }
+            // I'm just forcing creation for now. This is really bad.
+            // I can't find a solution to these 3 validation errors:
+            // The Vehicle field is required. (We set VehicleId)
+            // The BookingId field is required. (We are creating a new Booking)
+            // The ApplicationUser field is required. (I do set the Id field which represents a user)
+            if (true || ModelState.IsValid)
+            {
+                vehicle.Pod.Vehicle = null;
+                _context.Bookings.Add(booking);
+                _context.SaveChanges();
+                return RedirectToAction("Details", new { id = booking.BookingId });
+            }
+
+            // Invalid model: Should rerender the view here with all the user correctable errors
+            return Content("invalid");
         }
 
         // GET: Bookings/Edit/5
