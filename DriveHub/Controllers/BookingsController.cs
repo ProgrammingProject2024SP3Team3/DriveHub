@@ -26,16 +26,68 @@ namespace DriveHub.Controllers
             return View();
         }
 
+        // [Authorize] needed
         public async Task<IActionResult> CurrentBookings()
         {
-            var applicationDbContext = await _context.Bookings.Include(b => b.ApplicationUser).Include(b => b.Vehicle).ToListAsync();
-            return View(applicationDbContext);
+            // TODO: this needs to be scoped to the currently logged in user's bookings
+
+            // Here's the style of code we want to write if model relations allowed us
+            // var booking = await _context.Bookings
+            //     .Include(b => b.Vehicle)
+            //     .Include(b => b.StartPod)
+            //     .Include(b => b.EndPod)
+            //     .FirstOrDefaultAsync(b => b.BookingId == id);
+            // Unfortunately this is the code I can make work involving start and end pods
+            var bookings = await (from b in _context.Bookings
+                join sp in _context.Pods on b.StartPodId equals sp.PodId
+                join ep in _context.Pods on b.EndPodId equals ep.PodId
+                join ss in _context.Sites on sp.SiteId equals ss.SiteId
+                join es in _context.Sites on ep.SiteId equals es.SiteId
+                join vs in _context.Vehicles on b.VehicleId equals vs.VehicleId
+                where b.BookingStatus != BookingStatus.Complete
+                select new
+                {
+                    Booking = b,
+                    StartPod = sp,
+                    EndPod = ep,
+                    StartSite = ss,
+                    EndSite = es,
+                    Vehicle = vs
+                }).ToListAsync();
+
+            return View(bookings);
         }
 
+        // [Authorize] needed
         public async Task<IActionResult> PastBookings()
         {
-            var applicationDbContext = await _context.Bookings.Include(b => b.ApplicationUser).Include(b => b.Vehicle).ToListAsync();
-            return View(applicationDbContext);
+            // TODO: this needs to be scoped to the currently logged in user's bookings
+
+            // Here's the style of code we want to write if model relations allowed us
+            // var booking = await _context.Bookings
+            //     .Include(b => b.Vehicle)
+            //     .Include(b => b.StartPod)
+            //     .Include(b => b.EndPod)
+            //     .FirstOrDefaultAsync(b => b.BookingId == id);
+            // Unfortunately this is the code I can make work involving start and end pods
+            var bookings = await (from b in _context.Bookings
+                join sp in _context.Pods on b.StartPodId equals sp.PodId
+                join ep in _context.Pods on b.EndPodId equals ep.PodId
+                join ss in _context.Sites on sp.SiteId equals ss.SiteId
+                join es in _context.Sites on ep.SiteId equals es.SiteId
+                join vs in _context.Vehicles on b.VehicleId equals vs.VehicleId
+                where b.BookingStatus == BookingStatus.Complete
+                select new
+                {
+                    Booking = b,
+                    StartPod = sp,
+                    EndPod = ep,
+                    StartSite = ss,
+                    EndSite = es,
+                    Vehicle = vs
+                }).ToListAsync();
+
+            return View(bookings);
         }
 
         // GET: Bookings/Details/5

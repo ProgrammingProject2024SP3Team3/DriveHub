@@ -1,5 +1,38 @@
-﻿@{
+﻿@model IEnumerable<dynamic>
+@{
     ViewData["Title"] = "Current Bookings";
 }
 
-<h1 class="mb-6">@ViewData["Title"]</h1>
+<h1 class="text-center">Current Bookings</h1>
+<p class="text-center">Here are your currently active bookings.</p>
+
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        @foreach (var b in Model)
+        {
+            <div class="d-flex align-items-center p-3 mb-3 border rounded">
+                <div class="d-flex flex-column align-items-center me-3" style="width: 80px;">
+                    <p class="fs-1 mb-1">🚗</p>
+                    <p class="text-center">@b.Booking.BookingStatus</p>
+                </div>
+
+                <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                    <h5 class="mb-2">
+                        @b.Vehicle.Name the @b.Vehicle.Make @b.Vehicle.Model
+                    </h5>
+                    <p class="mb-1">
+                        Pickup @b.StartSite.SiteName Pod #@b.StartPod.PodName
+                    </p>
+                    <p class="mb-0">
+                        <strong>@b.Booking.StartTime.ToString("g") - @b.Booking.EndTime.ToString("g")</strong>
+                    </p>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <a class="btn mb-4 col-12 fw-bold text-white fs-4 w-100" style="background-color: #00A8E8;"
+                        href="/Bookings/Details/@b.Booking.BookingId">Details</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
