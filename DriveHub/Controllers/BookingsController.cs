@@ -39,17 +39,49 @@ namespace DriveHub.Controllers
         }
 
         // GET: Bookings/Details/5
+        // [Authorize] TODO
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            // This is code in the style I want to write but I cannot because StartPod and EndPod both being foreign keys of Pod confuses LINQ
+            // var booking = await _context.Bookings
+            //     .Include(b => b.Vehicle)
+            //     .Include(b => b.StartPod)
+            //     .Include(b => b.EndPod)
+            //     .FirstOrDefaultAsync(b => b.BookingId == id);
 
-            var booking = await _context.Bookings
-                .Include(b => b.ApplicationUser)
-                .Include(b => b.Vehicle)
-                .FirstOrDefaultAsync(m => m.BookingId == id);
+            // So instead we get this monstrosity
+            var booking = await (
+                from b in _context.Bookings
+                where b.BookingId == id
+                join v in _context.Vehicles on b.VehicleId equals v.VehicleId
+                join startPod in _context.Pods on b.StartPodId equals startPod.PodId
+                join startSite in _context.Sites on startPod.SiteId equals startSite.SiteId
+                join endPod in _context.Pods on b.EndPodId equals endPod.PodId
+                join endSite in _context.Sites on endPod.SiteId equals endSite.SiteId
+                select new
+                {
+                    b.BookingId,
+                    Vehicle = v,
+                    StartPod = new
+                    {
+                        Pod = startPod,
+                        PodName = startPod.PodName,
+                        Site = startSite
+                    },
+                    EndPod = new
+                    {
+                        Pod = endPod,
+                        PodName = endPod.PodName,
+                        Site = endSite
+                    },
+                    b.StartTime,
+                    b.EndTime,
+                    b.PricePerHour,
+                    b.BookingStatus
+                }
+            ).FirstOrDefaultAsync();
+
+            // TODO: needs to check booking belongs to User
             if (booking == null)
             {
                 return NotFound();
