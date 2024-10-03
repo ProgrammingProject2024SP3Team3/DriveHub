@@ -13,8 +13,8 @@ using NetTopologySuite.Geometries;
 namespace Admin.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241002093441_ApplicationDb")]
-    partial class ApplicationDb
+    [Migration("20241003060800_ApplicationContext")]
+    partial class ApplicationContext
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -570,8 +570,7 @@ namespace Admin.Migrations
                 {
                     b.Navigation("Bookings");
 
-                    b.Navigation("Pod")
-                        .IsRequired();
+                    b.Navigation("Pod");
                 });
 
             modelBuilder.Entity("DriveHubModel.VehicleRate", b =>

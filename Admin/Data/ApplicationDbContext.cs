@@ -1,7 +1,6 @@
 ﻿using DriveHubModel;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 
 namespace Admin.Data
 {
@@ -33,10 +32,10 @@ namespace Admin.Data
             modelBuilder.Entity<Pod>()
                .HasKey(c => c.PodId);
 
-            // TODO Set "geography" column type for spatial data in the Site entity
-            //modelBuilder.Entity<Site>()
-            //   .Property(l => l.Location)
-            //   .HasColumnType("geography");
+            // Set "geography" column type for spatial data in the Site entity
+            modelBuilder.Entity<Site>()
+               .Property(l => l.Location)
+               .HasColumnType("geography");
 
             modelBuilder.Entity<VehicleRate>()
                 .HasMany(c => c.Vehicles)
@@ -51,6 +50,11 @@ namespace Admin.Data
                 .WithMany(c => c.Vehicles)
                 .HasForeignKey(c => c.VehicleRateId);
 
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(c => c.Pod)
+                .WithOne(c => c.Vehicle)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
             // Define relationships
             modelBuilder.Entity<Site>()
                 .HasMany(c => c.Pods)
@@ -63,7 +67,8 @@ namespace Admin.Data
 
             modelBuilder.Entity<Pod>()
                 .HasOne(c => c.Vehicle)
-                .WithOne(c => c.Pod);
+                .WithOne(c => c.Pod)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.ApplicationUser)
@@ -73,7 +78,8 @@ namespace Admin.Data
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.Vehicle)
                 .WithMany(c => c.Bookings)
-                .HasForeignKey(c => c.VehicleId);
+                .HasForeignKey(c => c.VehicleId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<Booking>()
                 .Property(c => c.PricePerHour)

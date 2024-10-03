@@ -1,4 +1,4 @@
-﻿@model DriveHubModel.Pod
+﻿@model Admin.Models.Dto.Pod
 
 @{
     ViewData["Title"] = "Create";
@@ -14,11 +14,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="SiteId" class="control-label"></label>
-                <select asp-for="SiteId" class ="form-control" asp-items="ViewBag.SiteId"></select>
+                <select asp-for="SiteId" class="form-control" asp-items="ViewBag.SiteId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="VehicleId" class="control-label"></label>
-                <select asp-for="VehicleId" class ="form-control" asp-items="ViewBag.VehicleId"></select>
+                <select asp-for="VehicleId" class="form-control" asp-items="ViewBag.VehicleId">
+                    <option value="">None</option>
+                </select>
             </div>
             <div class="form-group">
                 <label asp-for="PodName" class="control-label"></label>
@@ -37,5 +39,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

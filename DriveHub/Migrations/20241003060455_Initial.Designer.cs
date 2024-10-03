@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace DriveHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241001081013_Initial")]
+    [Migration("20241003060455_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -570,8 +570,7 @@ namespace DriveHub.Migrations
                 {
                     b.Navigation("Bookings");
 
-                    b.Navigation("Pod")
-                        .IsRequired();
+                    b.Navigation("Pod");
                 });
 
             modelBuilder.Entity("DriveHubModel.VehicleRate", b =>

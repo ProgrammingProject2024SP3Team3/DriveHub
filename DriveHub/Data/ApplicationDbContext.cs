@@ -51,6 +51,11 @@ namespace DriveHub.Data
                 .WithMany(c => c.Vehicles)
                 .HasForeignKey(c => c.VehicleRateId);
 
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(c => c.Pod)
+                .WithOne(c => c.Vehicle)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
             // Define relationships
             modelBuilder.Entity<Site>()
                 .HasMany(c => c.Pods)
@@ -63,7 +68,8 @@ namespace DriveHub.Data
 
             modelBuilder.Entity<Pod>()
                 .HasOne(c => c.Vehicle)
-                .WithOne(c => c.Pod);
+                .WithOne(c => c.Pod)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.ApplicationUser)
@@ -73,7 +79,8 @@ namespace DriveHub.Data
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.Vehicle)
                 .WithMany(c => c.Bookings)
-                .HasForeignKey(c => c.VehicleId);
+                .HasForeignKey(c => c.VehicleId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<Booking>()
                 .Property(c => c.PricePerHour)

@@ -567,8 +567,7 @@ namespace Admin.Migrations
                 {
                     b.Navigation("Bookings");
 
-                    b.Navigation("Pod")
-                        .IsRequired();
+                    b.Navigation("Pod");
                 });
 
             modelBuilder.Entity("DriveHubModel.VehicleRate", b =>

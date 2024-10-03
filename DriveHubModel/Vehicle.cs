@@ -48,7 +48,31 @@ namespace DriveHubModel
             Colour = colour;
             Name = name;
         }
-         
+
+        [SetsRequiredMembers]
+        public Vehicle(
+            string vehicleRateId,
+            string make,
+            string model,
+            string registrationPlate,
+            string state,
+            string year,
+            int seats,
+            string colour,
+            string name
+            )
+        {
+            VehicleRateId = vehicleRateId;
+            Make = make;
+            Model = model;
+            RegistrationPlate = registrationPlate;
+            State = state;
+            Year = year;
+            Seats = seats;
+            Colour = colour;
+            Name = name;
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VehicleId { get; set; }
@@ -88,9 +112,15 @@ namespace DriveHubModel
         public virtual VehicleRate VehicleRate { get; set; }
 
         [JsonIgnore]
-        public virtual Pod Pod { get; set; }
+        [DisplayFormat(NullDisplayText = "None")]
+        public virtual Pod? Pod { get; set; }
 
         [JsonIgnore]
         public virtual IList<Booking> Bookings { get; set; } = new List<Booking>();
+
+        public override string ToString()
+        {
+            return VehicleId + " " + Name + " " + Make + " " + Model + " " + RegistrationPlate + " " + State + " " + Year + " " + Seats + " " + Colour + " " + VehicleRateId;
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace DriveHubModel
         public string EndPodId { get; set; }
 
         [Required]
-        [DataType(DataType.DateTime)]
+        [DataType(DataType.DateTime, ErrorMessage = "A start time is required")]
         [DisplayName("Start Time")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime StartTime { get; set; }

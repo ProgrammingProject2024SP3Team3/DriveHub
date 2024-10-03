@@ -91,10 +91,26 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("VehicleId,VehicleRateId,Make,Model,RegistrationPlate,State,Year,Seats")] Vehicle vehicle)
+        public async Task<IActionResult> Edit(string id, Admin.Models.Dto.Vehicle vehicleDto)
         {
-            if (id != vehicle.VehicleId)
+            _logger.LogInformation($"Editing {id}");
+            _logger.LogInformation($"Editing {vehicleDto.ToString()}");
+            var vehicle = await _context.Vehicles.FindAsync(id);
+            if (id != vehicleDto.VehicleId)
             {
+                _logger.LogWarning($"No match for {id}");
+                return NotFound();
+            }
+
+            if (vehicle == null)
+            {
+                _logger.LogWarning($"No match for {id}");
+                return NotFound();
+            }
+
+            if (!_context.VehicleRates.Any(e => e.VehicleRateId == vehicleDto.VehicleRateId))
+            {
+                _logger.LogWarning($"No match for rate {vehicleDto.VehicleRateId}");
                 return NotFound();
             }
 
@@ -102,13 +118,27 @@ namespace Admin.Controllers
             {
                 try
                 {
+                    _logger.LogWarning($"Model is valid {id}");                  
+
+                    vehicle.VehicleRateId = vehicleDto.VehicleRateId;
+                    vehicle.Name = vehicleDto.Name;
+                    vehicle.Make = vehicleDto.Make;
+                    vehicle.Model = vehicleDto.Model;
+                    vehicle.RegistrationPlate = vehicleDto.RegistrationPlate;
+                    vehicle.State = vehicleDto.State;
+                    vehicle.Year = vehicleDto.Year;
+                    vehicle.Seats = vehicleDto.Seats;
+                    vehicle.Colour = vehicleDto.Colour;
+
                     _context.Update(vehicle);
+                    _logger.LogWarning($"Updated {id}");
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!VehicleExists(vehicle.VehicleId))
                     {
+                        _logger.LogWarning($"Database error {id}");
                         return NotFound();
                     }
                     else
@@ -116,9 +146,11 @@ namespace Admin.Controllers
                         throw;
                     }
                 }
+                _logger.LogWarning($"Success editing {id}");
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "VehicleRateId", vehicle.VehicleRateId);
+            _logger.LogWarning($"Failed editing {id}");
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description", vehicle.VehicleRateId);
             return View(vehicle);
         }
 
