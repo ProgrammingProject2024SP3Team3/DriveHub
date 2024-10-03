@@ -231,58 +231,45 @@ namespace DriveHub.Controllers
         }
 
         // GET: Bookings/Edit/5
+        // [Authorize] Todo need authorize to work
         public async Task<IActionResult> Edit(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            // TODO: need to get booking only if it belongs to logged in user
             var booking = await _context.Bookings.FindAsync(id);
             if (booking == null)
             {
                 return NotFound();
             }
-            ViewData["Id"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", booking.Id);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", booking.VehicleId);
+
             return View(booking);
         }
 
         // POST: Bookings/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("BookingId,VehicleId,Id,StartPodId,EndPodId,StartTime,EndTime,PricePerHour,BookingStatus")] Booking booking)
+        // [Authorize] TODO needs authorize
+        public async Task<IActionResult> Edit(string id, DateTime StartTime, DateTime EndTime)
         {
-            if (id != booking.BookingId)
-            {
-                return NotFound();
+            // All of this can be put into model validations
+            if (
+                StartTime.AddHours(1) > EndTime // minimum 1 hour booking
+                || StartTime < DateTime.Now.AddMinutes(1) // booking start must be >= 1 minute from now
+                || StartTime > DateTime.Now.AddDays(7) // booking can't start more than 1 week from now per Veronika's requirement
+            ) {
+                // This should absolutely do the asp.net inline validation errors thing you guys know how to do
+                return BadRequest("StartTime must be between 1 minute and 1 week from now.");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(booking);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookingExists(booking.BookingId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["Id"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", booking.Id);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", booking.VehicleId);
-            return View(booking);
+            // TODO this needs to check the booking is associated with the logged in user
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null) return NotFound();
+            // This prevents changing of a completed journey but will need to be updated when we add more statuses
+            if (booking.BookingStatus == BookingStatus.Complete) return BadRequest("Can't change a completed Booking");
+
+            booking.StartTime = StartTime;
+            booking.EndTime = EndTime;
+            _context.SaveChanges();
+            return RedirectToAction("Details", new { id = booking.BookingId });
         }
 
         // GET: Bookings/Delete/5
