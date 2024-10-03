@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
+    [DisplayName("Price Category")]
     public class VehicleRate
     {
         public VehicleRate() { }
@@ -45,12 +46,13 @@ namespace DriveHubModel
         [Required]
         [DataType(DataType.Currency)]
         [DisplayFormat(DataFormatString = "{0:C}")]
+        [DisplayName("Price per hour")]
         public decimal PricePerHour { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         [DisplayName("Effective Date")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime EffectiveDate { get; set; }
 
         [JsonIgnore]

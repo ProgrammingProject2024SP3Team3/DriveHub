@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Admin.Migrations
+namespace Admin.Migrations.AdminDb
 {
     [DbContext(typeof(AdminDbContext))]
     partial class AdminDbContextModelSnapshot : ModelSnapshot

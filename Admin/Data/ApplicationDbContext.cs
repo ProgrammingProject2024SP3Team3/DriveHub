@@ -1,7 +1,6 @@
 ﻿using DriveHubModel;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 
 namespace Admin.Data
 {
@@ -21,38 +20,22 @@ namespace Admin.Data
             base.OnModelCreating(modelBuilder);
 
             // Define keys
+            modelBuilder.Entity<VehicleRate>()
+                .HasKey(c => c.VehicleRateId);
+
+            modelBuilder.Entity<Vehicle>()
+               .HasKey(c => c.VehicleId);
+
             modelBuilder.Entity<Site>()
                .HasKey(c => c.SiteId);
 
             modelBuilder.Entity<Pod>()
                .HasKey(c => c.PodId);
 
-            modelBuilder.Entity<Vehicle>()
-               .HasKey(c => c.VehicleId);
-
-            modelBuilder.Entity<VehicleRate>()
-                .HasKey(c => c.VehicleRateId);
-
             // Set "geography" column type for spatial data in the Site entity
-            //modelBuilder.Entity<Site>()
-            //   .Property(l => l.Location)
-            //   .HasColumnType("geography");
-
-            // Define relationships
             modelBuilder.Entity<Site>()
-                .HasMany(c => c.Pods)
-                .WithOne(c => c.Site)
-                .HasForeignKey(c => c.SiteId);
-
-            modelBuilder.Entity<Pod>()
-                .HasOne(c => c.Site)
-                .WithMany(c => c.Pods)
-                .HasForeignKey(c => c.SiteId);
-
-            modelBuilder.Entity<Vehicle>()
-                .HasOne(c => c.VehicleRate)
-                .WithMany(c => c.Vehicles)
-                .HasForeignKey(c => c.VehicleRateId);
+               .Property(l => l.Location)
+               .HasColumnType("geography");
 
             modelBuilder.Entity<VehicleRate>()
                 .HasMany(c => c.Vehicles)
@@ -62,6 +45,31 @@ namespace Admin.Data
                 .Property(c => c.PricePerHour)
                 .HasColumnType("Money");
 
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(c => c.VehicleRate)
+                .WithMany(c => c.Vehicles)
+                .HasForeignKey(c => c.VehicleRateId);
+
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(c => c.Pod)
+                .WithOne(c => c.Vehicle)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            // Define relationships
+            modelBuilder.Entity<Site>()
+                .HasMany(c => c.Pods)
+                .WithOne(c => c.Site);
+
+            modelBuilder.Entity<Pod>()
+                .HasOne(c => c.Site)
+                .WithMany(c => c.Pods)
+                .HasForeignKey(c => c.SiteId);
+
+            modelBuilder.Entity<Pod>()
+                .HasOne(c => c.Vehicle)
+                .WithOne(c => c.Pod)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.ApplicationUser)
                 .WithMany(c => c.Bookings)
@@ -70,7 +78,8 @@ namespace Admin.Data
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.Vehicle)
                 .WithMany(c => c.Bookings)
-                .HasForeignKey(c => c.VehicleId);
+                .HasForeignKey(c => c.VehicleId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<Booking>()
                 .Property(c => c.PricePerHour)

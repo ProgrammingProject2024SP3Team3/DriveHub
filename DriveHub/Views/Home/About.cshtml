@@ -1,117 +1,104 @@
 @{
     ViewData["Title"] = "About Us";
 }
-<h1 class="mb-6">@ViewData["Title"]</h1>
+
 
 <!--BODY STARTS HERE-->
-<div class="container">
-    <div class="container text-center">
-        <div class="row align-items-start">
-            <div class="col">
-                <p class="lead">
-                    Ease of Use
-                </p>
-            </div>
-            <div class="col">
-                <p class="lead">
-                    Seamless transactions
-                </p>
-            </div>
-            <div class="col">
-                <p class="lead">
-                    World Class Support
-                </p>
-            </div>
-        </div>
-        <p>
-        <p class="lead">
-            Lorem ipsum dolor sit amet. Quo praesentium dignissimos rem totam dolorem sed iusto exercitationem sed
-            nemo vero a molestias neque est enim voluptatem. Id sequi vitae ut velit laboriosam ut omnis error eos
-            consequatur consequatur ea obcaecati laudantium! Aut neque quis ut nesciunt officiis aut amet Quis non
-            cupiditate blanditiis.
-        </p>
-        <p class="lead">
-            Est quidem autem quo dolores officiis vel iusto cupiditate qui enim pariatur et enim consequatur qui
-            laboriosam galisum! Et odio asperiores ut consequuntur quisquam est voluptas suscipit cum laboriosam
-            amet et consequatur commodi ex nesciunt modi nam odio iure. Et molestiae labore et labore impedit sed
-            quidem voluptatum est repellat internos est assumenda voluptatem sed vero aliquid et earum Quis.
-        </p>
-        <p class="lead">
-            Et nostrum enim ut architecto Quis ea quisquam nostrum est repellat perferendis est enim odit qui quas
-            amet et quasi nulla. Id dolore molestias et veritatis officia vel magnam officia ea animi consequatur et
-            quam nemo eos voluptas sequi non sapiente quis. Sed voluptatem molestias est molestias incidunt et sunt
-            quaerat nam dicta aperiam sit quia expedita et suscipit rerum.
-        </p>
-        </p>
-    </div>
-    <div class="container">
-        <div id="carouselExampleWhite" class="carousel carousel-white slide">
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#carouselExampleWhite" data-bs-slide-to="0" class="active"
-                        aria-current="true" aria-label="Slide 1"></button>
-                <button type="button" data-bs-target="#carouselExampleWhite" data-bs-slide-to="1"
-                        aria-label="Slide 2"></button>
-                <button type="button" data-bs-target="#carouselExampleWhite" data-bs-slide-to="2"
-                        aria-label="Slide 3"></button>
-            </div>
-            <div class="carousel-inner">
-                <div class="carousel-item active" data-bs-interval="10000">
-                    <img src="https://drivehubstorage.blob.core.windows.net/website/showcase-about-keys.jpg"
-                         class="d-block w-100" alt="...">
-                    <div class="carousel-caption d-none d-md-block">
-                        <h5>First slide label</h5>
-                        <p>Some representative placeholder content for the first slide.</p>
-                    </div>
-                </div>
-                <div class="carousel-item" data-bs-interval="2000">
-                    <img src="https://drivehubstorage.blob.core.windows.net/website/showcase-about-happy1.jpg"
-                         class="d-block w-100" alt="...">
-                    <div class="carousel-caption d-none d-md-block">
-                        <h5>Second slide label</h5>
-                        <p>Some representative placeholder content for the second slide.</p>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <img src="https://drivehubstorage.blob.core.windows.net/website/showcase-about-customerservice.jpg"
-                         class="d-block w-100" alt="...">
-                    <div class="carousel-caption d-none d-md-block">
-                        <h5>Third slide label</h5>
-                        <p>Some representative placeholder content for the third slide.</p>
-                    </div>
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark"
-                    data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark"
-                    data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-        <div class="container">
-            <h1>Sample Text</h1>
-            <p class="lead">
-                Lorem ipsum dolor sit amet. Quo praesentium dignissimos rem totam dolorem sed iusto exercitationem sed
-                nemo vero a molestias neque est enim voluptatem. Id sequi vitae ut velit laboriosam ut omnis error eos
-                consequatur consequatur ea obcaecati laudantium! Aut neque quis ut nesciunt officiis aut amet Quis non
-                cupiditate blanditiis.
-            </p>
-            <p class="lead">
-                Est quidem autem quo dolores officiis vel iusto cupiditate qui enim pariatur et enim consequatur qui
-                laboriosam galisum! Et odio asperiores ut consequuntur quisquam est voluptas suscipit cum laboriosam
-                amet et consequatur commodi ex nesciunt modi nam odio iure. Et molestiae labore et labore impedit sed
-                quidem voluptatum est repellat internos est assumenda voluptatem sed vero aliquid et earum Quis.
-            </p>
-            <p class="lead">
-                Et nostrum enim ut architecto Quis ea quisquam nostrum est repellat perferendis est enim odit qui quas
-                amet et quasi nulla. Id dolore molestias et veritatis officia vel magnam officia ea animi consequatur et
-                quam nemo eos voluptas sequi non sapiente quis. Sed voluptatem molestias est molestias incidunt et sunt
-                quaerat nam dicta aperiam sit quia expedita et suscipit rerum.
-            </p>
-            </p>
-        </div>
-    </div>
+<style>
+    /* CSS to make the image responsive */
+    .responsive-image {
+        width: 100%; /* Make the image span the entire width of the page */
+        height: auto; /* Keep the aspect ratio */
+    }
+
+    /* Optional: Add some styling for the container */
+    .hero-container {
+        position: relative;
+        max-width: 100%; /* Ensures the image doesn't stretch beyond the viewport */
+        overflow: hidden; /* Hides any overflow if the image is too large */
+        padding: 40px;
+    }
+    
+
+    .smallhero-container {
+        max-width: 50%;
+        overflow: hidden;
+    }
+
+    .container-text-centre {
+        padding: 40px;
+    }
+
+    .subhero-section {
+        padding: 40px;
+    }
+    .lead{
+        padding: 20px;
+    }
+
+</style>
+<div class="hero-container">
+    <img src="https://drivehubstorage.blob.core.windows.net/website/about-hero-edit.png" alt="Responsive Image" class="responsive-image">
 </div>
+
+
+
+
+
+<div class="contents-container">
+    <div class="container-text-center">
+        <p class="lead">
+            DriveHub was proudly created by the students of RMIT's Programming Project SP3 2024 with an the idea of removing the hassles of owning a car and giving customers the convenience of hiring one with an on-demand server.
+            DriveHub plans to revolutionise the car indutry by giving the opportunity to it's customers to hire a car at their lesiure and drop it off at one of their hubs around Melbourne.
+            Providing a safe way to hire a car and not have any of the worries about owning the car.'
+        </p>
+        <div class="sub-container-section">
+            <div class="subhero-section">
+                <div class="row">
+                    <div class="col">
+                        <img src="https://drivehubstorage.blob.core.windows.net/website/about-mechanic.jpg" alt="responsive image" class="responsive-image">
+                    </div>
+                    <div class="col">
+                        <p class="lead">
+                            Born from the problem of expensive and time-consuming ownership, DriveHub has transformed urban mobility into a user-centric and hassle-free experience.
+                            Offering 24/7 access to a fleet of professionall owned and maintained cars.
+                            Using a QR code booking systema nd a pay-by-the-hour flexability along with a return to hub system that ensures your next ride is always where you need it to be.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="container-text-center">
+        <div class="sub-container-section">
+            <div class="subhero-section">
+                <div class="row">
+                    <div class="col">
+                        <p class="lead">
+                            Over 100 different cars to choose from located at 4 hubs around Melbourne, DriveHub will prove to be a leading Australian carshare provider,
+                            offering its customers accessible and affordable freedom without the hassle of car ownership.
+
+                            Become a DriveHub member today and join us in the movement to sustainable mobility and urban convenience.
+                        </p>
+                    </div>
+                    <div class="col">
+                        <img src="https://drivehubstorage.blob.core.windows.net/website/showcase-about-happy1.jpg" alt="responsive image" class="responsive-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-text-center">
+            <div class="sub-container-section">
+                <div class="subhero-section">
+                    <p class="lead">
+                        Founding Members of DriveHub are:
+                        Ian, Sean, Jack, Jarryd and Shampee
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>

@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Admin.Migrations
+namespace Admin.Migrations.AdminDb
 {
     [DbContext(typeof(AdminDbContext))]
-    [Migration("20240924112950_Admin")]
-    partial class Admin
+    [Migration("20241002093604_AdminDb")]
+    partial class AdminDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

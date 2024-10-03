@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Admin.Data;
@@ -13,16 +9,18 @@ namespace Admin.Controllers
     public class PodsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
-        public PodsController(ApplicationDbContext context)
+        public PodsController(ApplicationDbContext context, ILogger<PodsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Pods
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Pods.Include(p => p.Site).Include(p => p.Vehicle);
+            var applicationDbContext = _context.Pods.Include(p => p.Site).Include(p => p.Vehicle).OrderBy(c => c.SiteId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -38,6 +36,7 @@ namespace Admin.Controllers
                 .Include(p => p.Site)
                 .Include(p => p.Vehicle)
                 .FirstOrDefaultAsync(m => m.PodId == id);
+
             if (pod == null)
             {
                 return NotFound();
@@ -49,8 +48,9 @@ namespace Admin.Controllers
         // GET: Pods/Create
         public IActionResult Create()
         {
-            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "Address");
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId");
+            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName");
+            var vehicles = _context.Vehicles.Where(c => c.Pod == null).ToList();
+            ViewData["VehicleId"] = new SelectList(vehicles, "VehicleId", "Name");
             return View();
         }
 
@@ -59,16 +59,23 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PodId,SiteId,VehicleId,PodName")] Pod pod)
+        public async Task<IActionResult> Create(Admin.Models.Dto.Pod pod)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(pod);
+                Pod podDb = new Pod(
+                    pod.SiteId,
+                    pod.VehicleId,
+                    pod.PodName
+                    );
+                _context.Add(podDb);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "Address", pod.SiteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", pod.VehicleId);
+
+            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName", pod.SiteId);
+            var vehicles = _context.Vehicles.Where(c => c.Pod == null).ToList();
+            ViewData["VehicleId"] = new SelectList(vehicles, "VehicleId", "Name", pod.VehicleId);
             return View(pod);
         }
 
@@ -85,8 +92,18 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "Address", pod.SiteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", pod.VehicleId);
+
+            var vehicles = new List<Vehicle>();
+            if (pod.VehicleId != null)
+            {
+                _logger.LogWarning($"Pod {id} has a vehicle");
+                var vehicle = await _context.Vehicles.FindAsync(pod.VehicleId);
+                vehicles.Add(vehicle);
+            }
+            vehicles.AddRange(await _context.Vehicles.Where(c => c.Pod == null).ToListAsync());
+
+            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName", pod.SiteId);
+            ViewData["VehicleId"] = new SelectList(vehicles, "VehicleId", "Name", pod.VehicleId);
             return View(pod);
         }
 
@@ -122,8 +139,18 @@ namespace Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "Address", pod.SiteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", pod.VehicleId);
+
+            var vehicles = new List<Vehicle>();
+            if (pod.VehicleId != null)
+            {
+                _logger.LogWarning($"Pod {id} has a vehicle");
+                var vehicle = await _context.Vehicles.FindAsync(pod.VehicleId);
+                vehicles.Add(vehicle);
+            }
+            vehicles.AddRange(await _context.Vehicles.Where(c => c.Pod == null).ToListAsync());
+
+            ViewData["SiteId"] = new SelectList(_context.Sites, "SiteId", "SiteName", pod.SiteId);
+            ViewData["VehicleId"] = new SelectList(vehicles, "VehicleId", "Name", pod.VehicleId);
             return View(pod);
         }
 

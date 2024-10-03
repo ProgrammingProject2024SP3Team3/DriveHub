@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
@@ -62,7 +63,8 @@ namespace DriveHub.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Latitude = table.Column<double>(type: "float", nullable: false),
-                    Longitude = table.Column<double>(type: "float", nullable: false)
+                    Longitude = table.Column<double>(type: "float", nullable: false),
+                    Location = table.Column<Point>(type: "geography", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -354,7 +356,9 @@ namespace DriveHub.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Pods_VehicleId",
                 table: "Pods",
-                column: "VehicleId");
+                column: "VehicleId",
+                unique: true,
+                filter: "[VehicleId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_VehicleRateId",

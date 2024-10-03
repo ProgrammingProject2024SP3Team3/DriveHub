@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Pods</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -12,6 +12,9 @@
 <table class="table">
     <thead>
         <tr>
+            <th>
+                Photo
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.PodName)
             </th>
@@ -28,11 +31,14 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td class="img-fluid col-1">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/sites/@(@item.SiteId).jpg" />
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PodName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Site.Address)
+                    @Html.DisplayFor(modelItem => item.Site.SiteName)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Vehicle.Name)

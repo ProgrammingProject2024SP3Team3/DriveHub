@@ -11,7 +11,6 @@
  * as assessment work for COSC2650 Programming Project
  */
 
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -49,13 +48,37 @@ namespace DriveHubModel
             Colour = colour;
             Name = name;
         }
-         
+
+        [SetsRequiredMembers]
+        public Vehicle(
+            string vehicleRateId,
+            string make,
+            string model,
+            string registrationPlate,
+            string state,
+            string year,
+            int seats,
+            string colour,
+            string name
+            )
+        {
+            VehicleRateId = vehicleRateId;
+            Make = make;
+            Model = model;
+            RegistrationPlate = registrationPlate;
+            State = state;
+            Year = year;
+            Seats = seats;
+            Colour = colour;
+            Name = name;
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VehicleId { get; set; }
 
         [ForeignKey("VehicleRate")]
-        [DisplayName("Rate")]
+        [DisplayName("Price Category")]
         [Required]
         public string VehicleRateId { get; set; }
 
@@ -85,9 +108,19 @@ namespace DriveHubModel
         public string Name { get; set; }
 
         [JsonIgnore]
+        [DisplayName("Price Category")]
         public virtual VehicleRate VehicleRate { get; set; }
 
         [JsonIgnore]
+        [DisplayFormat(NullDisplayText = "None")]
+        public virtual Pod? Pod { get; set; }
+
+        [JsonIgnore]
         public virtual IList<Booking> Bookings { get; set; } = new List<Booking>();
+
+        public override string ToString()
+        {
+            return VehicleId + " " + Name + " " + Make + " " + Model + " " + RegistrationPlate + " " + State + " " + Year + " " + Seats + " " + Colour + " " + VehicleRateId;
+        }
     }
 }

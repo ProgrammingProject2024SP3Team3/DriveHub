@@ -9,6 +9,7 @@
  * as assessment work for COSC2650 Programming Project
  */
 
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -35,6 +36,7 @@ namespace DriveHubModel
             PostCode = postcode;
             Latitude = latitude;
             Longitude = longitude;
+            Location = new Point(longitude, latitude) { SRID = 4326 };
         }
 
         [Key]
@@ -42,6 +44,7 @@ namespace DriveHubModel
         public int SiteId { get; set; }
 
         [Required]
+        [DisplayName("Site name")]
         public string SiteName { get; set; }
 
         [Required]
@@ -58,8 +61,8 @@ namespace DriveHubModel
         public double Longitude { get; set; }
 
         // NetTopologySuite spatial data
-        //[Required]
-        //public Point Location { get; set; }  // Spatial data
+        [Required]
+        public Point Location { get; set; }  // Spatial data
 
         // One-to-Many relationship: A Site can have many Pods
         [JsonIgnore]

@@ -6,13 +6,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace Admin.Migrations.ApplicationDb
+namespace Admin.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240929085440_ApplicationContext")]
+    [Migration("20241003060800_ApplicationContext")]
     partial class ApplicationContext
     {
         /// <inheritdoc />
@@ -113,7 +114,9 @@ namespace Admin.Migrations.ApplicationDb
 
                     b.HasIndex("SiteId");
 
-                    b.HasIndex("VehicleId");
+                    b.HasIndex("VehicleId")
+                        .IsUnique()
+                        .HasFilter("[VehicleId] IS NOT NULL");
 
                     b.ToTable("Pods");
                 });
@@ -136,6 +139,10 @@ namespace Admin.Migrations.ApplicationDb
 
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
+
+                    b.Property<Point>("Location")
+                        .IsRequired()
+                        .HasColumnType("geography");
 
                     b.Property<double>("Longitude")
                         .HasColumnType("float");
@@ -479,8 +486,8 @@ namespace Admin.Migrations.ApplicationDb
                         .IsRequired();
 
                     b.HasOne("DriveHubModel.Vehicle", "Vehicle")
-                        .WithMany()
-                        .HasForeignKey("VehicleId");
+                        .WithOne("Pod")
+                        .HasForeignKey("DriveHubModel.Pod", "VehicleId");
 
                     b.Navigation("Site");
 
@@ -562,6 +569,8 @@ namespace Admin.Migrations.ApplicationDb
             modelBuilder.Entity("DriveHubModel.Vehicle", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Pod");
                 });
 
             modelBuilder.Entity("DriveHubModel.VehicleRate", b =>
