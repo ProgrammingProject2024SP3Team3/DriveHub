@@ -65,6 +65,12 @@ namespace DriveHubModel
         public virtual ApplicationUser ApplicationUser { get; set; }
 
         [JsonIgnore]
+        public virtual Pod StartPod { get; set; }
+
+        [JsonIgnore]
+        public virtual Pod EndPod { get; set; }
+
+        [JsonIgnore]
         public virtual Vehicle Vehicle { get; set; }
 
         [JsonIgnore]
