@@ -1,18 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DriveHub.Data;
 using DriveHubModel;
+using DriveHub.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DriveHub.Controllers
 {
+    [Authorize]
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
-        public BookingsController(ApplicationDbContext context)
+        public BookingsController(ApplicationDbContext context, ILogger<ApplicationDbContext> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Bookings
@@ -21,12 +25,21 @@ namespace DriveHub.Controllers
             return View();
         }
 
-        public IActionResult Search()
+        public async Task<IActionResult> Search()
         {
-            return View();
+            var vehicles = await _context.Vehicles.Where(c => c.Pod != null).Include(c => c.VehicleRate).ToListAsync();
+            var seats = vehicles.Select(c => c.Seats).Distinct().ToList();
+            var vehicleRates = await _context.VehicleRates.ToListAsync();
+            var pods = await _context.Pods.Where(c => c.VehicleId != null).Include(c => c.Site).Include(c => c.Vehicle).OrderBy(c => c.SiteId).ToListAsync();
+            var bookingSearchVM = new BookingSearchVM(
+                vehicles,
+                seats,
+                vehicleRates,
+                pods
+                );
+            return View(bookingSearchVM);
         }
 
-        // [Authorize] needed
         public async Task<IActionResult> CurrentBookings()
         {
             // TODO: this needs to be scoped to the currently logged in user's bookings
@@ -39,21 +52,21 @@ namespace DriveHub.Controllers
             //     .FirstOrDefaultAsync(b => b.BookingId == id);
             // Unfortunately this is the code I can make work involving start and end pods
             var bookings = await (from b in _context.Bookings
-                join sp in _context.Pods on b.StartPodId equals sp.PodId
-                join ep in _context.Pods on b.EndPodId equals ep.PodId
-                join ss in _context.Sites on sp.SiteId equals ss.SiteId
-                join es in _context.Sites on ep.SiteId equals es.SiteId
-                join vs in _context.Vehicles on b.VehicleId equals vs.VehicleId
-                where b.BookingStatus != BookingStatus.Complete
-                select new
-                {
-                    Booking = b,
-                    StartPod = sp,
-                    EndPod = ep,
-                    StartSite = ss,
-                    EndSite = es,
-                    Vehicle = vs
-                }).ToListAsync();
+                                  join sp in _context.Pods on b.StartPodId equals sp.PodId
+                                  join ep in _context.Pods on b.EndPodId equals ep.PodId
+                                  join ss in _context.Sites on sp.SiteId equals ss.SiteId
+                                  join es in _context.Sites on ep.SiteId equals es.SiteId
+                                  join vs in _context.Vehicles on b.VehicleId equals vs.VehicleId
+                                  where b.BookingStatus != BookingStatus.Complete
+                                  select new
+                                  {
+                                      Booking = b,
+                                      StartPod = sp,
+                                      EndPod = ep,
+                                      StartSite = ss,
+                                      EndSite = es,
+                                      Vehicle = vs
+                                  }).ToListAsync();
 
             return View(bookings);
         }
@@ -71,21 +84,21 @@ namespace DriveHub.Controllers
             //     .FirstOrDefaultAsync(b => b.BookingId == id);
             // Unfortunately this is the code I can make work involving start and end pods
             var bookings = await (from b in _context.Bookings
-                join sp in _context.Pods on b.StartPodId equals sp.PodId
-                join ep in _context.Pods on b.EndPodId equals ep.PodId
-                join ss in _context.Sites on sp.SiteId equals ss.SiteId
-                join es in _context.Sites on ep.SiteId equals es.SiteId
-                join vs in _context.Vehicles on b.VehicleId equals vs.VehicleId
-                where b.BookingStatus == BookingStatus.Complete
-                select new
-                {
-                    Booking = b,
-                    StartPod = sp,
-                    EndPod = ep,
-                    StartSite = ss,
-                    EndSite = es,
-                    Vehicle = vs
-                }).ToListAsync();
+                                  join sp in _context.Pods on b.StartPodId equals sp.PodId
+                                  join ep in _context.Pods on b.EndPodId equals ep.PodId
+                                  join ss in _context.Sites on sp.SiteId equals ss.SiteId
+                                  join es in _context.Sites on ep.SiteId equals es.SiteId
+                                  join vs in _context.Vehicles on b.VehicleId equals vs.VehicleId
+                                  where b.BookingStatus == BookingStatus.Complete
+                                  select new
+                                  {
+                                      Booking = b,
+                                      StartPod = sp,
+                                      EndPod = ep,
+                                      StartSite = ss,
+                                      EndSite = es,
+                                      Vehicle = vs
+                                  }).ToListAsync();
 
             return View(bookings);
         }
@@ -94,6 +107,9 @@ namespace DriveHub.Controllers
         // [Authorize] TODO
         public async Task<IActionResult> Details(string id)
         {
+
+            var user = HttpContext.User;
+
             // This is code in the style I want to write but I cannot because StartPod and EndPod both being foreign keys of Pod confuses LINQ
             // var booking = await _context.Bookings
             //     .Include(b => b.Vehicle)
@@ -191,7 +207,7 @@ namespace DriveHub.Controllers
                 // I don't think this should rerender the view for the user to try again, because something is really wrong here beyond just a validation error
                 return BadRequest("Invalid booking");
             }
-            
+
             var booking = new Booking
             {
                 VehicleId = id,
@@ -255,7 +271,8 @@ namespace DriveHub.Controllers
                 StartTime.AddHours(1) > EndTime // minimum 1 hour booking
                 || StartTime < DateTime.Now.AddMinutes(1) // booking start must be >= 1 minute from now
                 || StartTime > DateTime.Now.AddDays(7) // booking can't start more than 1 week from now per Veronika's requirement
-            ) {
+            )
+            {
                 // This should absolutely do the asp.net inline validation errors thing you guys know how to do
                 return BadRequest("StartTime must be between 1 minute and 1 week from now.");
             }
@@ -318,13 +335,15 @@ namespace DriveHub.Controllers
                 return NotFound();
             }
             var pod = await _context.Pods.FindAsync(booking.EndPodId);
+
             // This null check should not be necessary as endPodId is a Foreign-Key but the compiler complains (I think there's an underlying model problem here)
             if (pod == null)
             {
                 return NotFound();
             }
             // Prevent anyone returning an already returned car at a later date)
-            if (booking.BookingStatus == BookingStatus.Complete) {
+            if (booking.BookingStatus == BookingStatus.Complete)
+            {
                 return BadRequest("Can't return a completed Booking");
             }
 
@@ -336,7 +355,7 @@ namespace DriveHub.Controllers
             booking.BookingStatus = BookingStatus.Complete;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Details), new { id =  booking.BookingId });
+            return RedirectToAction(nameof(Details), new { id = booking.BookingId });
         }
 
         private bool BookingExists(string id)

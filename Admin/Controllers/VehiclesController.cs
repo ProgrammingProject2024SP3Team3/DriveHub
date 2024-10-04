@@ -95,13 +95,14 @@ namespace Admin.Controllers
         {
             _logger.LogInformation($"Editing {id}");
             _logger.LogInformation($"Editing {vehicleDto.ToString()}");
-            var vehicle = await _context.Vehicles.FindAsync(id);
+
             if (id != vehicleDto.VehicleId)
             {
                 _logger.LogWarning($"No match for {id}");
                 return NotFound();
             }
 
+            var vehicle = await _context.Vehicles.FindAsync(id);
             if (vehicle == null)
             {
                 _logger.LogWarning($"No match for {id}");

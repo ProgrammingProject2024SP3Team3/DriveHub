@@ -4,29 +4,34 @@
 
 <style>
     a.booking-link :hover {
-        background-color: lightgray;
+        background-color: #eeeeee;
     }
 </style>
 
-<h1 class="mb-6">Bookings</h1>
-
-<div class="row mt-6 text-center">
-    <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="Search">
-        <div>
-            <i class="bi bi-calendar-plus" style="color:#00A8E8; font-size:100px"></i>
-            <h3 class="service-heading">Book a Car</h3>
+<div class="row mt-2 text-center">
+    <div class="col-xs-0 col-md-1 col-lg-2"></div>
+    <div class="col-xs-12 col-md-10 col-lg-8">
+        <h1 class="mb-6">Bookings</h1>
+        <div class="row mt-2">
+            <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="Search">
+                <div>
+                    <i class="bi bi-calendar-plus" style="color:#00A8E8; font-size:100px"></i>
+                    <h4 class="service-heading">Book a Car</h4>
+                </div>
+            </a>
+            <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="CurrentBookings">
+                <div>
+                    <i class="bi bi-calendar-check" style="color:#00A8E8; font-size:100px"></i>
+                    <h4 class="service-heading">Your current bookings</h4>
+                </div>
+            </a>
+            <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="PastBookings">
+                <div>
+                    <i class="bi bi-calendar-week" style="color:#00A8E8; font-size:100px"></i>
+                    <h4 class="service-heading">Your previous bookings</h4>
+                </div>
+            </a>
         </div>
-    </a>
-    <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="CurrentBookings">
-        <div>
-            <i class="bi bi-calendar-check" style="color:#00A8E8; font-size:100px"></i>
-            <h3 class="service-heading">Your current bookings</h3>
-        </div>
-    </a>
-    <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="PastBookings">
-        <div>
-            <i class="bi bi-calendar-week" style="color:#00A8E8; font-size:100px"></i>
-            <h3 class="service-heading">Your previous bookings</h3>
-        </div>
-    </a>
+    </div>
+    <div class="col-xs-0 col-md-1 col-lg-2"></div>
 </div>
