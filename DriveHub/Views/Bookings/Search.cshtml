@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Let's find a car";
     ViewData["Seats"] = new SelectList(Model.Seats);
-    ViewData["Pods"] = new SelectList(Model.Pods.ToList(), "PodId", "PodName");
     ViewData["Vehicles"] = new SelectList(Model.Pods.ToList().Select(c => c.Vehicle), "VehicleId", "Name");
     ViewData["VehicleRates"] = new SelectList(Model.VehicleRates, "VehicleRateId", "Description");
 }
@@ -16,8 +15,8 @@
 </style>
 
 <div class="row h-100">
-    <div class="col-xs-0 col-md-1 col-lg-2"></div>
-    <div class="col-xs-12 col-md-10 col-lg-8">
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
+    <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
         <h1 class="mb-6 text-center">Booking Search</h1>
         <div class="mb-3 p-2 fw-bold fs-4" style="background-color: #FFBA17;">Select a location or number of seats to show available cars</div>
         <div class="row">
@@ -44,7 +43,7 @@
             <div id="car-list"></div>
         </div>
     </div>
-    <div class="col-xs-0 col-md-1 col-lg-2"></div>
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
 </div>
 <script>
     // Wrap with an Immediately Invoked Function Expression (IIFE) so we don't pollute the client

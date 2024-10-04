@@ -1,145 +1,113 @@
-@model DriveHubModel.Vehicle
-@{
-    ViewData["Title"] = "Make a Booking";
+@model DriveHub.Models.Dto.BookingDto
 
-    var Pod = @Model.Pod;
-    var Vehicle = @Model;
-    var Site = @Model.Pod.Site;
+@{
+    ViewData["Title"] = "Make a booking";
 }
 
-<h1 class="text-center">Make a Booking</h1>
-<p class="text-center">Make a new booking for @Vehicle.Name the @Vehicle.Make @Vehicle.Model</p>
+<div class="row mt-2">
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
+    <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
+        <h1 class="text-center">@ViewBag.Title</h1>
+        <p class="text-center">Make a new booking for @ViewBag.Vehicle</p>
+        <div class="mb-3" style="background-color: #f8f9fa;">
+            <div class="p-2 fw-bold fs-4" style="background-color: #FFBA17;">
+                Booking Details
+            </div>
 
-<form method="post">
-    <div class="mb-3" style="background-color: #f8f9fa;">
-        <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Details
+            <div class="p-3">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
+                    <div>
+                        <p class="mb-0">Pickup DriveHub @ViewBag.StartPod</p>
+                        <small>@ViewBag.StartSite</small>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Car:</label>
+                    <div class="form-control">@ViewBag.Vehicle</div>
+                    <a href="/Bookings/Search" class="small text-end d-block mt-1 btn btn-primary">Find another car close by</a>
+                </div>
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="VehicleId" />
+                    <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="StartTime" class="control-label">Booking Start</label>
+                            <input asp-for="StartTime" class="form-control" id="StartTime" />
+                            <span asp-validation-for="StartTime" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EndTime" class="control-label">Booking End</label>
+                            <input asp-for="EndTime" class="form-control" id="EndTime" />
+                            <span asp-validation-for="EndTime" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="EndPodId" class="control-label">Return Pod</label>
+                        <select asp-for="EndPodId" class="form-select" id="EndPodId" asp-items="ViewBag.Pods"></select>
+                        <span asp-validation-for="EndPodId" class="text-danger"></span>
+                    </div>
+
+                    <div class="booking-section mb-3">
+                        <div class="p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Cost</div>
+                        <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
+                            <p class="mb-0">Per Hour:</p>
+                            <p class="fw-bold fs-1">$<span id="price-per-hour">@ViewBag.PricePerHour.ToString("F2")</span><hr></p>
+                            <hr />
+                            <p class="mb-0">Total Cost:</p>
+                            <p class="fw-bold fs-1 mb-6" id="total-cost">$0</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <input type="submit" value="Create" class="btn btn-primary mb-4 fw-bold text-white fs-4 text-center" />
+                    </div>
+                </form>
+                    </div>
+            </div>
+
+            <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12">
+            </div>
         </div>
-
-        <div class="p-3">
-            <div class="d-flex align-items-center mb-3">
-                <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-                <div>
-                    <p class="mb-0">Pickup DriveHub @Site.SiteName Pod #@Pod.PodName</p>
-                    <small>@Site.Address, @Site.City</small>
-                    <input type="hidden" id="StartPodId" name="StartPodId" value="@Pod.PodId" />
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Car:</label>
-                <div class="form-control">@Vehicle.Name the @Vehicle.Make @Vehicle.Model</div>
-                <a href="/Bookings/Search" class="small text-end d-block mt-1">Find another car close by</a>
-            </div>
-
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label for="StartTime" class="form-label">Booking Start</label>
-                    <input type="datetime-local" class="form-control" id="StartTime" name="StartTime"
-                        value="@DateTime.Now.AddHours(1).ToString("s")" step="any" />
-                </div>
-                <div class="col-md-6">
-                    <label for="EndTime" class="form-label">Booking End</label>
-                    <input type="datetime-local" class="form-control" id="EndTime" name="EndTime"
-                        value="@DateTime.Now.AddHours(3).ToString("s")" step="any" />
-                </div>
-            </div>
-
-            <div class="mt-3">
-                <label for="EndPodId" class="form-label">Return Pod</label>
-                <select class="form-select" id="EndPodId" name="EndPodId">
-                    <option value="@Pod.PodId" selected>@Site.SiteName Pod #@Pod.PodName, @Site.Address, @Site.City
-                    </option>
-                </select>
-            </div>
-        </div>
+        <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
     </div>
-
-    <div class="booking-section mb-3">
-        <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Cost</div>
-        <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
-            <p class="mb-0">Per Hour:</p>
-            <p class="fw-bold fs-1">$<span id="price-per-hour">@Vehicle.VehicleRate.PricePerHour.ToString("F2")</span>/hr</p>
-            <input type="hidden" id="QuotedPricePerHour" name="QuotedPricePerHour"
-                value="@Vehicle.VehicleRate.PricePerHour" />
-            <hr />
-            <p class="mb-0">Total Cost:</p>
-            <p class="fw-bold fs-1 mb-0">$<span id="total-cost">0</span></p>
-        </div>
-    </div>
-
-    <input type="submit" value="Confirm and Pay" class="btn confirm-btn mb-4 col-12 fw-bold text-white fs-4"
-        style="background-color: #00A8E8;" />
-</form>
-
-<div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12">
 </div>
 
 <script>
-    // PURPOSE: this script is basically to keep booking times between MIN_BOOKING_HOURS (2) and MAX_BOOKING_HOURS (50)
-    // There may much be much better ways to do this involving datetime-local's min/max properties
+    // Format the price above to AUD using the locale, style, and currency.
+let AUDollar = new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+});
+    var quotedPricePerHour = @ViewBag.PricePerHour;
+    var quotedPrice = 0;
+    var startTime;
+    var endTime;
 
-    // Listen for changes to booking start/end and update form
-    function initDateTimeListeners() {
-        let startTimeInput = document.getElementById('StartTime')
-        let endTimeInput = document.getElementById('EndTime')
-        let pricePerHour = document.getElementById('QuotedPricePerHour').value
-        let totalCostEl = document.getElementById('total-cost')
-        let MILLIS_PER_HOUR = 1000 * 60 * 60
-        let MIN_BOOKING_HOURS = 2
-        let MAX_BOOKING_HOURS = 50
-        // Update the total cost based on booking start/end time
-        function updateTotalCost() {
-            let startTime = new Date(startTimeInput.value)
-            let endTime = new Date(endTimeInput.value)
-            let differenceInMs = endTime - startTime
-            let differenceInHours = differenceInMs / 1000 / 60 / 60
-            totalCostEl.textContent = (differenceInHours * pricePerHour).toFixed(2)
-        }
-        updateTotalCost()
-        // Format a javascript date object for a datetime-local input element
-        function formatDateForInput(date) {
-            let fDate = new Date(date)
-            fDate.setMinutes(fDate.getMinutes() - fDate.getTimezoneOffset())
-            return fDate.toISOString().slice(0,16)
-        }
-        // Listen for when booking start gets too close to booking end and extend the booking end
-        startTimeInput.addEventListener('input', function (event) {
-            let startTime = new Date(startTimeInput.value)
-            let endTime = new Date(endTimeInput.value)
-            let diffInMs = endTime - startTime
-            if (diffInMs < MIN_BOOKING_HOURS * MILLIS_PER_HOUR) {
-                let newEndTime = new Date(startTime)
-                newEndTime.setHours(newEndTime.getHours() + MIN_BOOKING_HOURS)
-                endTimeInput.value = formatDateForInput(newEndTime)
-            } else if (diffInMs > MAX_BOOKING_HOURS * MILLIS_PER_HOUR) {
-                let newEndTime = new Date(startTime)
-                newEndTime.setHours(newEndTime.getHours() + MAX_BOOKING_HOURS)
-                endTimeInput.value = formatDateForInput(newEndTime)
-            }
-            updateTotalCost()
-        })
-        // TODO: there's definitely some code repetition here
-        endTimeInput.addEventListener('input', function (event) {
-            let startTime = new Date(startTimeInput.value)
-            let endTime = new Date(endTimeInput.value)
-            let diffInMs = endTime - startTime
-            if (diffInMs < MIN_BOOKING_HOURS * MILLIS_PER_HOUR) {
-                let newStartTime = new Date(endTime)
-                newStartTime.setHours(newStartTime.getHours() - 2)
-                startTimeInput.value = formatDateForInput(newStartTime)
-            } else if (diffInMs > MAX_BOOKING_HOURS * MILLIS_PER_HOUR) {
-                let newStartTime = new Date(endTime)
-                newStartTime.setHours(newStartTime.getHours() - MAX_BOOKING_HOURS)
-                startTimeInput.value = formatDateForInput(newStartTime)
-            }
-            updateTotalCost()
-        })
-    }
+    document.querySelector('#StartTime').addEventListener('change', function () {
+        startTime = this.value;
+        console.log(startTime);
+    });
 
-    function initAll() {
-        // Init Google Map
-        let map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: @Site.Latitude, lng: @Site.Longitude },
+    document.querySelector('#EndTime').addEventListener('change', function () {
+        endTime = this.value;
+        console.log(endTime);
+
+        if (startTime != null) {
+            var diff = Math.abs(new Date(startTime) - new Date(endTime));
+            let minutes = Math.floor((diff/1000)/60);
+            quotedPrice = minutes * quotedPricePerHour/60;
+            console.log("price = " + quotedPrice);
+            if (quotedPrice > 0) document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
+        }
+    });
+
+    function initMap() {
+            // Init Google Map
+                let map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude },
             zoom: 19,
             mapTypeId: "roadmap",
             mapId: "DRIVEHUB_CREATE"
@@ -147,15 +115,16 @@
         new google.maps.marker.AdvancedMarkerElement({
             map,
             title: "Vehicle",
-            position: { lat: @Site.Latitude, lng: @Site.Longitude }
+            position: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude }
         })
-
-        // Listen for changes to booking start/end and update form
-        initDateTimeListeners()
-    }
-
-    window.initAll = initAll;
+        }
 </script>
-<script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places,geometry&loading=async"
-    defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
+        defer>
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

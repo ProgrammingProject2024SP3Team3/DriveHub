@@ -15,7 +15,7 @@ namespace DriveHub.SeedData
             var scope = services.CreateScope();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-            if (context.Users.Any()) { return; }
+            if (context.VehicleRates.Any()) { return; }
 
             foreach (var vehicleRate in GetVehicleRates())
             {
@@ -123,7 +123,7 @@ namespace DriveHub.SeedData
             IList<Pod> pods;
             logger.LogInformation("Loading pods data file.");
 
-            using (var reader = new StreamReader($"Data/SeedData/Pods.csv"))
+            using (var reader = new StreamReader($"Data/SeedData/EmptyPods.csv"))
             using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
             {
                 pods = csv.GetRecords<Pod>().ToList();
