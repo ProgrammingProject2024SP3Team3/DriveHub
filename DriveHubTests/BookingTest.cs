@@ -32,6 +32,22 @@ namespace DriveHubTests
         }
 
         [Fact]
+        public async Task Search_ShouldReturnEmptyList_WhenNoVehiclesAreAvailable()
+        {
+            // Arrange: Remove all vehicles from the context
+            bookingTestFixtures.Context.Vehicles.RemoveRange(bookingTestFixtures.Context.Vehicles);
+            await bookingTestFixtures.Context.SaveChangesAsync();
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Search();
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.ViewData.Model);
+            Assert.Empty(model.Vehicles); // Ensure the vehicle list is empty
+        }
+
+        [Fact]
         public async Task Create_ShouldCreateBooking_WhenValid()
         {
             // Arrange: Set up a mock authenticated user
