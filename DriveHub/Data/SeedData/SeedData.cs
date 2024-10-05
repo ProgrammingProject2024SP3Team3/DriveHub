@@ -61,9 +61,9 @@ namespace DriveHub.SeedData
             }
             context.SaveChanges();
 
-            context.Database.ExecuteSqlRaw(@"CREATE SPATIAL INDEX IX_Sites_Location 
-                                           ON [Sites]([Location]) 
-                                           USING GEOGRAPHY_AUTO_GRID;");
+            //context.Database.ExecuteSqlRaw(@"CREATE SPATIAL INDEX IX_Sites_Location 
+            //                               ON [Sites]([Location]) 
+            //                               USING GEOGRAPHY_AUTO_GRID;");
 
             foreach (var pod in GetPods(logger))
             {
@@ -123,7 +123,7 @@ namespace DriveHub.SeedData
             IList<Pod> pods;
             logger.LogInformation("Loading pods data file.");
 
-            using (var reader = new StreamReader($"Data/SeedData/EmptyPods.csv"))
+            using (var reader = new StreamReader($"Data/SeedData/Pods.csv"))
             using (var csv = new CsvReader(reader, CultureInfo.CurrentCulture))
             {
                 pods = csv.GetRecords<Pod>().ToList();

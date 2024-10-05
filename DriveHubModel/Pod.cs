@@ -73,5 +73,11 @@ namespace DriveHubModel
         [MaybeNull]
         [DisplayFormat(NullDisplayText = "None")]
         public virtual Vehicle? Vehicle { get; set; } = null;
+
+        [JsonIgnore]
+        public IList<Booking> StartPods { get; set; } = new List<Booking>();
+
+        [JsonIgnore]
+        public IList<Booking> EndPods { get; set; } = new List<Booking>();
     }
 }

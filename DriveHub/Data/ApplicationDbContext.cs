@@ -83,6 +83,18 @@ namespace DriveHub.Data
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<Booking>()
+                .HasOne(c => c.StartPod)
+                .WithMany(c => c.StartPods)
+                .HasForeignKey(c => c.StartPodId)
+                .OnDelete(DeleteBehavior.ClientNoAction);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(c => c.EndPod)
+                .WithMany(c => c.EndPods)
+                .HasForeignKey(c => c.EndPodId)
+                .OnDelete(DeleteBehavior.ClientNoAction);
+
+            modelBuilder.Entity<Booking>()
                 .Property(c => c.PricePerHour)
                 .HasColumnType("Money");
 

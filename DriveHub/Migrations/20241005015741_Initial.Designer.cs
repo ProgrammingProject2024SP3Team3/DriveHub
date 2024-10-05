@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace DriveHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241003060455_Initial")]
+    [Migration("20241005015741_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -29,7 +29,6 @@ namespace DriveHub.Migrations
             modelBuilder.Entity("DriveHubModel.Booking", b =>
                 {
                     b.Property<string>("BookingId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("BookingStatus")
@@ -38,7 +37,7 @@ namespace DriveHub.Migrations
 
                     b.Property<string>("EndPodId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
@@ -52,7 +51,7 @@ namespace DriveHub.Migrations
 
                     b.Property<string>("StartPodId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -63,7 +62,11 @@ namespace DriveHub.Migrations
 
                     b.HasKey("BookingId");
 
+                    b.HasIndex("EndPodId");
+
                     b.HasIndex("Id");
+
+                    b.HasIndex("StartPodId");
 
                     b.HasIndex("VehicleId");
 
@@ -449,19 +452,34 @@ namespace DriveHub.Migrations
 
             modelBuilder.Entity("DriveHubModel.Booking", b =>
                 {
+                    b.HasOne("DriveHubModel.Pod", "EndPod")
+                        .WithMany("EndPods")
+                        .HasForeignKey("EndPodId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
                     b.HasOne("DriveHubModel.ApplicationUser", "ApplicationUser")
                         .WithMany("Bookings")
                         .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DriveHubModel.Pod", "StartPod")
+                        .WithMany("StartPods")
+                        .HasForeignKey("StartPodId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
                     b.HasOne("DriveHubModel.Vehicle", "Vehicle")
                         .WithMany("Bookings")
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("EndPod");
+
+                    b.Navigation("StartPod");
 
                     b.Navigation("Vehicle");
                 });
@@ -559,6 +577,13 @@ namespace DriveHub.Migrations
             modelBuilder.Entity("DriveHubModel.Booking", b =>
                 {
                     b.Navigation("Journey");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Pod", b =>
+                {
+                    b.Navigation("EndPods");
+
+                    b.Navigation("StartPods");
                 });
 
             modelBuilder.Entity("DriveHubModel.Site", b =>

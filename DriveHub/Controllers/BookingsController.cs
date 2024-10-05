@@ -6,7 +6,6 @@ using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DriveHub.Models.Dto;
-using System.Security.Principal;
 
 namespace DriveHub.Controllers
 {
@@ -43,59 +42,36 @@ namespace DriveHub.Controllers
             return View(bookingSearchVM);
         }
 
-        public async Task<IActionResult> CurrentBookings()
+        public IActionResult CurrentBookings()
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IActionResult> PastBookings()
+        public IActionResult PastBookings()
         {
             throw new NotImplementedException();
         }
 
         // GET: Bookings/Details/5
-        public async Task<IActionResult> Details(string id)
+        public ActionResult Details(string id)
         {
-            // This is code in the style I want to write but I cannot because StartPod and EndPod both being foreign keys of Pod confuses LINQ
-            // var booking = await _context.Bookings
-            //     .Include(b => b.Vehicle)
-            //     .Include(b => b.StartPod)
-            //     .Include(b => b.EndPod)
-            //     .FirstOrDefaultAsync(b => b.BookingId == id);
+            throw new NotImplementedException();
+        }
 
-            // So instead we get this monstrosity
-            var booking = await (
-                from b in _context.Bookings
-                where b.BookingId == id
-                join v in _context.Vehicles on b.VehicleId equals v.VehicleId
-                join startPod in _context.Pods on b.StartPodId equals startPod.PodId
-                join startSite in _context.Sites on startPod.SiteId equals startSite.SiteId
-                join endPod in _context.Pods on b.EndPodId equals endPod.PodId
-                join endSite in _context.Sites on endPod.SiteId equals endSite.SiteId
-                select new
-                {
-                    b.BookingId,
-                    Vehicle = v,
-                    StartPod = new
-                    {
-                        Pod = startPod,
-                        PodName = startPod.PodName,
-                        Site = startSite
-                    },
-                    EndPod = new
-                    {
-                        Pod = endPod,
-                        PodName = endPod.PodName,
-                        Site = endSite
-                    },
-                    b.StartTime,
-                    b.EndTime,
-                    b.PricePerHour,
-                    b.BookingStatus
-                }
-            ).FirstOrDefaultAsync();
+        // GET: Bookings/Details/5
+        public async Task<IActionResult> BookingComplete(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-            // TODO: needs to check booking belongs to User
+            var booking = await _context.Bookings
+                .Include(b => b.EndPod)
+                .Include(b => b.StartPod)
+                .Include(b => b.Vehicle)
+                .FirstOrDefaultAsync(m => m.BookingId == id);
+
             if (booking == null)
             {
                 return NotFound();
@@ -108,16 +84,17 @@ namespace DriveHub.Controllers
         public async Task<IActionResult> Create(string id)
         {
             // Get a vehicle with its rate, pod and site
-            var vehicle = await _context.Vehicles.Where(c => c.VehicleId == id).Include(c => c.Pod).Include(c => c.VehicleRate).FirstOrDefaultAsync();
+            var vehicle = await _context.Vehicles.Where(c => c.VehicleId == id).Include(c => c.Pod).ThenInclude(c => c.Site).Include(c => c.VehicleRate).FirstOrDefaultAsync();
 
             // If we couldn't find the vehicle or it's not currently in a pod then bail out
             if (vehicle == null || vehicle.Pod == null)
             {
-                return NotFound($"Vehicle not found or not in a pod.");
+                _logger.LogWarning("Unable to find vehicle");
+                return RedirectToAction(nameof(Search));
             }
 
             // Get start and empty pods
-            var startPod = await _context.Pods.Where(c => c.VehicleId == id).Include(c => c.Site).FirstOrDefaultAsync();
+            var startPod = vehicle.Pod;
             var emptyPods = new List<PodVM>();
             var startPodVM = new PodVM();
             startPodVM.PodId = startPod.PodId;
@@ -158,10 +135,16 @@ namespace DriveHub.Controllers
                 ModelState.AddModelError("EndTime", "The minimum booking duration is 30 mins");
             }
 
-            // Custom validation to ensure booking is within one week from today
+            // Check if booking is within one week from today
             if (bookingDto.StartTime > DateTime.Now.AddDays(7))
             {
                 ModelState.AddModelError("StartTime", "Bookings cannot be made more than one week in advance.");
+            }
+
+            // Check if booking is within one week from today
+            if (bookingDto.StartTime > bookingDto.EndTime)
+            {
+                ModelState.AddModelError("StartTime", "Start time is after end time");
             }
 
             // Custom logic to check for overlapping bookings in the database
@@ -173,12 +156,22 @@ namespace DriveHub.Controllers
 
             if (conflictingBookings)
             {
-                ModelState.AddModelError("", "The selected vehicle is already booked during this time range.");
+                ModelState.AddModelError("VehicleId", "The selected vehicle is already booked during this time range.");
             }
+
+            var vehicle = await _context.Vehicles.FindAsync(bookingDto.VehicleId);
+            var currentPod = await _context.Pods.Where(c => c.PodId == bookingDto.StartPodId).Include(c => c.Site).FirstOrDefaultAsync();
+
+            // If we couldn't find the vehicle or it's not currently in a pod then bail out
+            //if (vehicle == null || currentPod == null || currentPod.VehicleId == null)
+            //{
+            //    return RedirectToAction(nameof(Index));
+            //}
 
             if (ModelState.IsValid)
             {
                 Booking booking = new Booking();
+                booking.Id = Guid.NewGuid().ToString();
                 booking.VehicleId = bookingDto.VehicleId;
                 booking.StartPodId = bookingDto.StartPodId;
                 booking.EndPodId = bookingDto.EndPodId;
@@ -186,17 +179,43 @@ namespace DriveHub.Controllers
                 booking.EndTime = bookingDto.EndTime;
                 booking.PricePerHour = bookingDto.QuotedPricePerHour;
                 booking.BookingStatus = BookingStatus.InProgress;
-
                 _context.Add(booking);
+
+                // Remove vehicle from pod
+                currentPod.VehicleId = null;
+                _context.Update(currentPod);
+
                 await _context.SaveChangesAsync();
 
-                var model = await _context.Bookings
-                 .Where(c => c.VehicleId == bookingDto.VehicleId)
-                 .Where(c => c.StartTime == bookingDto.StartTime)
-                 .FirstOrDefaultAsync();
-
-                return View("Done");
+                return View("BookingComplete", booking.BookingId);
             }
+
+            // Get start and empty pods
+            var startPod = currentPod;
+            var emptyPods = new List<PodVM>();
+            var startPodVM = new PodVM();
+            startPodVM.PodId = startPod.PodId;
+            startPodVM.PodName = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
+            emptyPods.Add(startPodVM);
+
+            var pods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
+            foreach (var pod in pods)
+            {
+                var podVM = new PodVM();
+                podVM.PodId = pod.PodId;
+                podVM.PodName = $"{pod.Site.SiteName} Pod #{pod.PodName}";
+                emptyPods.Add(podVM);
+            }
+
+            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}";
+            ViewBag.VehicleId = vehicle.VehicleId;
+            ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
+            ViewBag.StartPodId = startPod.PodId;
+            ViewBag.StartSite = $"{startPod.Site.Address}, {startPod.Site.City}";
+            ViewBag.StartSiteLatitude = startPod.Site.Latitude;
+            ViewBag.StartSiteLongitude = startPod.Site.Longitude;
+            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
+            ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
 
             return View(bookingDto);
         }
@@ -222,7 +241,7 @@ namespace DriveHub.Controllers
         // POST: Bookings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(BookingDto bookingDto)
+        public IActionResult Edit(BookingDto bookingDto)
         {
             throw new NotImplementedException();
         }
@@ -251,14 +270,14 @@ namespace DriveHub.Controllers
         // POST: Bookings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public IActionResult DeleteConfirmed(string id)
         {
             throw new NotImplementedException();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Return(string id)
+        public IActionResult Return(string id)
         {
             throw new NotImplementedException();
         }

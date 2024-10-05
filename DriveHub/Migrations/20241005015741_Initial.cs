@@ -218,37 +218,6 @@ namespace DriveHub.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bookings",
-                columns: table => new
-                {
-                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    StartPodId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EndPodId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
-                    BookingStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bookings", x => x.BookingId);
-                    table.ForeignKey(
-                        name: "FK_Bookings_AspNetUsers_Id",
-                        column: x => x.Id,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Vehicles_VehicleId",
-                        column: x => x.VehicleId,
-                        principalTable: "Vehicles",
-                        principalColumn: "VehicleId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Pods",
                 columns: table => new
                 {
@@ -268,6 +237,46 @@ namespace DriveHub.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Pods_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "VehicleId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bookings",
+                columns: table => new
+                {
+                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StartPodId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EndPodId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
+                    BookingStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookings", x => x.BookingId);
+                    table.ForeignKey(
+                        name: "FK_Bookings_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Pods_EndPodId",
+                        column: x => x.EndPodId,
+                        principalTable: "Pods",
+                        principalColumn: "PodId");
+                    table.ForeignKey(
+                        name: "FK_Bookings_Pods_StartPodId",
+                        column: x => x.StartPodId,
+                        principalTable: "Pods",
+                        principalColumn: "PodId");
+                    table.ForeignKey(
+                        name: "FK_Bookings_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
                         principalColumn: "VehicleId");
@@ -333,9 +342,19 @@ namespace DriveHub.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bookings_EndPodId",
+                table: "Bookings",
+                column: "EndPodId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bookings_Id",
                 table: "Bookings",
                 column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_StartPodId",
+                table: "Bookings",
+                column: "StartPodId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_VehicleId",
@@ -388,19 +407,19 @@ namespace DriveHub.Migrations
                 name: "Journeys");
 
             migrationBuilder.DropTable(
-                name: "Pods");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Bookings");
 
             migrationBuilder.DropTable(
-                name: "Sites");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Pods");
+
+            migrationBuilder.DropTable(
+                name: "Sites");
 
             migrationBuilder.DropTable(
                 name: "Vehicles");

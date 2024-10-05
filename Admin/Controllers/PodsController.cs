@@ -79,6 +79,8 @@ namespace Admin.Controllers
             return View(pod);
         }
 
+
+
         // GET: Pods/Edit/5
         public async Task<IActionResult> Edit(string id)
         {

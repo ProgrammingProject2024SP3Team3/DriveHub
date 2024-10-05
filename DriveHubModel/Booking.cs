@@ -19,7 +19,7 @@ namespace DriveHubModel
     public class Booking
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string BookingId { get; set; }
 
         [ForeignKey("Vehicle")]

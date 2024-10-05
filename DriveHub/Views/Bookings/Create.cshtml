@@ -26,11 +26,11 @@
                 <div class="mb-3">
                     <label class="form-label">Car:</label>
                     <div class="form-control">@ViewBag.Vehicle</div>
-                    <a href="/Bookings/Search" class="small text-end d-block mt-1 btn btn-primary">Find another car close by</a>
-                </div>
+                    <a asp-action="Search" class="small text-right mt-1 btn btn-primary">Find another car close by</a>                </div>
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" asp-for="VehicleId" />
+                    <input type="hidden" asp-for="VehicleId" value="@ViewBag.VehicleId"/>
+                    <input type="hidden" asp-for="StartPodId" value="@ViewBag.StartPodId"/>
                     <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
                     <div class="row g-3">
                         <div class="col-md-6">
