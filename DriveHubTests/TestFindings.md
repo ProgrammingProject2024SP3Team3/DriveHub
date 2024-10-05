@@ -40,13 +40,13 @@ if (conflictingBookings)
 
 ## 2. Aligning Tests with Controller Behavior
 
-We need to ensure that our tests match the current behavior of the controller. Let's take a closer look at why this mismatch is happening:
+We need to ensure that our tests match the current behavior of the controller.
 
 ### Current Issue:
 - The test **Create_ShouldFail_WhenBookingConflictsWithExistingBooking** expects a **ViewResult** when there is a booking conflict, but the controller might be returning a **RedirectToActionResult** (i.e., redirecting to another view, like **Index**).
 
 ### Why It Matters:
-- If the controller is redirecting, the test needs to reflect that behavior. But typically, when a validation error like a booking conflict occurs, it's better to return the form view with the error message so that the user can correct the input. This is the more common pattern for good user experience.
+- If the controller is redirecting, the test needs to reflect that behavior. But typically, when a validation error like a booking conflict occurs, it's better to return the form view with the error message so that the user can correct the input.
 
 ### Solutions:
 1. **Update the Test**: If we want to maintain the controller's current behavior of redirecting, we can adjust the test to expect a redirect:
@@ -67,7 +67,7 @@ if (!ModelState.IsValid)
 ```
 
 ### Conclusion:
-- It's usually better for the user to remain on the form when there's a conflict, so they can immediately correct the error rather than being redirected. This behavior also aligns better with the expectations in our tests.
+- It's usually better for the user to remain on the form when there's a conflict, so they can immediately correct the error rather than being redirected.
 
 ---
 
