@@ -190,7 +190,7 @@ namespace DriveHub.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return View("Details", booking.BookingId);
+                return View("Details", booking);
             }
 
             // Get start and empty pods

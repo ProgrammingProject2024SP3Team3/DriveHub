@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin", "Admin\Admin.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveHubModel", "DriveHubModel\DriveHubModel.csproj", "{657117D3-98B6-4B4B-8025-9B295BAA420C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveHubTests", "DriveHubTests\DriveHubTests.csproj", "{5FBD4BD3-D85F-4E3A-BD37-7527F2A7E88A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{657117D3-98B6-4B4B-8025-9B295BAA420C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{657117D3-98B6-4B4B-8025-9B295BAA420C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{657117D3-98B6-4B4B-8025-9B295BAA420C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FBD4BD3-D85F-4E3A-BD37-7527F2A7E88A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FBD4BD3-D85F-4E3A-BD37-7527F2A7E88A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FBD4BD3-D85F-4E3A-BD37-7527F2A7E88A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FBD4BD3-D85F-4E3A-BD37-7527F2A7E88A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

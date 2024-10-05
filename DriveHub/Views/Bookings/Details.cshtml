@@ -25,72 +25,79 @@
 </style>
 
 <h1 class="text-center">Booking Details</h1>
-<p class="text-center">Your booking details for @Vehicle.Name the @Vehicle.Make @Vehicle.Model</p>
+<p class="text-center">Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model</p>
 
-<div class="booking-section mb-3">
-    <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color: @StatusColour;">Status:
-        @Booking.BookingStatus
+<div class="row">
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
+    <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
+        <div class="booking-section mb-3">
+            <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:@StatusColour;">                Status:
+                @Booking.BookingStatus
+            </div>
+
+            <div class="p-3">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
+                    <div>
+                        <p class="mb-0">Pickup DriveHub @StartSite.SiteName Pod #@StartPod.PodName</p>
+                        <small>@StartSite.Address, @StartSite.City</small>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Car:</label>
+                    <div class="form-control">@Vehicle.Name the @Vehicle.Make @Vehicle.Model</div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="StartTime" class="form-label">Booking Start</label>
+                        <input type="datetime-local" class="form-control" id="StartTime" name="StartTime"
+                               value="@StartTime.ToString("s")" disabled />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="EndTime" class="form-label">Booking End</label>
+                        <input type="datetime-local" class="form-control" id="EndTime" name="EndTime"
+                               value="@EndTime.ToString("s")" disabled />
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center my-3">
+                    <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
+                    <div>
+                        <p class="mb-0">Return DriveHub @EndSite.SiteName Pod #@EndPod.PodName</p>
+                        <small>@EndSite.Address, @EndSite.City</small>
+                    </div>
+                </div>
+                @if (Booking.BookingStatus != BookingStatus.Complete)
+                {
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <a href="/Bookings/Edit/@Booking.BookingId" class="btn btn-secondary">
+                            Edit Booking
+                        </a>
+
+                        <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Booking.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
+                            <button type="submit" class="btn btn-danger">
+                                Return Vehicle
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+
+            <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
+                <p class="mb-0">Per Hour:</p>
+                <p class="fw-bold fs-1">$@Booking.PricePerHour.ToString("F2")/hr</p>
+                <hr />
+                <p class="mb-0">Total Cost:</p>
+                <p class="fw-bold fs-1 mb-0">$@TotalPrice.ToString("F2")</p>
+            </div>
+        </div>
+
+        <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12">
+        </div>
     </div>
-
-    <div class="p-3">
-        <div class="d-flex align-items-center mb-3">
-            <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-            <div>
-                <p class="mb-0">Pickup DriveHub @StartSite.SiteName Pod #@StartPod.PodName</p>
-                <small>@StartSite.Address, @StartSite.City</small>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Car:</label>
-            <div class="form-control">@Vehicle.Name the @Vehicle.Make @Vehicle.Model</div>
-        </div>
-
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label for="StartTime" class="form-label">Booking Start</label>
-                <input type="datetime-local" class="form-control" id="StartTime" name="StartTime"
-                    value="@StartTime.ToString("s")" disabled />
-            </div>
-            <div class="col-md-6">
-                <label for="EndTime" class="form-label">Booking End</label>
-                <input type="datetime-local" class="form-control" id="EndTime" name="EndTime"
-                    value="@EndTime.ToString("s")" disabled />
-            </div>
-        </div>
-
-        <div class="d-flex align-items-center my-3">
-            <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-            <div>
-                <p class="mb-0">Return DriveHub @EndSite.SiteName Pod #@EndPod.PodName</p>
-                <small>@EndSite.Address, @EndSite.City</small>
-            </div>
-        </div>
-        @if (Booking.BookingStatus != BookingStatus.Complete) {
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <a href="/Bookings/Edit/@Booking.BookingId" class="btn btn-secondary">
-                    Edit Booking
-                </a>
-
-                <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Booking.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
-                    <button type="submit" class="btn btn-danger">
-                        Return Vehicle
-                    </button>
-                </form>
-            </div>
-        }
-    </div>
-
-    <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
-        <p class="mb-0">Per Hour:</p>
-        <p class="fw-bold fs-1">$@Booking.PricePerHour.ToString("F2")/hr</p>
-        <hr />
-        <p class="mb-0">Total Cost:</p>
-        <p class="fw-bold fs-1 mb-0">$@TotalPrice.ToString("F2")</p>
-    </div>
-</div>
-
-<div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12">
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
 </div>
 
 <script>
@@ -111,6 +118,5 @@
 
     window.initAll = initAutocomplete;
 </script>
-<script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places,geometry&loading=async"
-    defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places,geometry&loading=async"
+        defer></script>

@@ -26,11 +26,12 @@
                 <div class="mb-3">
                     <label class="form-label">Car:</label>
                     <div class="form-control">@ViewBag.Vehicle</div>
-                    <a asp-action="Search" class="small text-right mt-1 btn btn-primary">Find another car close by</a>                </div>
+                    <a asp-action="Search" class="small text-right mt-1 btn btn-primary">Find another car close by</a>
+                </div>
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" asp-for="VehicleId" value="@ViewBag.VehicleId"/>
-                    <input type="hidden" asp-for="StartPodId" value="@ViewBag.StartPodId"/>
+                    <input type="hidden" asp-for="VehicleId" value="@ViewBag.VehicleId" />
+                    <input type="hidden" asp-for="StartPodId" value="@ViewBag.StartPodId" />
                     <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -59,65 +60,98 @@
                             <hr />
                             <p class="mb-0">Total Cost:</p>
                             <p class="fw-bold fs-1 mb-6" id="total-cost">$0</p>
+                            <span id="time-validation" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="text-center">
-                        <input type="submit" value="Create" class="btn btn-primary mb-4 fw-bold text-white fs-4 text-center" />
+                        <a asp-action="Search" id="cancel-button" class="btn btn-danger mb-4 fw-bold text-white fs-4">Cancel</a>
+                        <input type="submit" value="Create" id="create-button" class="d-none btn btn-primary mb-4 fw-bold text-white fs-4" />
                     </div>
                 </form>
-                    </div>
-            </div>
-
-            <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12">
             </div>
         </div>
-        <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
+        <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12">
+        </div>
     </div>
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
 </div>
 
 <script>
     // Format the price above to AUD using the locale, style, and currency.
-let AUDollar = new Intl.NumberFormat('en-AU', {
-    style: 'currency',
-    currency: 'AUD',
-});
+    let AUDollar = new Intl.NumberFormat('en-AU', {
+        style: 'currency',
+        currency: 'AUD',
+    });
     var quotedPricePerHour = @ViewBag.PricePerHour;
     var quotedPrice = 0;
     var startTime;
     var endTime;
 
-    document.querySelector('#StartTime').addEventListener('change', function () {
-        startTime = this.value;
-        console.log(startTime);
-    });
+    window.onload = function(){
+        document.querySelector('#StartTime').addEventListener('change', function () {
+            startTime = this.value;
+            console.log(startTime);
 
-    document.querySelector('#EndTime').addEventListener('change', function () {
-        endTime = this.value;
-        console.log(endTime);
+            if (endTime != null) {
+                var startDateTime = new Date(startTime);
+                var endDateTime = new Date(endTime);
+                    if (endDateTime < startDateTime) {
+                    document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                    document.getElementById("total-cost").innerHTML = "$0.00";
+                    document.getElementById("time-validation").innerHTML = "Start time must be before end time";
+                    document.getElementById("create-button").classList = "text-center d-none";
+                    return;
+                }
+                var diff = Math.abs(new Date(startTime) - new Date(endTime));
+                let minutes = Math.floor((diff / 1000) / 60);
+                    quotedPrice = minutes * quotedPricePerHour / 60;
+                console.log("price = " + quotedPrice);
+                if (quotedPrice > 0) document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
+                document.getElementById("time-validation").innerHTML = "";
+                document.getElementById("total-cost").classList = "fw-bold fs-1";
+                document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
+            }
+            });
 
-        if (startTime != null) {
-            var diff = Math.abs(new Date(startTime) - new Date(endTime));
-            let minutes = Math.floor((diff/1000)/60);
-            quotedPrice = minutes * quotedPricePerHour/60;
-            console.log("price = " + quotedPrice);
-            if (quotedPrice > 0) document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
+        document.querySelector('#EndTime').addEventListener('change', function () {
+            endTime = this.value;
+            console.log(endTime);
+
+            if (startTime != null) {
+                var startDateTime = new Date(startTime);
+                    var endDateTime = new Date(endTime);
+                    if (endDateTime < startDateTime) {
+                        document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                        document.getElementById("total-cost").innerHTML = "$0.00";
+                        document.getElementById("time-validation").innerHTML = "Start time must be before end time";
+                        document.getElementById("create-button").classList = "text-center d-none";
+                        return;
+                    }
+                    var diff = Math.abs(new Date(startTime) - new Date(endTime));
+                    let minutes = Math.floor((diff / 1000) / 60);
+                    quotedPrice = minutes * quotedPricePerHour / 60;
+                    console.log("price = " + quotedPrice);
+                    if (quotedPrice > 0) document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
+                    document.getElementById("time-validation").innerHTML = "";
+                    document.getElementById("total-cost").classList = "fw-bold fs-1";
+                        document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
+                }
+            });
         }
-    });
-
-    function initMap() {
-            // Init Google Map
+            function initMap() {
+                // Init Google Map
                 let map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude },
-            zoom: 19,
-            mapTypeId: "roadmap",
-            mapId: "DRIVEHUB_CREATE"
-        });
-        new google.maps.marker.AdvancedMarkerElement({
-            map,
-            title: "Vehicle",
-            position: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude }
-        })
-        }
+                    center: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude },
+                    zoom: 19,
+                    mapTypeId: "roadmap",
+                    mapId: "DRIVEHUB_CREATE"
+                });
+                new google.maps.marker.AdvancedMarkerElement({
+                    map,
+                    title: "Vehicle",
+                    position: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude }
+                })
+            }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
         defer>
