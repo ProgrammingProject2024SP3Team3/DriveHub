@@ -112,6 +112,70 @@ namespace DriveHubTests
         }
 
         [Fact]
+        public async Task Create_ShouldFail_WhenStartTimeIsInThePast()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068",
+                StartTime = DateTime.Now.AddHours(-1), // Start time in the past
+                EndTime = DateTime.Now.AddHours(1),
+                QuotedPricePerHour = 20
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert: Check if ModelState contains errors for StartTime
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
+        }
+
+        [Fact]
+        public async Task Create_ShouldFail_WhenBookingConflictsWithExistingBooking()
+        {
+            // Arrange: Seed a conflicting booking
+            bookingTestFixtures.Context.Bookings.Add(new Booking
+            {
+                BookingId = Guid.NewGuid().ToString(),
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068",
+                StartTime = DateTime.Now.AddHours(1),
+                EndTime = DateTime.Now.AddHours(3),
+                PricePerHour = 20,
+                BookingStatus = BookingStatus.InProgress
+            });
+            await bookingTestFixtures.Context.SaveChangesAsync();
+
+            // Arrange: Attempt to create a booking with conflicting times
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068",
+                StartTime = DateTime.Now.AddHours(2), // Overlaps with existing booking
+                EndTime = DateTime.Now.AddHours(4),
+                QuotedPricePerHour = 20
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert: Check for conflict in ModelState
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("VehicleId", bookingTestFixtures.Controller.ModelState.Keys);
+        }
+
+        [Fact]
         public async Task Details_ShouldReturnBooking_WhenExists()
         {
             // Arrange: Ensure the booking exists before calling Details
