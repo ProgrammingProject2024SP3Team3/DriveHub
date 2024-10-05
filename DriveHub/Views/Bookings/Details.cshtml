@@ -3,19 +3,10 @@
 @{
     ViewData["Title"] = "Booking Details";
 
-    var Booking = Model;
-    var Vehicle = Booking.Vehicle;
-    var StartPod = Booking.StartPod;
-    var EndPod = Booking.EndPod;
-    var StartSite = StartPod.Site;
-    var EndSite = EndPod.Site;
-    var StartTime = Booking.StartTime;
-    var EndTime = Booking.EndTime;
-    var TotalPrice = (EndTime - StartTime).TotalHours * (double)Booking.PricePerHour;
-    // pick a colour for our heading based on Booking Status
-    // var StatusColour = Booking.BookingStatus == BookingStatus.InProgress ? "#2FCD48" colour if in progress
-    //     : Booking.BookingStatus == BookingStatus.Complete ? "#252e31" colour if complete
-    //     : "#34ce56"; colour if not an above status
+    var vehicle = Model.Vehicle;
+    var startPod = Model.StartPod;
+    var endPod = Model.EndPod;
+    var totalPrice = (Model.EndTime - Model.StartTime).TotalHours * (double)Model.PricePerHour;
 }
 
 <style>
@@ -31,57 +22,62 @@
     <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
     <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
         <div class="booking-section mb-3">
-            @if (Booking.BookingStatus == BookingStatus.InProgress)
+            @if (Model.BookingStatus == BookingStatus.InProgress)
             {
-                <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:orange;">
+                <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#FFBA17;">
                     Status:
-                    @Booking.BookingStatus
+                    @Model.BookingStatus
                 </div>
             }
-
-
+            else
+            {
+                <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#252e31;">
+                    Status:
+                    @Model.BookingStatus
+                </div>
+            }
             <div class="p-3">
                 <div class="d-flex align-items-center mb-3">
                     <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
                     <div>
-                        <p class="mb-0">Pickup DriveHub @StartSite.SiteName Pod #@StartPod.PodName</p>
-                        <small>@StartSite.Address, @StartSite.City</small>
+                        <p class="mb-0">Pickup DriveHub @startPod.Site.SiteName Pod #@startPod.PodName</p>
+                        <small>@startPod.Site.Address, @startPod.Site.City</small>
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Car:</label>
-                    <div class="form-control">@Vehicle.Name the @Vehicle.Make @Vehicle.Model</div>
+                    <div class="form-control">@vehicle.Name the @vehicle.Make @vehicle.Model</div>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="StartTime" class="form-label">Booking Start</label>
                         <input type="datetime-local" class="form-control" id="StartTime" name="StartTime"
-                               value="@StartTime.ToString("s")" disabled />
+                               value="@Model.StartTime.ToString("s")" disabled />
                     </div>
                     <div class="col-md-6">
                         <label for="EndTime" class="form-label">Booking End</label>
                         <input type="datetime-local" class="form-control" id="EndTime" name="EndTime"
-                               value="@EndTime.ToString("s")" disabled />
+                               value="@Model.EndTime.ToString("s")" disabled />
                     </div>
                 </div>
 
                 <div class="d-flex align-items-center my-3">
                     <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
                     <div>
-                        <p class="mb-0">Return DriveHub @EndSite.SiteName Pod #@EndPod.PodName</p>
-                        <small>@EndSite.Address, @EndSite.City</small>
+                        <p class="mb-0">Return DriveHub @endPod.Site.SiteName Pod #@endPod.PodName</p>
+                        <small>@endPod.Site.Address, @endPod.Site.City</small>
                     </div>
                 </div>
-                @if (Booking.BookingStatus != BookingStatus.Complete)
+                @if (Model.BookingStatus != BookingStatus.Complete)
                 {
                     <div class="d-flex justify-content-between align-items-center mt-4">
-                        <a href="/Bookings/Edit/@Booking.BookingId" class="btn btn-secondary">
+                        <a href="/Bookings/Edit/@Model.BookingId" class="btn btn-secondary">
                             Edit Booking
                         </a>
 
-                        <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Booking.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
+                        <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Model.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
                             <button type="submit" class="btn btn-danger">
                                 Return Vehicle
                             </button>
@@ -92,10 +88,10 @@
 
             <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
                 <p class="mb-0">Per Hour:</p>
-                <p class="fw-bold fs-1">$@Booking.PricePerHour.ToString("F2")/hr</p>
+                <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")/hr</p>
                 <hr />
                 <p class="mb-0">Total Cost:</p>
-                <p class="fw-bold fs-1 mb-0">$@TotalPrice.ToString("F2")</p>
+                <p class="fw-bold fs-1 mb-0">$@totalPrice.ToString("F2")</p>
             </div>
         </div>
 
@@ -106,10 +102,10 @@
 </div>
 
 <script>
-    function initAutocomplete() {
+    function initMap() {
         // Init Google Map
         const map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: @StartSite.Latitude, lng: @StartSite.Longitude },
+            center: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude },
             zoom: 19,
             mapTypeId: "roadmap",
             mapId: "DRIVEHUB_DETAILS"
@@ -117,11 +113,9 @@
         new google.maps.marker.AdvancedMarkerElement({
             map,
             title: "Vehicle",
-            position: { lat: @StartSite.Latitude, lng: @StartSite.Longitude }
+            position: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude }
         })
     }
-
-    window.initAll = initAutocomplete;
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places,geometry&loading=async"
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
         defer></script>
