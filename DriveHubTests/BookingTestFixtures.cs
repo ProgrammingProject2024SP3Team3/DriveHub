@@ -1,4 +1,3 @@
-using DriveHub.Controllers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,6 +7,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DriveHub.Data;
+using DriveHub.Controllers;
 
 namespace DriveHubTests
 {
@@ -60,6 +60,25 @@ namespace DriveHubTests
             }, "mock"));
 
             Controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = mockUser }
+            };
+        }
+
+        // Public method to create mock users for specific cases
+        public ClaimsPrincipal CreateMockUser(string userId = "dac0b461-0e19-4879-a43c-53be7460f819", string userName = "test-user")
+        {
+            return new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Name, userName)
+            }, "mock"));
+        }
+
+        // Public method to set a mock user in the controller for a specific test case
+        public void SetMockUserToContext(Controller controller, ClaimsPrincipal mockUser)
+        {
+            controller.ControllerContext = new ControllerContext()
             {
                 HttpContext = new DefaultHttpContext { User = mockUser }
             };

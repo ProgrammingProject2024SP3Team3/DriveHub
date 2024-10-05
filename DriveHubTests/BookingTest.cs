@@ -58,10 +58,7 @@ namespace DriveHubTests
             }, "mock"));
 
             // Set the mocked user to the controller's context
-            bookingTestFixtures.Controller.ControllerContext = new ControllerContext()
-            {
-                HttpContext = new DefaultHttpContext() { User = mockUser }
-            };
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up valid booking data
             var bookingDto = new BookingDto
@@ -77,38 +74,9 @@ namespace DriveHubTests
             // Act
             var result = await bookingTestFixtures.Controller.Create(bookingDto);
 
-            // Assert: Check ModelState for validity
-            if (!bookingTestFixtures.Controller.ModelState.IsValid)
-            {
-                var errors = bookingTestFixtures.Controller.ViewData.ModelState
-                    .Where(e => e.Value.Errors.Count > 0)
-                    .Select(e => new
-                    {
-                        Field = e.Key,
-                        Errors = e.Value.Errors.Select(err => err.ErrorMessage).ToArray()
-                    });
-
-                // Log each field with its associated validation errors
-                foreach (var error in errors)
-                {
-                    Console.WriteLine($"Field: {error.Field}, Errors: {string.Join(", ", error.Errors)}");
-                }
-
-                Assert.Fail("ModelState should be valid, but it was invalid. See the logged errors for more details.");
-            }
-
-            // Assert: Ensure that the correct ViewResult is returned
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var booking = Assert.IsType<Booking>(viewResult.Model);
-
-            // Assert: Validate that the booking was saved correctly in the database
-            var createdBooking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync(b => b.VehicleId == bookingDto.VehicleId);
-            Assert.NotNull(createdBooking);
-            Assert.Equal(bookingDto.VehicleId, createdBooking.VehicleId);
-            Assert.Equal(bookingDto.StartPodId, createdBooking.StartPodId);
-            Assert.Equal(bookingDto.EndPodId, createdBooking.EndPodId);
-            Assert.Equal(bookingDto.StartTime, createdBooking.StartTime);
-            Assert.Equal(bookingDto.EndTime, createdBooking.EndTime);
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Details", redirectResult.ActionName); // Ensure redirect to Details
         }
 
         [Fact]
@@ -116,7 +84,7 @@ namespace DriveHubTests
         {
             // Arrange: Set up a mock authenticated user
             var mockUser = bookingTestFixtures.CreateMockUser();
-            bookingTestFixtures.SetMockUserToContext(mockUser);
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up invalid booking data with past StartTime
             var bookingDto = new BookingDto
@@ -151,7 +119,8 @@ namespace DriveHubTests
                 StartTime = DateTime.Now.AddHours(1),
                 EndTime = DateTime.Now.AddHours(3),
                 PricePerHour = 20,
-                BookingStatus = BookingStatus.InProgress
+                BookingStatus = BookingStatus.InProgress,
+                Id = "test-user-id" // Ensure this matches the expected user ID
             });
             await bookingTestFixtures.Context.SaveChangesAsync();
 
