@@ -1,6 +1,7 @@
 ﻿using DriveHubModel;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 
 namespace Admin.Data
 {
@@ -13,7 +14,6 @@ namespace Admin.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleRate> VehicleRates { get; set; }
         public DbSet<Booking> Bookings { get; set; }
-        public DbSet<Journey> Journeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -82,6 +82,18 @@ namespace Admin.Data
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
             modelBuilder.Entity<Booking>()
+                .HasOne(c => c.StartPod)
+                .WithMany(c => c.StartPods)
+                .HasForeignKey(c => c.StartPodId)
+                .OnDelete(DeleteBehavior.ClientNoAction);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(c => c.EndPod)
+                .WithMany(c => c.EndPods)
+                .HasForeignKey(c => c.EndPodId)
+                .OnDelete(DeleteBehavior.ClientNoAction);
+
+            modelBuilder.Entity<Booking>()
                 .Property(c => c.PricePerHour)
                 .HasColumnType("Money");
 
@@ -91,14 +103,6 @@ namespace Admin.Data
                 .HasConversion(
                     v => v.ToString(),
                     v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
-
-            modelBuilder.Entity<Journey>()
-                .HasOne(c => c.Booking)
-                .WithOne(c => c.Journey);
-
-            modelBuilder.Entity<Journey>()
-                .Property(c => c.Price)
-                .HasColumnType("Money");
         }
     }
 }

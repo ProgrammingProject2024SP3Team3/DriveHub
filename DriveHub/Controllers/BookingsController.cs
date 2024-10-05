@@ -62,15 +62,14 @@ namespace DriveHub.Controllers
         public async Task<IActionResult> PastBookings()
         {
             var bookings = await _context.Bookings
+                //.Where(c => c.Id == _userManager.GetUserId(User))
+                //.Where(c => c.EndTime < DateTime.Now)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
                 .ThenInclude(d => d.Site)
-                .Include(c => c.Vehicle)
                 .ToListAsync();
-            //.Where(c => c.Id == _userManager.GetUserId(User))
-            //.Where(c => c.EndTime < DateTime.Now)
 
             return View(bookings);
         }
