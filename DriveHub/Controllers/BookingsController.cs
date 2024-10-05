@@ -49,22 +49,41 @@ namespace DriveHub.Controllers
             return View(bookingSearchVM);
         }
 
-        public IActionResult CurrentBookings()
+        public async Task<IActionResult> CurrentBookings()
         {
-            throw new NotImplementedException();
+            var bookings = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                //.Where(c => c.EndTime < DateTime.Now)
+                .ToListAsync();
+
+            return View(bookings);
         }
 
-        public IActionResult PastBookings()
+        public async Task<IActionResult> PastBookings()
         {
-            throw new NotImplementedException();
+            var bookings = await _context.Bookings
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.Vehicle)
+                .ToListAsync();
+            //.Where(c => c.Id == _userManager.GetUserId(User))
+            //.Where(c => c.EndTime < DateTime.Now)
+
+            return View(bookings);
         }
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(string id)
         {
             var booking = await _context.Bookings
+                .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
 
@@ -106,7 +125,7 @@ namespace DriveHub.Controllers
                 emptyPods.Add(podVM);
             }
 
-            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}";
+            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
             ViewBag.VehicleId = vehicle.VehicleId;
             ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
             ViewBag.StartPodId = startPod.PodId;
