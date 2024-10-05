@@ -19,7 +19,7 @@
     <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
     <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
         <h1 class="text-center">Booking Details</h1>
-        <p class="text-center">Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model</p>
+        <p class="text-center">Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
         <div class="booking-section mb-3">
             @if (Model.BookingStatus == BookingStatus.InProgress)
             {
@@ -40,17 +40,17 @@
                 <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
                 <p class="mb-0">Pickup DriveHub @startPod.Site.SiteName Pod #@startPod.PodName</p>
             </div>
+            <hr />
             <div class="row">
-                <div class="col mb-3">
+                <div class="col-xs-12 col-md-8 mb-3">
                     <label class="form-label">Car</label>
-                    <div class="form-control">@vehicle.Name the @vehicle.Make @vehicle.Model</div>
+                    <div class="form-control">@vehicle.Name the @vehicle.Make @vehicle.Model. @Model.Vehicle.RegistrationPlate</div>
                 </div>
-                <div class="col container-fluid mb-3">
-                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                            @vehicle.VehicleId
-}.jpg" style="max-width:250px;">
+                <div class="col-xs-12 col-md-4 container-fluid mb-3">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@vehicle.VehicleId}.jpg" style="max-width:250px;">
                 </div>
             </div>
+            <hr />
             <div class="p-3">       
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -119,4 +119,5 @@
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
-        defer></script>
+        defer>
+</script>
