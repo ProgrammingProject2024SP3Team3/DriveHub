@@ -71,9 +71,6 @@ namespace DriveHubModel
 
         [JsonIgnore]
         public virtual Vehicle Vehicle { get; set; }
-
-        //[JsonIgnore]
-        //public virtual Journey? Journey { get; set; }
     }
 
     public enum BookingStatus

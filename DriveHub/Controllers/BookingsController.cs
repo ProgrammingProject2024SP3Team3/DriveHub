@@ -63,23 +63,12 @@ namespace DriveHub.Controllers
         }
 
         // GET: Bookings/Details/5
-        public ActionResult Details(string id)
+        public async Task<IActionResult> Details(string id)
         {
-            throw new NotImplementedException();
-        }
-
-        // GET: Bookings/Details/5
-        public async Task<IActionResult> BookingComplete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var booking = await _context.Bookings
-                .Include(b => b.EndPod)
-                .Include(b => b.StartPod)
-                .Include(b => b.Vehicle)
+                .Include(c => c.StartPod)
+                .Include(c => c.EndPod)
+                .Include(c => c.Vehicle)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
 
             if (booking == null)
@@ -181,7 +170,7 @@ namespace DriveHub.Controllers
             if (ModelState.IsValid)
             {
                 Booking booking = new Booking();
-                var userId = _userManager.GetUserId(User);              
+                var userId = _userManager.GetUserId(User);
 
                 booking.Id = userId;
                 booking.BookingId = Guid.NewGuid().ToString();
@@ -201,7 +190,7 @@ namespace DriveHub.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return View("BookingComplete", booking);
+                return View("Details", booking.BookingId);
             }
 
             // Get start and empty pods
