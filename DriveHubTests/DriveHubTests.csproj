@@ -22,9 +22,11 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />  <!-- xUnit test runner -->
   </ItemGroup>
 
-  <!-- Add Using directive for Xunit -->
+  <!-- Ensure CSV files in the TestData folder are copied to the output directory -->
   <ItemGroup>
-    <Using Include="Xunit" />
+    <None Update="TestData\*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <!-- Project Reference to DriveHub -->
