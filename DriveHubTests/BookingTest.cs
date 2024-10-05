@@ -195,5 +195,19 @@ namespace DriveHubTests
                 Assert.Fail("Booking not found."); // Fail test if booking doesn't exist
             }
         }
+
+        [Fact]
+        public async Task Details_ShouldReturnNotFound_WhenBookingDoesNotExist()
+        {
+            // Arrange: Use a non-existing booking ID
+            var nonExistingBookingId = "non-existing-booking-id";
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Details(nonExistingBookingId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
     }
 }
