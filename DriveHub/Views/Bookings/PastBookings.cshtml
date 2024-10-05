@@ -1,4 +1,5 @@
-﻿@model IEnumerable<dynamic>
+﻿@using DriveHubModel;
+@model IList<Booking>
 @{
     ViewData["Title"] = "Past Bookings";
 }
@@ -6,33 +7,10 @@
 <h1 class="text-center">@ViewData["Title"]</h1>
 <p class="text-center">Here are your completed bookings.</p>
 
-<div class="row justify-content-center">
-    <div class="col-md-9">
-        @foreach (var b in Model)
-        {
-            <div class="d-flex align-items-center p-3 mb-3 border rounded">
-                <div class="d-flex flex-column align-items-center me-3" style="width: 80px;">
-                    <p class="fs-1 mb-1">🚗</p>
-                    <p class="text-center">@b.Booking.BookingStatus</p>
-                </div>
-
-                <div class="flex-grow-1 d-flex flex-column justify-content-center">
-                    <h5 class="mb-2">
-                        @b.Vehicle.Name the @b.Vehicle.Make @b.Vehicle.Model
-                    </h5>
-                    <p class="mb-1">
-                        Pickup @b.StartSite.SiteName Pod #@b.StartPod.PodName
-                    </p>
-                    <p class="mb-0">
-                        <strong>@b.Booking.StartTime.ToString("g") - @b.Booking.EndTime.ToString("g")</strong>
-                    </p>
-                </div>
-
-                <div class="d-flex align-items-center">
-                    <a class="btn mb-4 col-12 fw-bold text-white fs-4 w-100" style="background-color: #00A8E8;"
-                        href="/Bookings/Details/@b.Booking.BookingId">Details</a>
-                </div>
-            </div>
-        }
+<div class="row h-100">
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
+    <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6 text-center">
+        <h3 class="text-warning">COMING SOON IN USER STORY 4</h3>
     </div>
+    <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6"></div>
 </div>
