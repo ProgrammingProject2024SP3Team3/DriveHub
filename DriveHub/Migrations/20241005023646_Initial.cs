@@ -282,26 +282,6 @@ namespace DriveHub.Migrations
                         principalColumn: "VehicleId");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Journeys",
-                columns: table => new
-                {
-                    JourneyId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsPaid = table.Column<bool>(type: "bit", nullable: false),
-                    Price = table.Column<decimal>(type: "Money", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Journeys", x => x.JourneyId);
-                    table.ForeignKey(
-                        name: "FK_Journeys_Bookings_BookingId",
-                        column: x => x.BookingId,
-                        principalTable: "Bookings",
-                        principalColumn: "BookingId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -362,12 +342,6 @@ namespace DriveHub.Migrations
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Journeys_BookingId",
-                table: "Journeys",
-                column: "BookingId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Pods_SiteId",
                 table: "Pods",
                 column: "SiteId");
@@ -404,13 +378,10 @@ namespace DriveHub.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Journeys");
+                name: "Bookings");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "Bookings");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

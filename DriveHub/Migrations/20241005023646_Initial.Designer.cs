@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace DriveHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241005015741_Initial")]
+    [Migration("20241005023646_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -71,30 +71,6 @@ namespace DriveHub.Migrations
                     b.HasIndex("VehicleId");
 
                     b.ToTable("Bookings");
-                });
-
-            modelBuilder.Entity("DriveHubModel.Journey", b =>
-                {
-                    b.Property<string>("JourneyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("BookingId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("Money");
-
-                    b.HasKey("JourneyId");
-
-                    b.HasIndex("BookingId")
-                        .IsUnique();
-
-                    b.ToTable("Journeys");
                 });
 
             modelBuilder.Entity("DriveHubModel.Pod", b =>
@@ -484,17 +460,6 @@ namespace DriveHub.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("DriveHubModel.Journey", b =>
-                {
-                    b.HasOne("DriveHubModel.Booking", "Booking")
-                        .WithOne("Journey")
-                        .HasForeignKey("DriveHubModel.Journey", "BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-                });
-
             modelBuilder.Entity("DriveHubModel.Pod", b =>
                 {
                     b.HasOne("DriveHubModel.Site", "Site")
@@ -572,11 +537,6 @@ namespace DriveHub.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("DriveHubModel.Booking", b =>
-                {
-                    b.Navigation("Journey");
                 });
 
             modelBuilder.Entity("DriveHubModel.Pod", b =>

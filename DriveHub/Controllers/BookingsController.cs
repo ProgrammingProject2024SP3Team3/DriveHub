@@ -6,6 +6,7 @@ using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DriveHub.Models.Dto;
+using Microsoft.AspNetCore.Identity;
 
 namespace DriveHub.Controllers
 {
@@ -14,11 +15,20 @@ namespace DriveHub.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public BookingsController(ApplicationDbContext context, ILogger<BookingsController> logger)
+        public BookingsController(
+            ApplicationDbContext context,
+            ILogger<BookingsController> logger,
+            SignInManager<IdentityUser> signInManager,
+            UserManager<IdentityUser> userManager
+        )
         {
             _context = context;
             _logger = logger;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: Bookings
@@ -163,15 +173,18 @@ namespace DriveHub.Controllers
             var currentPod = await _context.Pods.Where(c => c.PodId == bookingDto.StartPodId).Include(c => c.Site).FirstOrDefaultAsync();
 
             // If we couldn't find the vehicle or it's not currently in a pod then bail out
-            //if (vehicle == null || currentPod == null || currentPod.VehicleId == null)
-            //{
-            //    return RedirectToAction(nameof(Index));
-            //}
+            if (vehicle == null || currentPod == null || currentPod.VehicleId == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
 
             if (ModelState.IsValid)
             {
                 Booking booking = new Booking();
-                booking.Id = Guid.NewGuid().ToString();
+                var userId = _userManager.GetUserId(User);              
+
+                booking.Id = userId;
+                booking.BookingId = Guid.NewGuid().ToString();
                 booking.VehicleId = bookingDto.VehicleId;
                 booking.StartPodId = bookingDto.StartPodId;
                 booking.EndPodId = bookingDto.EndPodId;
@@ -183,11 +196,12 @@ namespace DriveHub.Controllers
 
                 // Remove vehicle from pod
                 currentPod.VehicleId = null;
+                currentPod.Vehicle = null;
                 _context.Update(currentPod);
 
                 await _context.SaveChangesAsync();
 
-                return View("BookingComplete", booking.BookingId);
+                return View("BookingComplete", booking);
             }
 
             // Get start and empty pods
@@ -257,7 +271,7 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .Include(b => b.ApplicationUser)
                 .Include(b => b.Vehicle)
-                .FirstOrDefaultAsync(m => m.BookingId == id);
+                .FirstOrDefaultAsync(m => m.BookingId.ToString() == id);
 
             if (booking == null)
             {
@@ -284,7 +298,7 @@ namespace DriveHub.Controllers
 
         private bool BookingExists(string id)
         {
-            return _context.Bookings.Any(e => e.BookingId == id);
+            return _context.Bookings.Any(e => e.BookingId.ToString() == id);
         }
     }
 }

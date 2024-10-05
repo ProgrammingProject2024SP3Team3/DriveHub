@@ -14,7 +14,6 @@ namespace DriveHub.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleRate> VehicleRates { get; set; }
         public DbSet<Booking> Bookings { get; set; }
-        public DbSet<Journey> Journeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -104,14 +103,6 @@ namespace DriveHub.Data
                 .HasConversion(
                     v => v.ToString(),
                     v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
-
-            modelBuilder.Entity<Journey>()
-                .HasOne(c => c.Booking)
-                .WithOne(c => c.Journey);
-
-            modelBuilder.Entity<Journey>()
-                .Property(c => c.Price)
-                .HasColumnType("Money");
         }
     }
 }

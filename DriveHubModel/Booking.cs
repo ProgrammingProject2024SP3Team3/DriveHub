@@ -19,7 +19,6 @@ namespace DriveHubModel
     public class Booking
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string BookingId { get; set; }
 
         [ForeignKey("Vehicle")]
@@ -73,8 +72,8 @@ namespace DriveHubModel
         [JsonIgnore]
         public virtual Vehicle Vehicle { get; set; }
 
-        [JsonIgnore]
-        public virtual Journey? Journey { get; set; }
+        //[JsonIgnore]
+        //public virtual Journey? Journey { get; set; }
     }
 
     public enum BookingStatus

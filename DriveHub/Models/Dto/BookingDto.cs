@@ -29,6 +29,5 @@ namespace DriveHub.Models.Dto
 
         [Required]
         [Range(20,50)]
-        public decimal QuotedPricePerHour { get; set; }
-    }
+        public decimal QuotedPricePerHour { get; set; }    }
 }
