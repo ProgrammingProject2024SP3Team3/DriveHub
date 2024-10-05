@@ -13,9 +13,9 @@
     var EndTime = Booking.EndTime;
     var TotalPrice = (EndTime - StartTime).TotalHours * (double)Booking.PricePerHour;
     // pick a colour for our heading based on Booking Status
-    var StatusColour = Booking.BookingStatus == BookingStatus.InProgress ? "#2FCD48" // colour if in progress
-        : Booking.BookingStatus == BookingStatus.Complete ? "#252e31" // colour if complete
-        : "#34ce56"; // colour if not an above status
+    // var StatusColour = Booking.BookingStatus == BookingStatus.InProgress ? "#2FCD48" colour if in progress
+    //     : Booking.BookingStatus == BookingStatus.Complete ? "#252e31" colour if complete
+    //     : "#34ce56"; colour if not an above status
 }
 
 <style>
@@ -31,9 +31,14 @@
     <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
     <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
         <div class="booking-section mb-3">
-            <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:@StatusColour;">                Status:
-                @Booking.BookingStatus
-            </div>
+            @if (Booking.BookingStatus == BookingStatus.InProgress)
+            {
+                <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:orange;">
+                    Status:
+                    @Booking.BookingStatus
+                </div>
+            }
+
 
             <div class="p-3">
                 <div class="d-flex align-items-center mb-3">

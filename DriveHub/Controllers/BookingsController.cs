@@ -15,19 +15,16 @@ namespace DriveHub.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
 
         public BookingsController(
             ApplicationDbContext context,
             ILogger<BookingsController> logger,
-            SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager
         )
         {
             _context = context;
             _logger = logger;
-            _signInManager = signInManager;
             _userManager = userManager;
         }
 

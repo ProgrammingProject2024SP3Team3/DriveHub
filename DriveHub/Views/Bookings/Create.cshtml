@@ -87,71 +87,76 @@
     var startTime;
     var endTime;
 
-    window.onload = function(){
-        document.querySelector('#StartTime').addEventListener('change', function () {
-            startTime = this.value;
-            console.log(startTime);
+    // window.onload = function(){
+    document.querySelector('#StartTime').addEventListener('change', function () {
+        startTime = this.value;
+        console.log(startTime);
 
-            if (endTime != null) {
-                var startDateTime = new Date(startTime);
-                var endDateTime = new Date(endTime);
-                    if (endDateTime < startDateTime) {
-                    document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
-                    document.getElementById("total-cost").innerHTML = "$0.00";
-                    document.getElementById("time-validation").innerHTML = "Start time must be before end time";
-                    document.getElementById("create-button").classList = "text-center d-none";
-                    return;
-                }
-                var diff = Math.abs(new Date(startTime) - new Date(endTime));
-                let minutes = Math.floor((diff / 1000) / 60);
-                    quotedPrice = minutes * quotedPricePerHour / 60;
-                console.log("price = " + quotedPrice);
-                if (quotedPrice > 0) document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
+        if (endTime != null) {
+            var startDateTime = new Date(startTime);
+            var endDateTime = new Date(endTime);
+            if (endDateTime < startDateTime) {
+                document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                document.getElementById("total-cost").innerHTML = "$0.00";
+                document.getElementById("time-validation").innerHTML = "Start time must be before end time";
+                document.getElementById("create-button").classList = "text-center d-none";
+                return;
+            }
+            var diff = Math.abs(new Date(startTime) - new Date(endTime));
+            let minutes = Math.floor((diff / 1000) / 60);
+                quotedPrice = minutes * quotedPricePerHour / 60;
+            console.log("price = " + quotedPrice);
+            if (quotedPrice > 0) { 
+                document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
                 document.getElementById("time-validation").innerHTML = "";
                 document.getElementById("total-cost").classList = "fw-bold fs-1";
                 document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
             }
-            });
-
-        document.querySelector('#EndTime').addEventListener('change', function () {
-            endTime = this.value;
-            console.log(endTime);
-
-            if (startTime != null) {
-                var startDateTime = new Date(startTime);
-                    var endDateTime = new Date(endTime);
-                    if (endDateTime < startDateTime) {
-                        document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
-                        document.getElementById("total-cost").innerHTML = "$0.00";
-                        document.getElementById("time-validation").innerHTML = "Start time must be before end time";
-                        document.getElementById("create-button").classList = "text-center d-none";
-                        return;
-                    }
-                    var diff = Math.abs(new Date(startTime) - new Date(endTime));
-                    let minutes = Math.floor((diff / 1000) / 60);
-                    quotedPrice = minutes * quotedPricePerHour / 60;
-                    console.log("price = " + quotedPrice);
-                    if (quotedPrice > 0) document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
-                    document.getElementById("time-validation").innerHTML = "";
-                    document.getElementById("total-cost").classList = "fw-bold fs-1";
-                        document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
-                }
-            });
         }
-            function initMap() {
-                // Init Google Map
-                let map = new google.maps.Map(document.getElementById("map"), {
-                    center: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude },
-                    zoom: 19,
-                    mapTypeId: "roadmap",
-                    mapId: "DRIVEHUB_CREATE"
-                });
-                new google.maps.marker.AdvancedMarkerElement({
-                    map,
-                    title: "Vehicle",
-                    position: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude }
-                })
+    });
+
+    document.querySelector('#EndTime').addEventListener('change', function () {
+        endTime = this.value;
+        console.log(endTime);
+
+        if (startTime != null) {
+            var startDateTime = new Date(startTime);
+            var endDateTime = new Date(endTime);
+            if (endDateTime < startDateTime) {
+                document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                document.getElementById("total-cost").innerHTML = "$0.00";
+                document.getElementById("time-validation").innerHTML = "Start time must be before end time";
+                document.getElementById("create-button").classList = "text-center d-none";
+                return;
             }
+            var diff = Math.abs(new Date(startTime) - new Date(endTime));
+            let minutes = Math.floor((diff / 1000) / 60);
+            quotedPrice = minutes * quotedPricePerHour / 60;
+            console.log("price = " + quotedPrice);
+            if (quotedPrice > 0) { 
+                document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
+                document.getElementById("time-validation").innerHTML = "";
+                document.getElementById("total-cost").classList = "fw-bold fs-1";
+                document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
+            }
+        }
+    });
+</script>
+<script>
+        function initMap() {
+        // Init Google Map
+        let map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude },
+            zoom: 19,
+            mapTypeId: "roadmap",
+            mapId: "DRIVEHUB_CREATE"
+        });
+        new google.maps.marker.AdvancedMarkerElement({
+            map,
+            title: "Vehicle",
+            position: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude }
+        })
+    }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
         defer>
