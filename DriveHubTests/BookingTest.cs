@@ -130,7 +130,7 @@ namespace DriveHubTests
 
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
             var viewResult = Assert.IsType<ViewResult>(result);
-            //Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
+            Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
         }
 
         // NOTE: This test conflicts with the M3 booking logic. We might need to implement this logic in M4.
