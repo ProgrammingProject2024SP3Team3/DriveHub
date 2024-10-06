@@ -75,8 +75,8 @@ namespace DriveHubTests
             var result = await bookingTestFixtures.Controller.Create(bookingDto);
 
             // Assert
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Details", redirectResult.ActionName); // Ensure redirect to Details
+            var redirectResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Details", redirectResult.ViewName); // Ensure redirect to Details
         }
 
         [Fact]
