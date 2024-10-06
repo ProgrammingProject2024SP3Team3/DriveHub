@@ -211,11 +211,15 @@ namespace DriveHub.Controllers
             var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == bookingDto.VehicleId);
             var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
 
-            // If we couldn't find the vehicle or pod then add an error
-            if (vehicle == null || startPod == null) // || conflictingBookings)
+            // Prevent users from posting illegal data combinations
+            if (vehicle == null ||
+                startPod == null ||
+                vehicle.VehicleRate.PricePerHour != bookingDto.QuotedPricePerHour ||
+                startPod.VehicleId != vehicle?.VehicleId
+                )
             {
-                _logger.LogError($"Couldn't find the vehicle or not in pod {bookingDto.VehicleId}");
-                ModelState.AddModelError("VehicleId", "That vehicle has just been booked by someone else");
+                _logger.LogError($"User has posted illegal data {bookingDto}");
+                return RedirectToAction(nameof(Error));
             }
 
             string? userId = _userManager.GetUserId(User);
@@ -236,7 +240,7 @@ namespace DriveHub.Controllers
                 booking.EndPodId = bookingDto.EndPodId;
                 booking.StartTime = bookingDto.StartTime;
                 booking.EndTime = bookingDto.EndTime;
-                booking.PricePerHour = bookingDto.QuotedPricePerHour;
+                booking.PricePerHour = vehicle.VehicleRate.PricePerHour;
                 booking.BookingStatus = BookingStatus.InProgress;
                 _context.Add(booking);
                 _logger.LogInformation($"Added Booking OK");
