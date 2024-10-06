@@ -17,7 +17,7 @@ namespace DriveHubTests
     {
         private BookingTestFixtures bookingTestFixtures;
 
-        
+
         public BookingTests()
         {
             bookingTestFixtures = new BookingTestFixtures();
@@ -137,7 +137,32 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Create_Should_Fail_When_Vehicle_Is_Not_In_Pod()
+        public async Task Create_Should_Error_When_User_Enters_Different_PricePerHour()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                StartTime = DateTime.Now.AddMinutes(10),
+                EndTime = DateTime.Now.AddMinutes(45),
+                QuotedPricePerHour = 5
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_Should_Fail_When_Vehicle_Is_Not_In_Correct_Pod()
         {
             // Arrange: Set up a mock authenticated user
             var mockUser = bookingTestFixtures.CreateMockUser();
@@ -155,10 +180,10 @@ namespace DriveHubTests
             };
 
             // Act
-            await bookingTestFixtures.Controller.Create(bookingDto);
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
 
             // Assert
-            Assert.IsType<RedirectToActionResult>(nameof(Error));
+            Assert.IsType<RedirectToActionResult>(result);
         }
 
         [Fact]
@@ -185,6 +210,33 @@ namespace DriveHubTests
             // Assert
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
             Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_Should_Fail_When_Starttime_Is_Greater_Than_7_days()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                StartTime = DateTime.Now.AddDays(7).AddMinutes(30),
+                EndTime = DateTime.Now.AddDays(8),
+                QuotedPricePerHour = 20.50m
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
             Assert.IsType<ViewResult>(result);
         }
 
@@ -262,6 +314,5 @@ namespace DriveHubTests
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
-
     }
 }
