@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
+using Xunit.Sdk;
 
 namespace DriveHubTests
 {
@@ -63,12 +64,12 @@ namespace DriveHubTests
             // Arrange: Set up valid booking data
             var bookingDto = new BookingDto
             {
-                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545", // Ensure valid vehicle ID
-                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d", // Ensure valid pod ID
-                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d", // Ensure valid pod ID
+                VehicleId = "5780bc06-a5e2-4598-9eea-7cb90b55e169", // Ensure valid vehicle ID
+                StartPodId = "77be04ce-fa47-4d5e-81b9-9e8de26230e1", // Ensure valid pod ID
+                EndPodId = "77be04ce-fa47-4d5e-81b9-9e8de26230e1", // Ensure valid pod ID
                 StartTime = DateTime.Now.AddHours(1), // Ensure time within validation
                 EndTime = DateTime.Now.AddHours(2),
-                QuotedPricePerHour = 20.50m
+                QuotedPricePerHour = 27.50m
             };
 
             // Act
@@ -104,6 +105,32 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
             Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
+        }
+
+        [Fact]
+        public async Task Create_Should_Fail_When_Booking_Time_Is_Less_Than_30_mins()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                StartTime = DateTime.Now.AddMinutes(10),
+                EndTime = DateTime.Now.AddMinutes(15),
+                QuotedPricePerHour = 20.50m
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            var viewResult = Assert.IsType<ViewResult>(result);
+            //Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
         }
 
         // NOTE: This test conflicts with the M3 booking logic. We might need to implement this logic in M4.

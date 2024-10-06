@@ -214,7 +214,7 @@ namespace DriveHub.Controllers
             // Prevent users from posting illegal data combinations
             if (vehicle == null ||
                 startPod == null ||
-                vehicle.VehicleRate.PricePerHour != bookingDto.QuotedPricePerHour ||
+                vehicle?.VehicleRate.PricePerHour != bookingDto.QuotedPricePerHour ||
                 startPod.VehicleId != vehicle?.VehicleId
                 )
             {
