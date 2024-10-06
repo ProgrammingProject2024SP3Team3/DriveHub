@@ -202,21 +202,21 @@ namespace DriveHub.Controllers
             //                 (b.EndTime <= bookingDto.EndTime && b.EndTime >= bookingDto.StartTime)))
             //    .Any();
 
-            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == bookingDto.VehicleId);
-            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
-
-            // If we couldn't find the vehicle or pod then bail out
-            if (vehicle == null || startPod == null) // || conflictingBookings)
-            {
-                _logger.LogError($"Couldn't find the vehicle or not in pod {bookingDto.VehicleId}");
-                ModelState.AddModelError("VehicleId", "That vehicle has just been booked by someone else");
-            }
-
             //if (conflictingBookings)
             //{
             //    _logger.LogWarning($"The selected vehicle is already booked during this time range. {bookingDto.VehicleId}");
             //    ModelState.AddModelError("VehicleId", "The selected vehicle is already booked during this time range.");
             //}
+
+            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == bookingDto.VehicleId);
+            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
+
+            // If we couldn't find the vehicle or pod then add an error
+            if (vehicle == null || startPod == null) // || conflictingBookings)
+            {
+                _logger.LogError($"Couldn't find the vehicle or not in pod {bookingDto.VehicleId}");
+                ModelState.AddModelError("VehicleId", "That vehicle has just been booked by someone else");
+            }
 
             string? userId = _userManager.GetUserId(User);
             if (userId == null)
