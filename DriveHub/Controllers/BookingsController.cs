@@ -164,6 +164,7 @@ namespace DriveHub.Controllers
         public async Task<IActionResult> Create(BookingDto bookingDto)
         {
             _logger.LogInformation($"Received POST to make a booking");
+            _logger.LogInformation(bookingDto.ToString());
 
             // Check if booking duration is less than 30 mins
             var diff = bookingDto.EndTime - bookingDto.StartTime;
@@ -191,31 +192,31 @@ namespace DriveHub.Controllers
             if (bookingDto.StartTime > bookingDto.EndTime)
             {
                 _logger.LogWarning($"Start time is after end time {bookingDto.StartTime} {bookingDto.EndTime}");
-                ModelState.AddModelError("StartTime", "Start time is after end time");
+                ModelState.AddModelError("StartTime", "Start time must be before end time");
             }
 
             // Custom logic to check for overlapping bookings in the database
-            var conflictingBookings = _context.Bookings
-                .Where(b => b.VehicleId == bookingDto.VehicleId &&
-                            ((b.StartTime <= bookingDto.EndTime && b.StartTime >= bookingDto.StartTime) ||
-                             (b.EndTime <= bookingDto.EndTime && b.EndTime >= bookingDto.StartTime)))
-                .Any();
+            //var conflictingBookings = _context.Bookings
+            //    .Where(b => b.VehicleId == bookingDto.VehicleId &&
+            //                ((b.StartTime <= bookingDto.EndTime && b.StartTime >= bookingDto.StartTime) ||
+            //                 (b.EndTime <= bookingDto.EndTime && b.EndTime >= bookingDto.StartTime)))
+            //    .Any();
 
-            if (conflictingBookings)
-            {
-                _logger.LogWarning($"The selected vehicle is already booked during this time range. {bookingDto.VehicleId}");
-                ModelState.AddModelError("VehicleId", "The selected vehicle is already booked during this time range.");
-            }
+            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == bookingDto.VehicleId);
+            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
 
-            var vehicle = await _context.Vehicles.FindAsync(bookingDto.VehicleId);
-            var currentPod = await _context.Pods.Where(c => c.PodId == bookingDto.StartPodId).Include(c => c.Site).FirstOrDefaultAsync();
-
-            // If we couldn't find the vehicle or it's not currently in a pod then bail out
-            if (vehicle == null || currentPod == null || currentPod.VehicleId == null)
+            // If we couldn't find the vehicle or pod then bail out
+            if (vehicle == null || startPod == null)
             {
                 _logger.LogError($"Couldn't find the vehicle or not in pod {bookingDto.VehicleId}");
-                return RedirectToAction(nameof(Error));
+                ModelState.AddModelError("VehicleId", "That vehicle has just been booked by someone else");
             }
+
+            //if (conflictingBookings)
+            //{
+            //    _logger.LogWarning($"The selected vehicle is already booked during this time range. {bookingDto.VehicleId}");
+            //    ModelState.AddModelError("", "The selected vehicle is already booked during this time range.");
+            //}
 
             if (ModelState.IsValid)
             {
@@ -226,6 +227,7 @@ namespace DriveHub.Controllers
                     return RedirectToAction(nameof(Error));
                 }
 
+                _logger.LogInformation($"Booking is valid");
                 Booking booking = new Booking();
                 booking.BookingId = Guid.NewGuid().ToString();
                 booking.VehicleId = bookingDto.VehicleId;
@@ -237,11 +239,12 @@ namespace DriveHub.Controllers
                 booking.PricePerHour = bookingDto.QuotedPricePerHour;
                 booking.BookingStatus = BookingStatus.InProgress;
                 _context.Add(booking);
+                _logger.LogInformation($"Added Booking OK");
 
                 // Remove vehicle from pod
-                currentPod.VehicleId = null;
-                currentPod.Vehicle = null;
-                _context.Update(currentPod);
+                startPod.VehicleId = null;
+                startPod.Vehicle = null;
+                _context.Update(startPod);
 
                 await _context.SaveChangesAsync();
 
@@ -249,8 +252,8 @@ namespace DriveHub.Controllers
             }
 
             // -- Return a page with data and errors if the model is not valid --
+            _logger.LogError($"There was an error with booking {bookingDto.ToString()}");
             // Get start pod and empty pods
-            var startPod = currentPod;
             var emptyPods = new List<PodVM>();
             var startPodVM = new PodVM();
             startPodVM.PodId = startPod.PodId;

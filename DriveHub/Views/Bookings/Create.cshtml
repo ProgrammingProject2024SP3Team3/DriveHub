@@ -21,20 +21,20 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col p-3">
-                <label class="form-label">Car</label>
-                <div class="form-control">@ViewBag.Vehicle</div>
-                <a asp-action="Search" class="small text-right mt-1 btn btn-primary">Find another car close by?</a>
-            </div>
-            <div class="col container-fluid pb-3">
-                <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg" style="max-width:350px;">
-            </div>
-        </div>
-
         <form asp-action="Create">
+            <div class="row">
+                <div class="col p-3">
+                    <label class="form-label">Car</label>
+                    <div class="form-control">@ViewBag.Vehicle</div>
+                    <input type="hidden" asp-for="VehicleId" value="@ViewBag.VehicleId" />
+                    <span asp-validation-for="VehicleId" class="text-danger"></span>
+                    <a asp-action="Search" class="small text-right mt-1 btn btn-primary">Find another car close by?</a>
+                </div>
+                <div class="col container-fluid pb-3">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg" style="max-width:350px;">
+                </div>
+            </div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="VehicleId" value="@ViewBag.VehicleId" />
             <input type="hidden" asp-for="StartPodId" value="@ViewBag.StartPodId" />
             <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
             <div class="row g-3">
@@ -101,6 +101,13 @@
                 document.getElementById("create-button").classList = "text-center d-none";
                 return;
             }
+            if (startDateTime < new Date()) {
+                document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                document.getElementById("total-cost").innerHTML = "$0.00";
+                document.getElementById("time-validation").innerHTML = "Start time must be in the future";
+                document.getElementById("create-button").classList = "text-center d-none";
+                return;
+            }
             var diff = Math.abs(new Date(startTime) - new Date(endTime));
             let minutes = Math.floor((diff / 1000) / 60);
             quotedPrice = minutes * quotedPricePerHour / 60;
@@ -125,6 +132,13 @@
                 document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
                 document.getElementById("total-cost").innerHTML = "$0.00";
                 document.getElementById("time-validation").innerHTML = "Start time must be before end time";
+                document.getElementById("create-button").classList = "text-center d-none";
+                return;
+            }
+            if (startDateTime < new Date()) {
+                document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                document.getElementById("total-cost").innerHTML = "$0.00";
+                document.getElementById("time-validation").innerHTML = "Start time must be in the future";
                 document.getElementById("create-button").classList = "text-center d-none";
                 return;
             }
