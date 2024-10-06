@@ -38,7 +38,7 @@
                     </select>
                 </div>-->
             </div>
-            <div class="col mb-4" id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>     
+            <div class="col mb-4" id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>
             <div class="mb-3 p-2 fw-bold fs-4" style="background-color: #FFBA17;">Select a car</div>
             <div id="car-list"></div>
         </div>
@@ -135,7 +135,7 @@
 
             // Get the number of seats selected by the user
             let numberOfSeats = document.getElementById('seatCountSelect').value
-                                
+
             // Render a big horrible Raw HTML block for ever nearby car
             // TODO: this is so ugly and it's a prime cleanup candidate once we're feature complete
             for (let siteI = 0; siteI < sites.length && totalCarsDisplayed < MAX_CARS_TO_DISPLAY; siteI++) {
@@ -160,21 +160,21 @@
                     }
                     carListHTML +=
                         `<a class="text-decoration-none car-item" href="/Bookings/Create/${car.VehicleId}">
-                            <div class="row border my-3 container-fluid">
-                                <div class="col-xs-12 col-sm-3 col-lg-4">
-                                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px;">
+                                <div class="row border my-3 container-fluid">
+                                    <div class="col-xs-12 col-sm-3 col-lg-4">
+                                        <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px;">
+                                    </div>
+                                    <div class="col-xs-12 col-sm-9 col-lg-8">
+                                        <div class="mb-0 text-decoration-none text-dark"><strong>${timeText}${locationText}</strong></div>
+                                        <div class="mb-0 text-decoration-none text-dark">${car.Name} the ${car.Make} ${car.Model}</div>
+                                    </div>
                                 </div>
-                                <div class="col-xs-12 col-sm-9 col-lg-8">
-                                    <div class="mb-0 text-decoration-none text-dark"><strong>${timeText}${locationText}</strong></div>
-                                    <div class="mb-0 text-decoration-none text-dark">${car.Name} the ${car.Make} ${car.Model}</div>
-                                </div>
-                            </div>
-                            </a>`
+                                </a>`
                     totalCarsDisplayed++;
                 }
             }
             document.getElementById('car-list').innerHTML = carListHTML
-            }
+        }
 
         // Init the Location search bar for the map
         function initSearchBar(map) {
@@ -220,7 +220,7 @@
                 // Fit the map viewport to our created bounds
                 map.fitBounds(bounds)
             })
-            }
+        }
 
         // Init geolocation API that will give the user's current location
         function initGeolocation(map) {
@@ -247,7 +247,7 @@
             } else {
                 console.log("Error: No geolocation API enabled in browser")
             }
-            }
+        }
 
         // Init a click listener on the map that let's the user choose their search
         function initMapClickListener(map) {
@@ -256,7 +256,7 @@
                 searchLocation = mapsMouseEvent.latLng
                 updateMap()
             })
-            }
+        }
 
         function initAll() {
             console.log(siteData)
@@ -275,13 +275,13 @@
             // Init Geolocation (user's lat/long from their GPS)
             initGeolocation(map)
             // Init a click listener on the map that let's the user choose their search
-                initMapClickListener(map)
+            initMapClickListener(map)
 
             // Update the map whenever the user picks another seat count
-                document.getElementById('seatCountSelect').addEventListener('change', updateMap)
+            document.getElementById('seatCountSelect').addEventListener('change', updateMap)
 
             updateMap()
-            }
+        }
 
         // This parses the new Pod API into the form the map currently uses.
         // NOTE: Naming is a bit odd because I originally based this map on C# classes
@@ -323,7 +323,7 @@
             let siteTree = []
             for (let siteName in siteMap) siteTree.push(siteMap[siteName])
             return siteTree
-            }
+        }
 
         function fetchJsonThenInit() {
             fetch('/api/pods')
@@ -338,9 +338,9 @@
                 }).catch(function (error) {
                     console.log('Error while fetching pods', error)
                 })
-            }
+        }
 
         window.initAll = fetchJsonThenInit
-        })()
+    })()
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places,geometry&loading=async" defer></script>

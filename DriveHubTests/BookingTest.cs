@@ -1,21 +1,15 @@
-using DriveHub.Controllers;
 using DriveHub.Models.Dto;
 using DriveHub.Models.ViewModels;
 using DriveHubModel;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
-using Microsoft.EntityFrameworkCore;
-using Xunit.Sdk;
-using Moq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DriveHubTests
 {
     public class BookingTests
     {
-        private BookingTestFixtures bookingTestFixtures;
+        private readonly BookingTestFixtures bookingTestFixtures;
 
 
         public BookingTests()
@@ -162,13 +156,13 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Create_Should_Fail_When_Vehicle_Is_Not_In_Correct_Pod()
+        public async Task Create_Should_Error_When_Vehicle_Is_Not_In_Correct_Pod()
         {
             // Arrange: Set up a mock authenticated user
             var mockUser = bookingTestFixtures.CreateMockUser();
             bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
-            // Arrange: Set up invalid booking data with past StartTime
+            // Arrange: Set up illegal booking data with bad pod and vehicle combinations
             var bookingDto = new BookingDto
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
