@@ -106,6 +106,9 @@ namespace DriveHubTests
             Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
         }
 
+        // NOTE: This test conflicts with the M3 booking logic. We might need to implement this logic in M4.
+        // M3 Fact: A vehicle in a pod is available for booking.
+        // M3 Fact: If a vehicle has-a booking, then it does not have-a pod.
         //[Fact]
         //public async Task Create_ShouldFail_WhenBookingConflictsWithExistingBooking()
         //{

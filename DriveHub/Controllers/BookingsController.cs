@@ -206,7 +206,7 @@ namespace DriveHub.Controllers
             var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
 
             // If we couldn't find the vehicle or pod then bail out
-            if (vehicle == null || startPod == null)
+            if (vehicle == null || startPod == null) // || conflictingBookings)
             {
                 _logger.LogError($"Couldn't find the vehicle or not in pod {bookingDto.VehicleId}");
                 ModelState.AddModelError("VehicleId", "That vehicle has just been booked by someone else");
@@ -215,18 +215,18 @@ namespace DriveHub.Controllers
             //if (conflictingBookings)
             //{
             //    _logger.LogWarning($"The selected vehicle is already booked during this time range. {bookingDto.VehicleId}");
-            //    ModelState.AddModelError("", "The selected vehicle is already booked during this time range.");
+            //    ModelState.AddModelError("VehicleId", "The selected vehicle is already booked during this time range.");
             //}
+
+            string? userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                _logger.LogError($"User is not logged in");
+                ModelState.AddModelError("", "Your session has expired. Please login again.");
+            }
 
             if (ModelState.IsValid)
             {
-                string? userId = _userManager.GetUserId(User);
-                if (userId == null)
-                {
-                    _logger.LogError($"User is not logged in");
-                    return RedirectToAction(nameof(Error));
-                }
-
                 _logger.LogInformation($"Booking is valid");
                 Booking booking = new Booking();
                 booking.BookingId = Guid.NewGuid().ToString();
