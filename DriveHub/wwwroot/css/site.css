@@ -89,6 +89,14 @@ h5 {
         box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb; /* Focus state */
     }
 
+form {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
 /* Custom Table Styles */
 .table {
     margin-bottom: 1rem;
@@ -104,6 +112,7 @@ a {
     color: #007bff;
     text-decoration: none;
     transition: color 0.2s ease; /* Smooth hover transition */
+    padding: inherit;
 }
 
     a:hover {
