@@ -6,31 +6,119 @@
     a.booking-link :hover {
         background-color: #dddddd;
     }
+
+    .img-fluid, img-fluid {
+        border-radius: 15px;
+        vertical-align: middle;
+    }
 </style>
 
-<div class="row mt-2 text-center">
+<div class="row">
     <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
     <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
-        <h1 class="mb-6">Bookings</h1>
-        <div class="row mt-2">
+        <h1 class="mb-4">@ViewData["Title"]</h1>
+        <div class="row mt-6 mb-4 text-center">
             <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="Search">
                 <div>
                     <i class="bi bi-calendar-plus" style="color:#00A8E8; font-size:100px"></i>
-                    <h4 class="service-heading">Book a Car</h4>
+                    <h3 class="service-heading">Book a Car</h3>
                 </div>
             </a>
             <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="CurrentBookings">
                 <div>
                     <i class="bi bi-calendar-check" style="color:#00A8E8; font-size:100px"></i>
-                    <h4 class="service-heading">Your current bookings</h4>
+                    <h3 class="service-heading">Your current bookings</h3>
                 </div>
             </a>
             <a class="booking-link text-decoration-none text-dark col-xs-12 col-md-4" asp-action="PastBookings">
                 <div>
                     <i class="bi bi-calendar-week" style="color:#00A8E8; font-size:100px"></i>
-                    <h4 class="service-heading">Your previous bookings</h4>
+                    <h3 class="service-heading">Your previous bookings</h3>
                 </div>
             </a>
+        </div>
+        <div class="container-fluid mb-3">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking-banner.jpg" alt="booking-banner" style="max-width:contain" />
+        </div>
+        <div>
+            <h2 class="text-center pb-3">How does DriveHub work?</h2>
+            <div class="row p-2">
+                <div class="col-sm-4">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking1.jpg" alt="booking1" style="max-width:contain" />
+                </div>
+                <div class="col-sm-8">
+                    <h4> 1. Book a Car</h4>
+                    <p class="lead">
+                        Choose a vehicle, location, date, and time that is convenient for you.
+                        All DriveHub bookings are return trips, so you’ll need to bring the car back to its home pod at the end of your booking.
+                    </p>
+                </div>
+            </div>
+            <div class="row p-3">
+                <div class="col-sm-4">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking2.jpg" alt="booking2" style="max-width:contain" />
+                </div>
+                <div class="col-sm-8">
+                    <h4> 2. Inspect</h4>
+                    <p class="lead">
+                        When you arrive at the car, check the vehicle for any damage before you start driving.
+                        If you find any issues, let us know via the app.
+                    </p>
+                </div>
+            </div>
+            <div class="row p-3">
+                <div class="col-sm-4">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking3.jpg" alt="booking3" style="max-width:contain" />
+                </div>
+                <div class="col-sm-8">
+                    <h4> 3. Scan QR Code </h4>
+                    <p class="lead">
+                        Use your smartphone to lock and unlock the vehicle by scanning the QR Code on the windscreen in the DriveHub app.
+                        Be sure to tap off at the end of your trip to lock the car.
+                    </p>
+                </div>
+            </div>
+            <div class="row p-3">
+                <div class="col-sm-4">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking4.jpg" alt="booking4" style="max-width:contain" />
+                </div>
+                <div class="col-sm-8">
+                    <h4> 4. Keys</h4>
+                    <p class="lead">
+                        Car keys are attached near the steering wheel.
+                        If you can’t find a key your car may have a keyless ignition – just press the "start" button to get going.
+                    </p>
+                </div>
+            </div>
+            <div class="row p-3">
+                <div class="col-sm-4">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking5.jpg" alt="booking5" style="max-width:contain" />
+                </div>
+                <div class="col-sm-8">
+                    <h4> 5. Fuel</h4>
+                    <p class="lead">
+                        Return your vehicle with at least a 1/4 tank of fuel for the next member.
+                        Fuel is on us, so if petrol drops below ¼ during your booking, fill it all the way and pay using the fuel card attached to the car keys.
+                    </p>
+                </div>
+            </div>
+            <div class="row p-3">
+                <div class="col-sm-4">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking6.jpg" alt="booking6" style="max-width:contain" />
+                </div>
+                <div class="col-sm-8">
+                    <h4> 6. Return</h4>
+                    <p class="lead">
+                        All DriveHub bookings are round trips.
+                        Follow the app instructions to bring the car back to its designated home pod.
+                        Take your belongings and any rubbish with you, leaving the car clean and ready to go for the next member.
+                        Don't forget to tap off to lock the vehicle at the end of your booking. -It’s that easy!
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/booking-banner2.jpg" alt="booking-banner2" style="max-width:contain" />
         </div>
     </div>
     <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
