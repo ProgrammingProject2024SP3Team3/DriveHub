@@ -8,13 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Sdk;
+using Moq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DriveHubTests
 {
     public class BookingTests
     {
-        private readonly BookingTestFixtures bookingTestFixtures;
+        private BookingTestFixtures bookingTestFixtures;
 
+        
         public BookingTests()
         {
             bookingTestFixtures = new BookingTestFixtures();
@@ -102,7 +105,7 @@ namespace DriveHubTests
             var result = await bookingTestFixtures.Controller.Create(bookingDto);
 
             // Assert: Check if ModelState contains errors for StartTime
-            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.IsType<ViewResult>(result);
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
             Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
         }
@@ -129,8 +132,60 @@ namespace DriveHubTests
             var result = await bookingTestFixtures.Controller.Create(bookingDto);
 
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
-            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.IsType<ViewResult>(result);
             Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
+        }
+
+        [Fact]
+        public async Task Create_Should_Fail_When_Vehicle_Is_Not_In_Pod()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "5f0244c5-765c-41b5-a4ee-5c01badd5ad6",
+                EndPodId = "5f0244c5-765c-41b5-a4ee-5c01badd5ad6",
+                StartTime = DateTime.Now.AddMinutes(10),
+                EndTime = DateTime.Now.AddMinutes(15),
+                QuotedPricePerHour = 20.50m
+            };
+
+            // Act
+            await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(nameof(Error));
+        }
+
+        [Fact]
+        public async Task Create_Should_Fail_When_Starttime_Is_Before_Endtime()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                StartTime = DateTime.Now.AddMinutes(60),
+                EndTime = DateTime.Now.AddMinutes(10),
+                QuotedPricePerHour = 20.50m
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
+            Assert.IsType<ViewResult>(result);
         }
 
         // NOTE: This test conflicts with the M3 booking logic. We might need to implement this logic in M4.
