@@ -45,6 +45,14 @@ for details on configuring this project to bundle and minify static web assets. 
         transition: color 0.3s ease, text-decoration 0.3s ease;
     }
 
+    @media (max-width: 1024px) {
+        .navbar-nav .nav-item {
+            font-size: 0.85rem; /* Smaller button font */
+            padding: 6px 10px; /* Reduce padding on smaller screens */
+        }
+    }
+
+
 /* Media query for devices with max width of 768px (tablets and smaller) */
 @media (max-width: 768px) {
     .navbar-nav .nav-item {
@@ -81,7 +89,6 @@ for details on configuring this project to bundle and minify static web assets. 
 
 /* Footer Styles */
 .footer {
-    background-color: #343a40;
     color: white;
     padding: 20px 0;
     width: 100%;
