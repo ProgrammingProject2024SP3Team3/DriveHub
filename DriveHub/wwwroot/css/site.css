@@ -1,3 +1,11 @@
+
+/* Universal Box Sizing */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 /* Global Font Settings */
 html {
     font-size: 14px; /* Base font size for small screens */
@@ -7,11 +15,6 @@ html {
     margin: 0;
 }
 
-@media (min-width: 768px) {
-    html {
-        font-size: 16px; /* Larger font size for bigger screens */
-    }
-}
 
 /* Body and Layout */
 body {
@@ -28,11 +31,39 @@ main {
     flex-grow: 1;
 }
 
-/* Universal Box Sizing */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: orange;
+    line-height: 1.2;
+}
+
+h2, h3, h4, h5 {
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+/* Adjust font sizes individually */
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+h5 {
+    font-size: 1.25rem;
 }
 
 /* Buttons */
@@ -68,17 +99,6 @@ main {
     background-color: rgba(0, 168, 232, 0.075); /* Light hover effect on rows */
 }
 
-/* Media Queries for Responsive Layout */
-@media (max-width: 768px) {
-    .container, .main-content {
-        padding-top: 90px; /* Adjust padding for smaller screens */
-    }
-
-    .btn {
-        padding: 8px 16px; /* Smaller padding for mobile buttons */
-    }
-}
-
 /* Links */
 a {
     color: #007bff;
@@ -92,11 +112,59 @@ a {
 
 /* Layout */
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 15px;
 }
 
 footer {
     margin-top: auto;
+}
+
+@media (min-width: 768px) {
+    .btn {
+        padding: 8px 16px; /* Smaller padding for mobile buttons */
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+    h4 {
+        font-size: 1.25rem;
+    }
+
+    h5 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    h4 {
+        font-size: 1.1rem;
+    }
+
+    h5 {
+        font-size: 1rem;
+    }
 }
