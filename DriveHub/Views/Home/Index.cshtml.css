@@ -17,7 +17,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(28, 55, 94, 0.5); /* Semi-transparent overlay */
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
     z-index: 0;
 }
 
@@ -33,7 +33,9 @@
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 1.5s ease-out;
+    padding: 5%;
 }
+
 
 .hero-heading.scrolled {
     opacity: 1;
@@ -69,30 +71,6 @@
     outline: none;
 }
 
-@media (min-width: 768px) {
-    .hero-heading{
-        padding-top: 8rem;
-    }
-    .hero-heading h1{
-        font-size: 2rem;
-    }
-
-    /* Adjust the padding of the search bar */
-    .hero-search-bar input {
-        width: 75%; /* Wider input field for larger screens */
-        padding: 15px; /* More padding for a more comfortable UI */
-    }
-
-    .hero-search-bar button {
-        width: 25%; /* Slightly smaller button compared to the input field */
-        padding: 15px; /* Match padding with input */
-    }
-
-    /* Ensure the hero section maintains a good layout */
-    .hero-section {
-        justify-content: center; /* Ensure the content stays centered */
-    }
-}
 
 /* Services Section */
 .services-section {
@@ -158,7 +136,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    background-color: rgba(12, 4, 34, 0.6); /* Dark overlay */
     z-index: 0;
 }
 
@@ -183,17 +161,121 @@
     border: none;
 }
 
-/* Responsive adjustments */
-@media (min-width: 768px) {
+/******************************************************
+* Responsive Design for Various Screen Sizes *
+ ******************************************************/
+
+/* Responsive for Tablets/Small Laptops (1024px) */
+@media (max-width: 1024px) {
     .call-to-action h2 {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
 
     .form-subscribe .form-control {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
+        padding: 12px;
     }
 
     .form-subscribe .btn {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
+        padding: 12px 20px;
+    }
+}
+
+
+
+
+
+/* Responsive for Larger Mobiles (768px) */
+@media (max-width: 768px){
+    .hero-heading{
+        padding-top: 6rem;
+    }
+
+    .hero-heading h1{
+        font-size: 2rem;
+    }
+
+    .hero-search-bar {
+        max-width: 90%;
+        padding-bottom: 5%; 
+    }
+
+    .hero-search-bar input, .hero-search-bar button {
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    .hero-search-bar input {
+        width: 75%; /* Wider input field for larger screens */
+        padding: 12px; /* More padding for a more comfortable UI */
+    }
+
+    .hero-search-bar button {
+        width: 25%; /* Slightly smaller button compared to the input field */
+        padding: 12px 15px; /* Match padding with input */
+    }
+
+    .hero-section {
+        justify-content: center; /* Ensure the content stays centered */
+    }
+    .call-to-action h2 {
+        font-size: 1.8rem;
+    }
+
+    .form-subscribe .form-control {
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    .form-subscribe .btn {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+
+
+
+/* Responsive for Small Mobiles (480px and below) */
+@media (max-width: 480px) {
+
+    .hero-heading{
+        padding-top: 4rem;
+    }
+
+    .hero-heading h1{
+        font-size: 0.8rem;
+    }
+
+    .hero-search-bar {
+        max-width: 100%; 
+        padding-bottom: 5%; 
+    }
+
+    .hero-search-bar input, .hero-search-bar button {
+        font-size: 1rem;
+        padding: 8px;
+    }
+
+    .hero-search-bar input {
+        width: 70%; /* Make input field full width */
+    }
+
+    .hero-search-bar button {
+        width: 30%;
+    }
+
+    .call-to-action h2 {
+        font-size: 1.5rem;
+    }
+
+    .form-subscribe .form-control {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .form-subscribe .btn {
+        font-size: 0.9rem;
+        padding: 8px 15px;
     }
 }
