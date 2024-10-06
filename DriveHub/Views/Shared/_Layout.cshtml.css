@@ -29,6 +29,12 @@ for details on configuring this project to bundle and minify static web assets. 
         color: #1470b5;
     }
 
+
+/* Mobile toggle button */
+.navbar-toggler {
+    border: #00A8E8;
+}
+
 /* Style for the nav links */
 .navbar-nav .nav-item {
     font-size: 1.1rem;
@@ -44,40 +50,6 @@ for details on configuring this project to bundle and minify static web assets. 
         border-radius: 5px; /* Optional rounded corners for the hover effect */
         transition: color 0.3s ease, text-decoration 0.3s ease;
     }
-
-/* Media query for devices with max width of 768px (tablets and smaller) */
-@media (max-width: 768px) {
-    .navbar-nav .nav-item {
-        font-size: 1rem;
-        margin: 10px;
-        padding: 0.5rem;
-    }
-
-        /* Add hover effect for smaller devices */
-        .navbar-nav .nav-item:hover {
-            background-color: #00A8E8;
-            background-color: transparent;
-        }
-}
-
-/* Media query for very small devices (max-width: 576px, such as small phones) */
-@media (max-width: 576px) {
-    .navbar-nav .nav-item {
-        font-size: 0.9rem;
-        margin: 5px;
-        padding: 0.5rem;
-    }
-
-        .navbar-nav .nav-item:hover {
-            background-color: #00A8E8;
-            background-color: transparent;
-        }
-}
-
-/* Mobile toggle button */
-.navbar-toggler {
-    border: #00A8E8;
-}
 
 /* Footer Styles */
 .footer {

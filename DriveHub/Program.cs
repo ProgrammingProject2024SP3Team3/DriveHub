@@ -61,6 +61,16 @@ else
     app.UseHsts();
 }
 
+app.Use(async (context, next) =>
+{
+    await next();
+    if (context.Response.StatusCode == 404)
+    {
+        context.Request.Path = "/Home/FourOFour";
+        await next();
+    }
+});
+
 // Localise to AU
 app.UseRequestLocalization(new RequestLocalizationOptions
 {

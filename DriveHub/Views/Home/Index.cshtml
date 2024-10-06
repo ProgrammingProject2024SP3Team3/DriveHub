@@ -6,20 +6,19 @@
 <header class="hero-section">
     <div class="container">
         <div class="row justify-content-center">
-         <div class="col-xl-8">
-        <div class="text-center text-white">
-            <h1 class="hero-heading mb-5">Find, Book, and Drive – Anytime, Anywhere!</h1>
-            </div>
-            <div class="hero-search-bar">
-                <input type="text" class="form-control-lg" placeholder="Search for a car">
-                <button class="btn btn-primary btn-lg">Search</button>
-                    </div>
+            <div class="col-xl-8">
+                <div class="text-center text-white">
+                    <h1 class="hero-heading mb-5">Find, Book, and Drive – Anytime, Anywhere!</h1>
+                </div>
+                <div class="hero-search-bar">
+                    <a asp-action="Index" asp-controller="Bookings" class="btn btn-primary btn-lg">Find a car near you!</a>
+                </div>
             </div>
         </div>
     </div>
 </header>
 
- <!-- Services Section -->
+<!-- Services Section -->
 <section class="services-section text-center">
     <div class="container">
         <div class="row">
@@ -78,4 +77,30 @@
         </div>
     </div>
 </section>
+
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        const heroHeading = document.querySelector('.hero-heading');
+
+        // A check if heroHeading exists so it doesn't error on other pages
+        if (heroHeading) {
+            setTimeout(() => {
+                heroHeading.classList.add('scrolled');
+            }, 500);
+        }
+
+        const fadeInOnScroll = () => {
+            const scrollPosition = window.scrollY;
+            const opacity = Math.min(1, scrollPosition / (windowHeight / 2));
+
+            heroHeading.style.opacity = opacity;
+
+            if (scrollPosition <= windowHeight) {
+                heroHeading.style.transition = 'opacity 0.5s ease-out';
+            }
+        };
+
+        window.addEventListener('scroll', fadeInOnScroll)
+    });
+</script>
 

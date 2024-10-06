@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
 namespace Admin.Migrations
 {
     /// <inheritdoc />
-    public partial class Admin : Migration
+    public partial class Application : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +31,7 @@ namespace Admin.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -48,6 +50,39 @@ namespace Admin.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sites",
+                columns: table => new
+                {
+                    SiteId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SiteName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PostCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Latitude = table.Column<double>(type: "float", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: false),
+                    Location = table.Column<Point>(type: "geography", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sites", x => x.SiteId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VehicleRates",
+                columns: table => new
+                {
+                    VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
+                    EffectiveDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VehicleRates", x => x.VehicleRateId);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,6 +191,97 @@ namespace Admin.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Vehicles",
+                columns: table => new
+                {
+                    VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Make = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RegistrationPlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Year = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Seats = table.Column<int>(type: "int", nullable: false),
+                    Colour = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vehicles", x => x.VehicleId);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_VehicleRates_VehicleRateId",
+                        column: x => x.VehicleRateId,
+                        principalTable: "VehicleRates",
+                        principalColumn: "VehicleRateId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pods",
+                columns: table => new
+                {
+                    PodId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SiteId = table.Column<int>(type: "int", nullable: false),
+                    VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PodName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pods", x => x.PodId);
+                    table.ForeignKey(
+                        name: "FK_Pods_Sites_SiteId",
+                        column: x => x.SiteId,
+                        principalTable: "Sites",
+                        principalColumn: "SiteId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Pods_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "VehicleId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bookings",
+                columns: table => new
+                {
+                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StartPodId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EndPodId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
+                    BookingStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookings", x => x.BookingId);
+                    table.ForeignKey(
+                        name: "FK_Bookings_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Pods_EndPodId",
+                        column: x => x.EndPodId,
+                        principalTable: "Pods",
+                        principalColumn: "PodId");
+                    table.ForeignKey(
+                        name: "FK_Bookings_Pods_StartPodId",
+                        column: x => x.StartPodId,
+                        principalTable: "Pods",
+                        principalColumn: "PodId");
+                    table.ForeignKey(
+                        name: "FK_Bookings_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "VehicleId");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -194,6 +320,43 @@ namespace Admin.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_EndPodId",
+                table: "Bookings",
+                column: "EndPodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_Id",
+                table: "Bookings",
+                column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_StartPodId",
+                table: "Bookings",
+                column: "StartPodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_VehicleId",
+                table: "Bookings",
+                column: "VehicleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pods_SiteId",
+                table: "Pods",
+                column: "SiteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pods_VehicleId",
+                table: "Pods",
+                column: "VehicleId",
+                unique: true,
+                filter: "[VehicleId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vehicles_VehicleRateId",
+                table: "Vehicles",
+                column: "VehicleRateId");
         }
 
         /// <inheritdoc />
@@ -215,10 +378,25 @@ namespace Admin.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Bookings");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Pods");
+
+            migrationBuilder.DropTable(
+                name: "Sites");
+
+            migrationBuilder.DropTable(
+                name: "Vehicles");
+
+            migrationBuilder.DropTable(
+                name: "VehicleRates");
         }
     }
 }

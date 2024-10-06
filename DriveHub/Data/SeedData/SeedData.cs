@@ -2,9 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using DriveHub.Data;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace DriveHub.SeedData
 {
@@ -18,7 +15,7 @@ namespace DriveHub.SeedData
             var scope = services.CreateScope();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-            if (context.Users.Any()) { return; }
+            if (context.VehicleRates.Any()) { return; }
 
             foreach (var vehicleRate in GetVehicleRates())
             {
@@ -64,8 +61,9 @@ namespace DriveHub.SeedData
             }
             context.SaveChanges();
 
-            var stmt = context.Sites.FromSqlRaw
-                    ($"CREATE SPATIAL INDEX[IX_Sites_Location] ON [Sites]([Location]) WITH(BOUNDING_BOX = (144.3336, -38.4339, 145.8783, -37.4713));");
+            //context.Database.ExecuteSqlRaw(@"CREATE SPATIAL INDEX IX_Sites_Location 
+            //                               ON [Sites]([Location]) 
+            //                               USING GEOGRAPHY_AUTO_GRID;");
 
             foreach (var pod in GetPods(logger))
             {

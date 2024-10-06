@@ -6,8 +6,8 @@ using Microsoft.Extensions.Azure;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var adminString = builder.Configuration.GetConnectionString("AdminConnection") ?? throw new InvalidOperationException("Connection string 'AdminConnection' not found.");
-var applicationString = builder.Configuration.GetConnectionString("ApplicationConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationConnection' not found.");
+var adminString = builder.Configuration.GetConnectionString("DriveHubDbAdmin") ?? throw new InvalidOperationException("Connection string 'AdminConnection' not found.");
+var applicationString = builder.Configuration.GetConnectionString("DriveHubDb") ?? throw new InvalidOperationException("Connection string 'ApplicationConnection' not found.");
 
 builder.Services.AddDbContext<AdminDbContext>(options =>
     options.UseSqlServer(adminString));

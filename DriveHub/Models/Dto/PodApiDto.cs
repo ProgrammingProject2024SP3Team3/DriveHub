@@ -1,5 +1,5 @@
 /**
- * PodDto.cs 30/09/2024
+ * PodApiDto.cs 30/09/2024
  *
  * author: Ian McElwaine s3863018@rmit.student.edu.au
  * author: Sean Atherton s3893785@student.rmit.edu.au
@@ -11,7 +11,7 @@
 
 namespace DriveHub.Models.Dto
 {
-    public class PodDto
+    public class PodApiDto
     {
         public string PodId { get; set; }
 

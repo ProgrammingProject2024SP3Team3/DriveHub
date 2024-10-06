@@ -1,69 +1,42 @@
 ﻿@model DriveHubModel.Booking
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Change Booking Time";
 }
 
-<h1>Edit</h1>
+<h1 class="text-center">Change Booking Time</h1>
+<p class="text-center">Edit your upcoming car booking's start and end times.</p>
 
-<h4>Booking</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="BookingId" />
-            <div class="form-group">
-                <label asp-for="VehicleId" class="control-label"></label>
-                <select asp-for="VehicleId" class="form-control" asp-items="ViewBag.VehicleId"></select>
-                <span asp-validation-for="VehicleId" class="text-danger"></span>
+<div class="row mt-2">
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
+    <div class="col-xs-12 col-md-10 col-lg-8 col-xl-6">
+        <div class="">
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="StartTime" class="form-label">Booking Start</label>
+                        <input type="datetime-local" class="form-control" id="StartTime" name="StartTime"
+                               value="@Model.StartTime.ToString("s")" step="any" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="EndTime" class="form-label">Booking End</label>
+                        <input type="datetime-local" class="form-control" id="EndTime" name="EndTime"
+                               value="@Model.EndTime.ToString("s")" step="any" />
+                    </div>
+                </div>
+                <div class="text-center mt-5 mb-3">
+                    <input type="submit" value="Update Booking Time" class="btn btn-danger fw-bold text-white fs-4" />
+                </div>
+            </form>
+            <div class="text-end">
+                <a href="/Bookings/Details/@Model.BookingId">Back to Booking</a>
             </div>
-            <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <select asp-for="Id" class="form-control" asp-items="ViewBag.Id"></select>
-                <span asp-validation-for="Id" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StartPodId" class="control-label"></label>
-                <input asp-for="StartPodId" class="form-control" />
-                <span asp-validation-for="StartPodId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EndPodId" class="control-label"></label>
-                <input asp-for="EndPodId" class="form-control" />
-                <span asp-validation-for="EndPodId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StartTime" class="control-label"></label>
-                <input asp-for="StartTime" class="form-control" />
-                <span asp-validation-for="StartTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EndTime" class="control-label"></label>
-                <input asp-for="EndTime" class="form-control" />
-                <span asp-validation-for="EndTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PricePerHour" class="control-label"></label>
-                <input asp-for="PricePerHour" class="form-control" />
-                <span asp-validation-for="PricePerHour" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BookingStatus" class="control-label"></label>
-                <select asp-for="BookingStatus" class="form-control"></select>
-                <span asp-validation-for="BookingStatus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
+    <div class="col-xs-0 col-md-1 col-lg-2 col-xl-3"></div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -17,11 +17,11 @@ namespace DriveHub.Controllers
             _context = context;
         }
 
-        // GET: api/Pods
+        // GET: api/EmptyPods
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PodDto>>> GetPods()
+        public async Task<ActionResult<IEnumerable<PodApiDto>>> GetPods()
         {
-            var dtos = new List<PodDto>();
+            var dtos = new List<PodApiDto>();
             var pods = await _context.Pods.Include(c => c.Site).Include(c => c.Vehicle).Include(c => c.Vehicle.VehicleRate).ToListAsync();
 
             foreach (var pod in pods)
@@ -32,9 +32,9 @@ namespace DriveHub.Controllers
             return dtos;
         }
 
-        // GET: api/Pods/5
+        // GET: api/EmptyPods/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PodDto>> GetPod(string id)
+        public async Task<ActionResult<PodApiDto>> GetPod(string id)
         {
             var pod = await _context.Pods.Where(c => c.PodId == id).Include(c => c.Site).Include(c => c.Vehicle).Include(c => c.Vehicle.VehicleRate).FirstOrDefaultAsync();
 
@@ -53,9 +53,9 @@ namespace DriveHub.Controllers
             return _context.Pods.Any(e => e.PodId == id);
         }
 
-        private static PodDto GetPodDto(Pod pod)
+        private static PodApiDto GetPodDto(Pod pod)
         {
-            var dto = new PodDto();
+            var dto = new PodApiDto();
             dto.PodId = pod.PodId;
             dto.PodName = pod.PodName;
             dto.SiteName = pod.Site.SiteName;

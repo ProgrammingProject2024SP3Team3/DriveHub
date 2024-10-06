@@ -58,27 +58,6 @@ main {
         box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb; /* Focus state */
     }
 
-/* Custom Table Styles */
-.table {
-    margin-bottom: 1rem;
-    color: #212529;
-}
-
-.table-hover tbody tr:hover {
-    background-color: rgba(0, 168, 232, 0.075); /* Light hover effect on rows */
-}
-
-/* Media Queries for Responsive Layout */
-@media (max-width: 768px) {
-    .container, .main-content {
-        padding-top: 90px; /* Adjust padding for smaller screens */
-    }
-
-    .btn {
-        padding: 8px 16px; /* Smaller padding for mobile buttons */
-    }
-}
-
 /* Links */
 a {
     color: #007bff;
@@ -92,9 +71,7 @@ a {
 
 /* Layout */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
+    max-width: 1920px;
 }
 
 footer {
