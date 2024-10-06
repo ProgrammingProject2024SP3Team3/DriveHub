@@ -65,10 +65,10 @@ namespace DriveHubTests
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545", // Ensure valid vehicle ID
                 StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d", // Ensure valid pod ID
-                EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068", // Ensure valid pod ID
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d", // Ensure valid pod ID
                 StartTime = DateTime.Now.AddHours(1), // Ensure time within validation
                 EndTime = DateTime.Now.AddHours(2),
-                QuotedPricePerHour = 20
+                QuotedPricePerHour = 20.50m
             };
 
             // Act
@@ -91,10 +91,10 @@ namespace DriveHubTests
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
                 StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068",
+                EndPodId = "4121be84-af99-4be1-80b9-5c4fd2117567",
                 StartTime = DateTime.Now.AddHours(-1), // Start time in the past
                 EndTime = DateTime.Now.AddHours(1),
-                QuotedPricePerHour = 20
+                QuotedPricePerHour = 20.50m
             };
 
             // Act
