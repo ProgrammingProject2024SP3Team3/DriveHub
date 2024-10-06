@@ -18,8 +18,16 @@ namespace Admin.Controllers
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Bookings.Include(b => b.ApplicationUser).Include(b => b.EndPod).Include(b => b.StartPod).Include(b => b.Vehicle);
-            return View(await applicationDbContext.ToListAsync());
+            var bookings = await _context.Bookings
+                .Include(b => b.ApplicationUser)
+                .Include(b => b.EndPod)
+                .ThenInclude(c => c.Site)
+                .Include(b => b.StartPod)
+                .ThenInclude(c => c.Site)
+                .Include(b => b.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .ToListAsync();
+            return View(bookings);
         }
 
         // GET: Bookings/Details/5
@@ -47,10 +55,10 @@ namespace Admin.Controllers
         // GET: Bookings/Create
         public IActionResult Create()
         {
-            ViewData["Id"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id");
-            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodId");
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodId");
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId");
+            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName");
+            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName");
+            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName");
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name");
             return View();
         }
 
@@ -67,10 +75,10 @@ namespace Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Id"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", booking.Id);
-            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodId", booking.EndPodId);
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodId", booking.StartPodId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", booking.VehicleId);
+            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
+            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
+            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
             return View(booking);
         }
 
@@ -87,10 +95,10 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["Id"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", booking.Id);
-            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodId", booking.EndPodId);
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodId", booking.StartPodId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", booking.VehicleId);
+            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
+            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
+            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
             return View(booking);
         }
 
@@ -126,10 +134,10 @@ namespace Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Id"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", booking.Id);
-            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodId", booking.EndPodId);
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodId", booking.StartPodId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "VehicleId", booking.VehicleId);
+            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
+            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
+            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
             return View(booking);
         }
 

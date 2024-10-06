@@ -34,6 +34,19 @@ namespace DriveHub.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Return the error page when a booking action is not sane. Not publicly accessible.
+        /// </summary>
+        /// <returns>The error page</returns>
+        private IActionResult Error()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Search for a vehicle to book
+        /// </summary>
+        /// <returns>The vehicle search page</returns>
         public async Task<IActionResult> Search()
         {
             var vehicles = await _context.Vehicles.Where(c => c.Pod != null).Include(c => c.VehicleRate).ToListAsync();
@@ -84,6 +97,7 @@ namespace DriveHub.Controllers
                 .Include(c => c.EndPod)
                 .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
+                .ThenInclude(d => d.VehicleRate)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
 
             if (booking == null)
@@ -97,14 +111,21 @@ namespace DriveHub.Controllers
         // GET: Bookings/Create
         public async Task<IActionResult> Create(string id)
         {
+            _logger.LogInformation($"Received a request to book vehicle {id}");
+
             // Get a vehicle with its rate, pod and site
-            var vehicle = await _context.Vehicles.Where(c => c.VehicleId == id).Include(c => c.Pod).ThenInclude(c => c.Site).Include(c => c.VehicleRate).FirstOrDefaultAsync();
+            var vehicle = await _context.Vehicles
+                .Where(c => c.VehicleId == id)
+                .Include(c => c.Pod)
+                .ThenInclude(c => c.Site)
+                .Include(c => c.VehicleRate)
+                .FirstOrDefaultAsync();
 
             // If we couldn't find the vehicle or it's not currently in a pod then bail out
             if (vehicle == null || vehicle.Pod == null)
             {
-                _logger.LogWarning("Unable to find vehicle");
-                return RedirectToAction(nameof(Search));
+                _logger.LogWarning($"Unable to find vehicle or not in pod {id}");
+                return RedirectToAction(nameof(Error));
             }
 
             // Get start and empty pods
@@ -142,22 +163,34 @@ namespace DriveHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookingDto bookingDto)
         {
+            _logger.LogInformation($"Received POST to make a booking");
+
             // Check if booking duration is less than 30 mins
             var diff = bookingDto.EndTime - bookingDto.StartTime;
             if (diff.TotalMinutes < 30)
             {
+                _logger.LogWarning($"The minimum booking duration is 30 mins {bookingDto.StartTime} {bookingDto.EndTime}");
                 ModelState.AddModelError("EndTime", "The minimum booking duration is 30 mins");
             }
 
             // Check if booking is within one week from today
             if (bookingDto.StartTime > DateTime.Now.AddDays(7))
             {
+                _logger.LogWarning($"Bookings cannot be made more than one week in advance. {bookingDto.StartTime}");
                 ModelState.AddModelError("StartTime", "Bookings cannot be made more than one week in advance.");
             }
 
-            // Check if booking is within one week from today
+            // Check if start time is in the past
+            if (bookingDto.StartTime < DateTime.Now)
+            {
+                _logger.LogWarning($"Start time must be in the future. {bookingDto.StartTime}");
+                ModelState.AddModelError("StartTime", "Start time must be in the future.");
+            }
+
+            // Check if start time is after end time
             if (bookingDto.StartTime > bookingDto.EndTime)
             {
+                _logger.LogWarning($"Start time is after end time {bookingDto.StartTime} {bookingDto.EndTime}");
                 ModelState.AddModelError("StartTime", "Start time is after end time");
             }
 
@@ -170,6 +203,7 @@ namespace DriveHub.Controllers
 
             if (conflictingBookings)
             {
+                _logger.LogWarning($"The selected vehicle is already booked during this time range. {bookingDto.VehicleId}");
                 ModelState.AddModelError("VehicleId", "The selected vehicle is already booked during this time range.");
             }
 
@@ -179,17 +213,23 @@ namespace DriveHub.Controllers
             // If we couldn't find the vehicle or it's not currently in a pod then bail out
             if (vehicle == null || currentPod == null || currentPod.VehicleId == null)
             {
-                return RedirectToAction(nameof(Index));
+                _logger.LogError($"Couldn't find the vehicle or not in pod {bookingDto.VehicleId}");
+                return RedirectToAction(nameof(Error));
             }
 
             if (ModelState.IsValid)
             {
-                Booking booking = new Booking();
-                var userId = _userManager.GetUserId(User);
+                string? userId = _userManager.GetUserId(User);
+                if (userId == null)
+                {
+                    _logger.LogError($"User is not logged in");
+                    return RedirectToAction(nameof(Error));
+                }
 
-                booking.Id = userId;
+                Booking booking = new Booking();
                 booking.BookingId = Guid.NewGuid().ToString();
                 booking.VehicleId = bookingDto.VehicleId;
+                booking.Id = userId;
                 booking.StartPodId = bookingDto.StartPodId;
                 booking.EndPodId = bookingDto.EndPodId;
                 booking.StartTime = bookingDto.StartTime;
@@ -208,7 +248,8 @@ namespace DriveHub.Controllers
                 return View("Details", booking);
             }
 
-            // Get start and empty pods
+            // -- Return a page with data and errors if the model is not valid --
+            // Get start pod and empty pods
             var startPod = currentPod;
             var emptyPods = new List<PodVM>();
             var startPodVM = new PodVM();
@@ -225,6 +266,7 @@ namespace DriveHub.Controllers
                 emptyPods.Add(podVM);
             }
 
+            // Get the view data
             ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}";
             ViewBag.VehicleId = vehicle.VehicleId;
             ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";

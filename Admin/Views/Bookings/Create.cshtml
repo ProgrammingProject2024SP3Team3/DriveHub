@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Create";
+    var bookingId = Guid.NewGuid().ToString();
 }
 
 <h1>Create</h1>
@@ -12,6 +13,7 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BookingId" value="@bookingId"/>
             <div class="form-group">
                 <label asp-for="VehicleId" class="control-label"></label>
                 <select asp-for="VehicleId" class ="form-control" asp-items="ViewBag.VehicleId"></select>
