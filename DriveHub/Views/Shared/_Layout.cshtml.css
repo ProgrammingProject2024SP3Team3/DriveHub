@@ -35,6 +35,12 @@ for details on configuring this project to bundle and minify static web assets. 
     border: #00A8E8;
 }
 
+
+.navbar-nav {
+    display: flex;
+}
+
+
 /* Style for the nav links */
 .navbar-nav .nav-item {
     font-size: 1.1rem;
@@ -57,8 +63,9 @@ for details on configuring this project to bundle and minify static web assets. 
     color: white;
     padding: 20px 0;
     width: 100%;
-    position: static;
+    position: relative;
     bottom: 0;
+    margin-top: auto;
 }
 
     .footer h5 {
@@ -94,7 +101,33 @@ for details on configuring this project to bundle and minify static web assets. 
         transition: color 0.3s ease, background-color 0.3s ease; /* Add smooth transition */
     }
 
+
+
 @media (max-width: 768px) {
+
+    .navbar-nav .nav-item {
+        margin: 10px 0;
+        padding: 0.5rem 1rem;
+    }
+
+    .navbar-collapse {
+        text-align: center;
+        padding: 0;
+    }
+
+    .navbar-toggler {
+        margin: 0;
+    }
+
+    .navbar-collapse.collapse.show {
+        width: 100%;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
     .footer .text-lg-end {
         text-align: left !important;
     }
