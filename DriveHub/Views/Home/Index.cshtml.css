@@ -47,28 +47,7 @@
     display: flex;
     justify-content: center;
     align-items: stretch;
-    padding-bottom: 12%;
-}
-
-.hero-search-bar input {
-    flex-grow: 1;
-    padding: 10px;
-    font-size: 1.1rem;
-    border-radius: 5px 0 0 5px;
-    border: 1px solid #00A8E8
-}
-
-.hero-search-bar button {
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    border-radius: 0 5px 5px 0;
-    border: 1px solid #00A8E8;
-    background-color: #00A8E8;
-    color: white;
-}
-
-.hero-search-bar input:focus{
-    outline: none;
+    padding-bottom: 20%;
 }
 
 
@@ -91,7 +70,7 @@
 }
 
 .service-description {
-    font-size: 1rem;
+    font-size: 1.25rem;
 }
 
 /* QR Code Section */
@@ -116,9 +95,6 @@
     margin-bottom: 20px;
 }
 
-.qr-text p {
-    font-size: 1rem;
-}
 
 /* Call to Action Section */
 .call-to-action {

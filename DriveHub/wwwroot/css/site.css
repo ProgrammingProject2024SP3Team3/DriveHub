@@ -59,11 +59,27 @@ h3 {
 
 h4 {
     font-size: 1.5rem;
+    color: orange;
 }
 
 h5 {
     font-size: 1.25rem;
 }
+
+p .lead{
+    font-size: 1.5rem;
+    line-height: 1.6;
+}
+
+ul, ol {
+    font-size: 1.25rem;
+    line-height: 1.6;
+}
+
+ul li, ol li {
+    padding-bottom: 10px;
+}
+
 
 /* Buttons */
 .btn {
