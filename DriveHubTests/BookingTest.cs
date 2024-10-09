@@ -1,18 +1,16 @@
-using DriveHub.Controllers;
 using DriveHub.Models.Dto;
 using DriveHub.Models.ViewModels;
 using DriveHubModel;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
-using Microsoft.EntityFrameworkCore;
 
 namespace DriveHubTests
 {
     public class BookingTests
     {
         private readonly BookingTestFixtures bookingTestFixtures;
+
 
         public BookingTests()
         {
@@ -63,12 +61,12 @@ namespace DriveHubTests
             // Arrange: Set up valid booking data
             var bookingDto = new BookingDto
             {
-                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545", // Ensure valid vehicle ID
-                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d", // Ensure valid pod ID
-                EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068", // Ensure valid pod ID
+                VehicleId = "5780bc06-a5e2-4598-9eea-7cb90b55e169", // Ensure valid vehicle ID
+                StartPodId = "77be04ce-fa47-4d5e-81b9-9e8de26230e1", // Ensure valid pod ID
+                EndPodId = "77be04ce-fa47-4d5e-81b9-9e8de26230e1", // Ensure valid pod ID
                 StartTime = DateTime.Now.AddHours(1), // Ensure time within validation
                 EndTime = DateTime.Now.AddHours(2),
-                QuotedPricePerHour = 20
+                QuotedPricePerHour = 27.50m
             };
 
             // Act
@@ -91,19 +89,149 @@ namespace DriveHubTests
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
                 StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068",
+                EndPodId = "4121be84-af99-4be1-80b9-5c4fd2117567",
                 StartTime = DateTime.Now.AddHours(-1), // Start time in the past
                 EndTime = DateTime.Now.AddHours(1),
-                QuotedPricePerHour = 20
+                QuotedPricePerHour = 20.50m
             };
 
             // Act
             var result = await bookingTestFixtures.Controller.Create(bookingDto);
 
             // Assert: Check if ModelState contains errors for StartTime
-            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.IsType<ViewResult>(result);
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
             Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
+        }
+
+        [Fact]
+        public async Task Create_Should_Fail_When_Booking_Time_Is_Less_Than_30_mins()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                StartTime = DateTime.Now.AddMinutes(10),
+                EndTime = DateTime.Now.AddMinutes(15),
+                QuotedPricePerHour = 20.50m
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.IsType<ViewResult>(result);
+            Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
+        }
+
+        [Fact]
+        public async Task Create_Should_Error_When_User_Enters_Different_PricePerHour()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                StartTime = DateTime.Now.AddMinutes(10),
+                EndTime = DateTime.Now.AddMinutes(45),
+                QuotedPricePerHour = 5
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_Should_Error_When_Vehicle_Is_Not_In_Correct_Pod()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up illegal booking data with bad pod and vehicle combinations
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "5f0244c5-765c-41b5-a4ee-5c01badd5ad6",
+                EndPodId = "5f0244c5-765c-41b5-a4ee-5c01badd5ad6",
+                StartTime = DateTime.Now.AddMinutes(10),
+                EndTime = DateTime.Now.AddMinutes(15),
+                QuotedPricePerHour = 20.50m
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_Should_Fail_When_Starttime_Is_Before_Endtime()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                StartTime = DateTime.Now.AddMinutes(60),
+                EndTime = DateTime.Now.AddMinutes(10),
+                QuotedPricePerHour = 20.50m
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_Should_Fail_When_Starttime_Is_Greater_Than_7_days()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Set up invalid booking data with past StartTime
+            var bookingDto = new BookingDto
+            {
+                VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
+                StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
+                StartTime = DateTime.Now.AddDays(7).AddMinutes(30),
+                EndTime = DateTime.Now.AddDays(8),
+                QuotedPricePerHour = 20.50m
+            };
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(bookingDto);
+
+            // Assert
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
+            Assert.IsType<ViewResult>(result);
         }
 
         // NOTE: This test conflicts with the M3 booking logic. We might need to implement this logic in M4.
@@ -180,6 +308,5 @@ namespace DriveHubTests
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
-
     }
 }

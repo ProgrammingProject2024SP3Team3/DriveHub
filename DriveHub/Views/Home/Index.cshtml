@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "DriveHub";
+    Layout = "_HeroLayout";
 }
 
 <!-- Hero Section -->
@@ -11,7 +12,7 @@
                     <h1 class="hero-heading mb-5">Find, Book, and Drive – Anytime, Anywhere!</h1>
                 </div>
                 <div class="hero-search-bar">
-                    <a asp-action="Index" asp-controller="Bookings" class="btn btn-primary btn-lg">Find a car near you!</a>
+                    <a asp-action="Search" asp-controller="Bookings" class="btn btn-primary btn-lg">Find a car near you!</a>
                 </div>
             </div>
         </div>
