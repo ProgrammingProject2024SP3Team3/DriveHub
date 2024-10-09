@@ -18,7 +18,7 @@
 <h1 class="text-center">Booking Details</h1>
 <p class="text-center">Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
 <div class="booking-section mb-3">
-    @if (Model.BookingStatus == BookingStatus.InProgress)
+    @if (@Model.BookingStatus == BookingStatus.InProgress)
     {
         <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#FFBA17;">
             Status:
@@ -45,7 +45,7 @@
         </div>
         <div class="col-xs-12 col-md-4 container-fluid mb-3">
             <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                @vehicle.VehicleId
+                        @vehicle.VehicleId
 }.jpg" style="max-width:250px;">
         </div>
     </div>
@@ -98,22 +98,24 @@
 
 <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 
-<script>
-    function initMap() {
-        // Init Google Map
-        const map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude },
-            zoom: 19,
-            mapTypeId: "roadmap",
-            mapId: "DRIVEHUB_DETAILS"
-        });
-        new google.maps.marker.AdvancedMarkerElement({
-            map,
-            title: "Vehicle",
-            position: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude }
-        })
-    }
-</script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
-        defer>
-</script>
+@section Scripts {
+    <script>
+        function initMap() {
+            // Init Google Map
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude },
+                zoom: 19,
+                mapTypeId: "roadmap",
+                mapId: "DRIVEHUB_DETAILS"
+            });
+            new google.maps.marker.AdvancedMarkerElement({
+                map,
+                title: "Vehicle",
+                position: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude }
+            })
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
+            defer>
+    </script>
+}
