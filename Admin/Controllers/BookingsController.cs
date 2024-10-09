@@ -19,7 +19,6 @@ namespace Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var bookings = await _context.Bookings
-                .Include(b => b.ApplicationUser)
                 .Include(b => b.EndPod)
                 .ThenInclude(c => c.Site)
                 .Include(b => b.StartPod)
@@ -27,6 +26,7 @@ namespace Admin.Controllers
                 .Include(b => b.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
                 .ToListAsync();
+
             return View(bookings);
         }
 
@@ -39,7 +39,6 @@ namespace Admin.Controllers
             }
 
             var booking = await _context.Bookings
-                .Include(b => b.ApplicationUser)
                 .Include(b => b.EndPod)
                 .Include(b => b.StartPod)
                 .Include(b => b.Vehicle)

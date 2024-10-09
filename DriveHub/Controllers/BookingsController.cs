@@ -76,12 +76,13 @@ namespace DriveHub.Controllers
             }
 
             var bookings = await _context.Bookings
-                .Where(b => b.Id == userId && b.EndTime > DateTime.Now)
-                .Include(b => b.Vehicle)
-                .Include(b => b.StartPod)
-                .ThenInclude(p => p.Site)
-                .Include(b => b.EndPod)
-                .ThenInclude(p => p.Site)
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.EndTime > DateTime.Now)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
                 .ToListAsync();
 
             if (!bookings.Any())
@@ -97,8 +98,8 @@ namespace DriveHub.Controllers
         public async Task<IActionResult> PastBookings()
         {
             var bookings = await _context.Bookings
-                //.Where(c => c.Id == _userManager.GetUserId(User))
-                //.Where(c => c.EndTime < DateTime.Now)
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.EndTime < DateTime.Now)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
