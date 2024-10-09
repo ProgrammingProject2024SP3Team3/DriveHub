@@ -62,21 +62,44 @@ namespace DriveHub.Controllers
             return View(bookingSearchVM);
         }
 
+        /// <summary>
+        /// Displays current (in-progress) bookings for the logged-in user.
+        /// </summary>
+        /// <returns>A view showing in-progress bookings</returns>
         public async Task<IActionResult> CurrentBookings()
         {
+            string userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                _logger.LogError("CurrentBookings: User not logged in.");
+                return RedirectToAction(nameof(Error));
+            }
+
             var bookings = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                //.Where(c => c.EndTime < DateTime.Now)
+                .Where(c => c.EndTime > DateTime.Now)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
                 .ToListAsync();
+
+            if (!bookings.Any())
+            {
+                _logger.LogInformation("CurrentBookings: No active bookings found for the user.");
+                ViewBag.Message = "You have no current bookings.";
+            }
 
             return View(bookings);
         }
 
+
         public async Task<IActionResult> PastBookings()
         {
             var bookings = await _context.Bookings
-                //.Where(c => c.Id == _userManager.GetUserId(User))
-                //.Where(c => c.EndTime < DateTime.Now)
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.EndTime < DateTime.Now)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
