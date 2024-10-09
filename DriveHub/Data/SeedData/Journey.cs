@@ -9,29 +9,19 @@
  * as assessment work for COSC2650 Programming Project
  */
 
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace DriveHubModel
+namespace DriveHub.SeedData
 {
     public class Journey
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string JourneyId { get; set; }
 
-        [Required]
-        [ForeignKey("Booking")]
         public string BookingId { get; set; }
 
-        [Required]
         public bool IsPaid { get; set; }
 
-        [Required]
-        [DataType(DataType.Currency)]
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal Price { get; set; }
-
-        public virtual Booking Booking { get; set; }
     }
 }

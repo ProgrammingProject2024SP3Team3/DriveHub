@@ -12,15 +12,33 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
+    [DisplayName("Price Category")]
     public class VehicleRate
     {
+        public VehicleRate() { }
+
+        [SetsRequiredMembers]
+        public VehicleRate(
+            string vehicleRateId,
+            string description,
+            decimal pricePerHour,
+            DateTime effectiveDate
+            )
+        {
+            VehicleRateId = vehicleRateId;
+            Description = description;
+            PricePerHour = pricePerHour;
+            EffectiveDate = effectiveDate;
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public required string VehicleRateId { get; set; }
+        public string VehicleRateId { get; set; }
 
         [Required]
         public string Description { get; set; }
@@ -28,12 +46,13 @@ namespace DriveHubModel
         [Required]
         [DataType(DataType.Currency)]
         [DisplayFormat(DataFormatString = "{0:C}")]
+        [DisplayName("Price per hour")]
         public decimal PricePerHour { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         [DisplayName("Effective Date")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime EffectiveDate { get; set; }
 
         [JsonIgnore]

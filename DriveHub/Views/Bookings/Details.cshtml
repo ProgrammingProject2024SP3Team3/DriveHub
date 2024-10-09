@@ -1,7 +1,12 @@
 ﻿@model DriveHubModel.Booking
-
+@using DriveHubModel
 @{
     ViewData["Title"] = "Booking Details";
+
+    var vehicle = Model.Vehicle;
+    var startPod = Model.StartPod;
+    var endPod = Model.EndPod;
+    var totalPrice = (Model.EndTime - Model.StartTime).TotalHours * (double)Model.PricePerHour;
 }
 
 <style>
@@ -11,88 +16,106 @@
 </style>
 
 <h1 class="text-center">Booking Details</h1>
-<p class="text-center">Your booking details for the Suzuki Hatch on Main St</p>
-
+<p class="text-center">Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
 <div class="booking-section mb-3">
-    <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color: #2FCD48;">Status:
-        In Progress
-    </div>
+    @if (@Model.BookingStatus == BookingStatus.InProgress)
+    {
+        <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#FFBA17;">
+            Status:
+            In progress
+        </div>
+    }
+    else
+    {
+        <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#252e31;">
+            Status:
+            @Model.BookingStatus
+        </div>
+    }
 
     <div class="d-flex align-items-center mb-3">
         <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-        <div>
-            <p class="mb-0">Pickup DriveHub Orion Pod</p>
-            <small>Main St Near the Station</small>
+        <p class="mb-0">Pickup DriveHub @startPod.Site.SiteName Pod #@startPod.PodName</p>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-xs-12 col-md-8 mb-3">
+            <label class="form-label">Car</label>
+            <div class="form-control">@vehicle.Name the @vehicle.Make @vehicle.Model. @Model.Vehicle.RegistrationPlate</div>
+        </div>
+        <div class="col-xs-12 col-md-4 container-fluid mb-3">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
+                        @vehicle.VehicleId
+}.jpg" style="max-width:250px;">
         </div>
     </div>
+    <hr />
+    <div class="p-3">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="StartTime" class="form-label">Booking Start</label>
+                <input type="datetime-local" class="form-control" id="StartTime" name="StartTime"
+                       value="@Model.StartTime.ToString("s")" disabled />
+            </div>
+            <div class="col-md-6">
+                <label for="EndTime" class="form-label">Booking End</label>
+                <input type="datetime-local" class="form-control" id="EndTime" name="EndTime"
+                       value="@Model.EndTime.ToString("s")" disabled />
+            </div>
+        </div>
 
-    <div class="mb-3">
-        <label class="form-label">Car:</label>
-        <div class="form-control">Suzi the Suzuki Hatch</div>
-    </div>
+        <div class="d-flex align-items-center my-3">
+            <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
+            <div>
+                <p class="mb-0">Return DriveHub @endPod.Site.SiteName Pod #@endPod.PodName</p>
+                <small>@endPod.Site.Address, @endPod.Site.City</small>
+            </div>
+        </div>
+        @if (Model.BookingStatus != BookingStatus.Complete)
+        {
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <a href="/Bookings/Edit/@Model.BookingId" class="btn btn-secondary">
+                    Edit Booking
+                </a>
 
-    <div class="row g-3">
-        <div>
-            <label for="bookingStart" class="form-label mb-0">Booking Start</label>
-        </div>
-        <div class="col-md-6">
-            <div class="form-control">19 / 09 / 2024-09-19</div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-control">01:30 pm</div>
-        </div>
-        <div>
-            <label for="bookingEnd" class="form-label">Booking End</label>
-        </div>
-        <div class="col-md-6">
-            <div class="form-control">19 / 09 / 2024-09-19</div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-control">05:30 pm</div>
-        </div>
-    </div>
-
-    <div class="d-flex align-items-center my-3">
-        <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-        <div>
-            <p class="mb-0">Return DriveHub Odysseus Pod</p>
-            <small>Second St, North Fitzroy</small>
-        </div>
+                <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Model.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
+                    <button type="submit" class="btn btn-danger">
+                        Return Vehicle
+                    </button>
+                </form>
+            </div>
+        }
     </div>
 
     <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
         <p class="mb-0">Per Hour:</p>
-        <p class="fw-bold fs-1">$30/hr</p>
+        <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")/hr</p>
         <hr />
         <p class="mb-0">Total Cost:</p>
-        <p class="fw-bold fs-1 mb-0">$120</p>
+        <p class="fw-bold fs-1 mb-0">$@totalPrice.ToString("F2")</p>
     </div>
-
-    <a href="/Bookings/Edit" class="small text-end d-block mt-1 pb-1">Edit this booking</a>
 </div>
 
-<div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12">
-</div>
+<div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 
-<script>
-    function initAutocomplete() {
-        const map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: -37.8167399, lng: 144.9612497 },
-            zoom: 19,
-            mapTypeId: "roadmap",
-        });
-
-        new google.maps.Marker({
-            map,
-            title: "Car",
-            position: { lat: -37.8167399, lng: 144.9612497 },
-        })
-
-        bounds.union(place.geometry.viewport);
-    }
-
-    window.initAutocomplete = initAutocomplete;
-</script>
-<script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAutocomplete&libraries=places&v=weekly&loading=async"
-    defer></script>
+@section Scripts {
+    <script>
+        function initMap() {
+            // Init Google Map
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude },
+                zoom: 19,
+                mapTypeId: "roadmap",
+                mapId: "DRIVEHUB_DETAILS"
+            });
+            new google.maps.marker.AdvancedMarkerElement({
+                map,
+                title: "Vehicle",
+                position: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude }
+            })
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
+            defer>
+    </script>
+}

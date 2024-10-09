@@ -1,11 +1,3 @@
-
-/* Universal Box Sizing */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
 /* Global Font Settings */
 html {
     font-size: 14px; /* Base font size for small screens */
@@ -15,6 +7,11 @@ html {
     margin: 0;
 }
 
+@media (min-width: 768px) {
+    html {
+        font-size: 16px; /* Larger font size for bigger screens */
+    }
+}
 
 /* Body and Layout */
 body {
@@ -31,39 +28,11 @@ main {
     flex-grow: 1;
 }
 
-
-h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    color: orange;
-    line-height: 1.2;
-}
-
-h2, h3, h4, h5 {
-    font-weight: bold;
-    margin-top: 0;
-    margin-bottom: 1rem;
-    line-height: 1.3;
-}
-
-/* Adjust font sizes individually */
-h2 {
-    font-size: 2rem;
-}
-
-h3 {
-    font-size: 1.75rem;
-}
-
-h4 {
-    font-size: 1.5rem;
-}
-
-h5 {
-    font-size: 1.25rem;
+/* Universal Box Sizing */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
 /* Buttons */
@@ -89,24 +58,6 @@ h5 {
         box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb; /* Focus state */
     }
 
-form {
-        background-color: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-
-/* Custom Table Styles */
-.table {
-    margin-bottom: 1rem;
-    color: #212529;
-}
-
-.table-hover tbody tr:hover {
-    background-color: rgba(0, 168, 232, 0.075); /* Light hover effect on rows */
-}
-
 /* Links */
 a {
     color: #007bff;
@@ -120,59 +71,24 @@ a {
 
 /* Layout */
 .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 15px;
+    max-width: 1920px;
 }
 
 footer {
     margin-top: auto;
 }
 
-@media (min-width: 768px) {
-    .btn {
-        padding: 8px 16px; /* Smaller padding for mobile buttons */
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    h2 {
-        font-size: 1.75rem;
-    }
-
-    h3 {
-        font-size: 1.5rem;
-    }
-
-    h4 {
-        font-size: 1.25rem;
-    }
-
-    h5 {
-        font-size: 1.1rem;
-    }
+.h1, h1 {
+    color: orange;
+    font-weight: bold;
 }
 
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.75rem;
-    }
+.h2, h2 {
+    color: orange;
+    font-weight: bold;
+}
 
-    h2 {
-        font-size: 1.5rem;
-    }
-
-    h3 {
-        font-size: 1.25rem;
-    }
-
-    h4 {
-        font-size: 1.1rem;
-    }
-
-    h5 {
-        font-size: 1rem;
-    }
+.h4, h4 {
+    color: orange;
+    font-weight: bold;
 }

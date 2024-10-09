@@ -1,5 +1,7 @@
 using DriveHub.Data;
+using DriveHub.SeedData;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 
@@ -23,12 +25,34 @@ builder.Services.AddAzureClients(clientBuilder =>
     clientBuilder.AddQueueServiceClient(builder.Configuration["VehiclePhotos:queue"]!, preferMsi: true);
 });
 
+// Store in session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options => {
+    // Make the session cookie essential.
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline and seed data if required
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
+
+    // Populate database with seed data
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            SeedData.Initialize(services);
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error has occurred while seeding the database.");
+        }
+    }
 }
 else
 {
@@ -37,12 +61,31 @@ else
     app.UseHsts();
 }
 
+app.Use(async (context, next) =>
+{
+    await next();
+    if (context.Response.StatusCode == 404)
+    {
+        context.Request.Path = "/Home/FourOFour";
+        await next();
+    }
+});
+
+// Localise to AU
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en-AU")
+});
+
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

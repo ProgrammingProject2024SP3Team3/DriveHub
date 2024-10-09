@@ -4,16 +4,20 @@ using Admin.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
 namespace Admin.Migrations
 {
-    [DbContext(typeof(AdminDbContext))]
-    partial class AdminDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20241005072528_Application")]
+    partial class Application
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +25,188 @@ namespace Admin.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("DriveHubModel.Booking", b =>
+                {
+                    b.Property<string>("BookingId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BookingStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndPodId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("PricePerHour")
+                        .HasColumnType("Money");
+
+                    b.Property<string>("StartPodId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VehicleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BookingId");
+
+                    b.HasIndex("EndPodId");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("StartPodId");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Pod", b =>
+                {
+                    b.Property<string>("PodId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PodName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SiteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VehicleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PodId");
+
+                    b.HasIndex("SiteId");
+
+                    b.HasIndex("VehicleId")
+                        .IsUnique()
+                        .HasFilter("[VehicleId] IS NOT NULL");
+
+                    b.ToTable("Pods");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Site", b =>
+                {
+                    b.Property<int>("SiteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SiteId"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<Point>("Location")
+                        .IsRequired()
+                        .HasColumnType("geography");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("PostCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SiteName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SiteId");
+
+                    b.ToTable("Sites");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Vehicle", b =>
+                {
+                    b.Property<string>("VehicleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Colour")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Make")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RegistrationPlate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Seats")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleRateId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Year")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("VehicleId");
+
+                    b.HasIndex("VehicleRateId");
+
+                    b.ToTable("Vehicles");
+                });
+
+            modelBuilder.Entity("DriveHubModel.VehicleRate", b =>
+                {
+                    b.Property<string>("VehicleRateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PricePerHour")
+                        .HasColumnType("Money");
+
+                    b.HasKey("VehicleRateId");
+
+                    b.ToTable("VehicleRates");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -86,6 +272,11 @@ namespace Admin.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -137,6 +328,10 @@ namespace Admin.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator().HasValue("IdentityUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -224,6 +419,75 @@ namespace Admin.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DriveHubModel.ApplicationUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.HasDiscriminator().HasValue("ApplicationUser");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Booking", b =>
+                {
+                    b.HasOne("DriveHubModel.Pod", "EndPod")
+                        .WithMany("EndPods")
+                        .HasForeignKey("EndPodId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.HasOne("DriveHubModel.ApplicationUser", "ApplicationUser")
+                        .WithMany("Bookings")
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DriveHubModel.Pod", "StartPod")
+                        .WithMany("StartPods")
+                        .HasForeignKey("StartPodId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.HasOne("DriveHubModel.Vehicle", "Vehicle")
+                        .WithMany("Bookings")
+                        .HasForeignKey("VehicleId")
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("EndPod");
+
+                    b.Navigation("StartPod");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Pod", b =>
+                {
+                    b.HasOne("DriveHubModel.Site", "Site")
+                        .WithMany("Pods")
+                        .HasForeignKey("SiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DriveHubModel.Vehicle", "Vehicle")
+                        .WithOne("Pod")
+                        .HasForeignKey("DriveHubModel.Pod", "VehicleId");
+
+                    b.Navigation("Site");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Vehicle", b =>
+                {
+                    b.HasOne("DriveHubModel.VehicleRate", "VehicleRate")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("VehicleRateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VehicleRate");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -273,6 +537,35 @@ namespace Admin.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DriveHubModel.Pod", b =>
+                {
+                    b.Navigation("EndPods");
+
+                    b.Navigation("StartPods");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Site", b =>
+                {
+                    b.Navigation("Pods");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Vehicle", b =>
+                {
+                    b.Navigation("Bookings");
+
+                    b.Navigation("Pod");
+                });
+
+            modelBuilder.Entity("DriveHubModel.VehicleRate", b =>
+                {
+                    b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("DriveHubModel.ApplicationUser", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

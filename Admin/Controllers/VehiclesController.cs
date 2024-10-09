@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Admin.Data;
@@ -14,15 +10,18 @@ namespace Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public VehiclesController(ApplicationDbContext context)
+        private readonly ILogger _logger;
+
+        public VehiclesController(ApplicationDbContext context, ILogger<Controller> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Vehicles
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Vehicles.Include(v => v.VehicleRate);
+            var applicationDbContext = _context.Vehicles.Include(v => v.VehicleRate).Include(v => v.Pod);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -36,6 +35,7 @@ namespace Admin.Controllers
 
             var vehicle = await _context.Vehicles
                 .Include(v => v.VehicleRate)
+                .Include(v => v.Pod)
                 .FirstOrDefaultAsync(m => m.VehicleId == id);
             if (vehicle == null)
             {
@@ -48,7 +48,7 @@ namespace Admin.Controllers
         // GET: Vehicles/Create
         public IActionResult Create()
         {
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "VehicleRateId");
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description");
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "VehicleRateId", vehicle.VehicleRateId);
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description", vehicle.VehicleRateId);
             return View(vehicle);
         }
 
@@ -82,7 +82,7 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "VehicleRateId", vehicle.VehicleRateId);
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description", vehicle.VehicleRateId);
             return View(vehicle);
         }
 
@@ -91,10 +91,27 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("VehicleId,VehicleRateId,Make,Model,RegistrationPlate,State,Year,Seats")] Vehicle vehicle)
+        public async Task<IActionResult> Edit(string id, Admin.Models.Dto.Vehicle vehicleDto)
         {
-            if (id != vehicle.VehicleId)
+            _logger.LogInformation($"Editing {id}");
+            _logger.LogInformation($"Editing {vehicleDto.ToString()}");
+
+            if (id != vehicleDto.VehicleId)
             {
+                _logger.LogWarning($"No match for {id}");
+                return NotFound();
+            }
+
+            var vehicle = await _context.Vehicles.FindAsync(id);
+            if (vehicle == null)
+            {
+                _logger.LogWarning($"No match for {id}");
+                return NotFound();
+            }
+
+            if (!_context.VehicleRates.Any(e => e.VehicleRateId == vehicleDto.VehicleRateId))
+            {
+                _logger.LogWarning($"No match for rate {vehicleDto.VehicleRateId}");
                 return NotFound();
             }
 
@@ -102,13 +119,27 @@ namespace Admin.Controllers
             {
                 try
                 {
+                    _logger.LogWarning($"Model is valid {id}");                  
+
+                    vehicle.VehicleRateId = vehicleDto.VehicleRateId;
+                    vehicle.Name = vehicleDto.Name;
+                    vehicle.Make = vehicleDto.Make;
+                    vehicle.Model = vehicleDto.Model;
+                    vehicle.RegistrationPlate = vehicleDto.RegistrationPlate;
+                    vehicle.State = vehicleDto.State;
+                    vehicle.Year = vehicleDto.Year;
+                    vehicle.Seats = vehicleDto.Seats;
+                    vehicle.Colour = vehicleDto.Colour;
+
                     _context.Update(vehicle);
+                    _logger.LogWarning($"Updated {id}");
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!VehicleExists(vehicle.VehicleId))
                     {
+                        _logger.LogWarning($"Database error {id}");
                         return NotFound();
                     }
                     else
@@ -116,9 +147,11 @@ namespace Admin.Controllers
                         throw;
                     }
                 }
+                _logger.LogWarning($"Success editing {id}");
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "VehicleRateId", vehicle.VehicleRateId);
+            _logger.LogWarning($"Failed editing {id}");
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description", vehicle.VehicleRateId);
             return View(vehicle);
         }
 
@@ -133,6 +166,7 @@ namespace Admin.Controllers
             var vehicle = await _context.Vehicles
                 .Include(v => v.VehicleRate)
                 .FirstOrDefaultAsync(m => m.VehicleId == id);
+
             if (vehicle == null)
             {
                 return NotFound();
@@ -146,9 +180,17 @@ namespace Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var vehicle = await _context.Vehicles.FindAsync(id);
+            var vehicle = await _context.Vehicles.Where(c => c.VehicleId == id).Include(c => c.Pod).FirstOrDefaultAsync();
+
             if (vehicle != null)
             {
+                var podId = vehicle.Pod?.PodId;
+                var pod = await _context.Pods.FindAsync(podId);
+                if (pod != null)
+                {
+                    pod.VehicleId = null;
+                    _context.Pods.Update(pod);
+                }
                 _context.Vehicles.Remove(vehicle);
             }
 

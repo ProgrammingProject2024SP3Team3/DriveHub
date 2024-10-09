@@ -18,6 +18,11 @@ namespace DriveHub.Controllers
             return View();
         }
 
+        public IActionResult FourOFour()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

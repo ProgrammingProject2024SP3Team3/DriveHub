@@ -1,74 +1,55 @@
-@using System.Text.Json
+ @model DriveHub.Models.ViewModels.BookingSearchVM;
+
 @{
     ViewData["Title"] = "Let's find a car";
-
-    // Mock Object of all sites, their pods, and what cars are currently rentable
-    if (ViewData["SearchData"] == null)
-    {
-        ViewData["SearchData"] = new
-        {
-            Sites = new[] {
-new { SiteName = "RMIT Snooze Lounge", Address = "445 SWANSTON ST", City = "MELBOURNE", Location = new {longitude =
-144.96297733436015, latitude = -37.808207787152966}, Cars = new[] {
-new { VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545", Make = "Tesla", Model = "Model Y", Name = "The Silver Bullet",
-Seats = 5, Rate = 20.5 },
-new { VehicleId = "0fbbd18e-bd5b-4f99-a00b-29533d26c3ad", Make = "Toyota", Model = "RAV4", Name = "Thunderbolt", Seats =
-5, Rate = 27.5 },
-new { VehicleId = "0e1769a3-c277-462f-a448-830b76328285", Make = "Toyota", Model = "Hilux", Name = "Vroominator", Seats
-= 2, Rate = 25.0 }
-}},
-new { SiteName = "United Petroleum West Gate North", Address = "2 WEST GATE FREEWAY", City = "PORT MELBOURNE", Location
-= new {longitude = 144.95097561347418, latitude = -37.81833347027388}, Cars = new[] {
-new { VehicleId = "36d4bc1e-6159-46df-ad98-da93a38bcc82", Make = "Toyota", Model = "Hilux", Name = "Shadow Cruiser",
-Seats = 2, Rate = 20.5 },
-new { VehicleId = "417b7216-6148-4a40-9458-99db17987790", Make = "Hyundai", Model = "i30", Name = "Stealth Rocket",
-Seats = 5, Rate = 20.0 }
-}}
-}
-        };
-    }
+    ViewData["Seats"] = new SelectList(Model.Seats);
+    ViewData["Vehicles"] = new SelectList(Model.Pods.ToList().Select(c => c.Vehicle), "VehicleId", "Name");
+    ViewData["VehicleRates"] = new SelectList(Model.VehicleRates, "VehicleRateId", "Description");
 }
 
 <style>
-    .car-item {
-        padding: 10px;
-        background-color: #f8f9fa;
-        margin-bottom: 10px;
+    a.car-item :hover {
+        color: #1470b5;
+        background-color: #dddddd;
     }
 </style>
+
 <h1 class="mb-6 text-center">Booking Search</h1>
-
-<p class="text-center">Select a location and time to show available cars.</p>
-
-<div class="row mb-3">
-    <div class="col-md-3">
+<div class="mb-3 p-2 fw-bold fs-4" style="background-color: #FFBA17;">Select a location or number of seats to show available cars</div>
+<div class="row">
+    <div class="col-xs-12 col-md-4">
         <div class="mb-3">
             <label for="pac-input" class="form-label">Location</label>
             <input id="pac-input" class="controls w-100 form-control" type="text" placeholder="Location" />
         </div>
-
         <div class="mb-3">
-            <label for="seatCountSelect" class="form-label">Number of Seats</label>
-            <select class="form-select" id="seatCountSelect" disabled>
+            <label for="seatCountSelect" asp-for="Seats" class="form-label">Number of Seats</label>
+            <select class="form-select" id="seatCountSelect" asp-items="ViewBag.Seats">
                 <option value="any" selected>Any</option>
-                <option value="2">2</option>
-                <option value="5">5</option>
             </select>
         </div>
+        <!--<div class="mb-3">
+            <label for="vehicleRatesSelect" asp-for="VehicleRates" class="form-label">Vehicle category</label>
+            <select class="form-select" id="vehicleRatesSelect" asp-items="ViewBag.VehicleRates">
+                <option value="any" selected>Any</option>
+            </select>
+        </div>-->
     </div>
-    <div class=" col-md-9">
-        <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>
-    </div>
+    <div class="col mb-4" id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>
+    <div class="mb-3 p-2 fw-bold fs-4" style="background-color: #FFBA17;">Select a car</div>
+    <div id="car-list"></div>
 </div>
-
-<div id="car-list"></div>
 
 <script>
     // Wrap with an Immediately Invoked Function Expression (IIFE) so we don't pollute the client
     (function () {
+        // The maximum cars to display in the car list below the map
+        let MAX_CARS_TO_DISPLAY = 20
+
         // The raw search data converted to JSON (there is no customer entered data in this)
         // TODO: There is an assumption here that those who can enter Admin data are not trying to hack users, which may be unacceptable. We can manually create nodes and use textContent if admin XSS is a concern.
-        let searchData = @Html.Raw(JsonSerializer.Serialize(ViewData["SearchData"]))
+        let siteData
+    @* let siteData = @Html.Raw(JsonSerializer.Serialize(ViewData["siteData"])) *@
             // The google map object
             let map;
         // All markers currently placed on the map
@@ -92,11 +73,11 @@ Seats = 5, Rate = 20.0 }
             let seatCount = document.getElementById('seatCountSelect').value
 
             // Add all sites as markers
-            for (let site of searchData.Sites) {
+            for (let site of siteData) {
                 let marker = new google.maps.marker.AdvancedMarkerElement({
                     map,
                     title: site.SiteName,
-                    position: { lat: site.Location.latitude, lng: site.Location.longitude },
+                    position: { lat: site.Latitude, lng: site.Longitude },
                 })
                 markers.push(marker)
 
@@ -129,12 +110,12 @@ Seats = 5, Rate = 20.0 }
 
         // Render the list of nearest cars underneath the map
         function updateAndRenderCarList() {
-            let sites = [...searchData.Sites]
+            let sites = [...siteData]
             // If we have a search location, sort all sites by distance to that search location
             if (searchLocation || geolocation) {
                 // Calculate flight distance of site to current searchLocation (in kilometres)
                 for (site of sites) {
-                    let sitePos = { lat: site.Location.latitude, lng: site.Location.longitude }
+                    let sitePos = { lat: site.Latitude, lng: site.Longitude }
                     // calculate the distance between the site and last search location, or the user's geolocation if no searches yet
                     site.distanceInKMs = searchLocation ?
                         (google.maps.geometry.spherical.computeDistanceBetween(searchLocation, sitePos)) / 1000
@@ -145,9 +126,22 @@ Seats = 5, Rate = 20.0 }
             }
 
             let carListHTML = ''
-            for (site of sites) {
-                for (car of site.Cars) {
-                    let locationText = `${site.Address}, ${site.City}`.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' ') // format location from db
+            let totalCarsDisplayed = 0
+
+            // Get the number of seats selected by the user
+            let numberOfSeats = document.getElementById('seatCountSelect').value
+
+            // Render a big horrible Raw HTML block for ever nearby car
+            // TODO: this is so ugly and it's a prime cleanup candidate once we're feature complete
+            for (let siteI = 0; siteI < sites.length && totalCarsDisplayed < MAX_CARS_TO_DISPLAY; siteI++) {
+                let site = sites[siteI]
+                for (let podI = 0; podI < site.Pods.length && totalCarsDisplayed < MAX_CARS_TO_DISPLAY; podI++) {
+                    let pod = site.Pods[podI]
+                    let car = pod.Vehicle
+                    // Skip cars with the wrong number of seats
+                    if (numberOfSeats !== 'any' && numberOfSeats != car.Seats) continue
+
+                    let locationText = `${site.SiteName}, ${site.City}`.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' ') // format location from db
                     let timeText = ''
                     if (site.distanceInKMs) {
                         let kmph = 40 // kilometers per hour
@@ -160,14 +154,18 @@ Seats = 5, Rate = 20.0 }
                         }
                     }
                     carListHTML +=
-                        `<div class="car-item d-flex align-items-center">
-                        <div class="car-icon me-3">🚗</div>
-                        <div>
-                            <p class="mb-0"><strong>${timeText}${locationText}</strong></p>
-                            <p class="mb-0">${car.Name} the ${car.Make} ${car.Model}</p>
-                        </div>
-                        <a class="btn confirm-btn fw-bold text-white ms-auto" style="background-color: #00A8E8;" href="/Bookings/Create">></a>
-                    </div>`
+                        `<a class="text-decoration-none car-item" href="/Bookings/Create/${car.VehicleId}">
+                                    <div class="row border my-3 container-fluid">
+                                        <div class="col-xs-12 col-sm-3 col-lg-4">
+                                            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px;">
+                                        </div>
+                                        <div class="col-xs-12 col-sm-9 col-lg-8">
+                                            <div class="mb-0 text-decoration-none text-dark"><strong>${timeText}${locationText}</strong></div>
+                                            <div class="mb-0 text-decoration-none text-dark">${car.Name} the ${car.Make} ${car.Model}</div>
+                                        </div>
+                                    </div>
+                                    </a>`
+                    totalCarsDisplayed++;
                 }
             }
             document.getElementById('car-list').innerHTML = carListHTML
@@ -204,11 +202,11 @@ Seats = 5, Rate = 20.0 }
                     bounds.extend(place.geometry.location)
                 }
                 // Add our first car site to the bounds (only if it exists)
-                if (searchData.Sites && searchData.Sites[0]) {
+                if (siteData[0]) {
                     // TODO: this should be the nearest car site instead of just grabbing the first site
                     // This will cause issues if melbourne is no longer the capital site for the company
-                    let siteWantedOnMap = searchData.Sites[0].Location
-                    bounds.extend(new google.maps.LatLng(siteWantedOnMap.latitude, siteWantedOnMap.longitude))
+                    let siteWantedOnMap = siteData[0]
+                    bounds.extend(new google.maps.LatLng(siteWantedOnMap.Latitude, siteWantedOnMap.Longitude))
                 }
                 // update our Search Location with coords from Google
                 searchLocation = place.geometry.location
@@ -256,13 +254,14 @@ Seats = 5, Rate = 20.0 }
         }
 
         function initAll() {
-            console.log(searchData)
+            console.log(siteData)
             // Init Google Map
             map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: -37.8083331, lng: 144.9639386 },
-                zoom: 13,
+                // Center map on the first site or RMIT if no sites exist
+                center: siteData[0] ? { lat: siteData[0].Latitude, lng: siteData[0].Longitude } : { lat: -37.8083331, lng: 144.9639386 },
+                zoom: 12,
                 mapTypeId: "roadmap",
-                mapId: "DRIVEHUB_MAP",
+                mapId: "DRIVEHUB_SEARCH",
                 streetViewControl: false,
                 clickableIcons: false
             })
@@ -279,9 +278,64 @@ Seats = 5, Rate = 20.0 }
             updateMap()
         }
 
-        window.initAll = initAll
+        // This parses the new Pod API into the form the map currently uses.
+        // NOTE: Naming is a bit odd because I originally based this map on C# classes
+        function parsePodDataToTreeOfSites(podData) {
+            let siteMap = {}
+            podData
+                .filter(pod => pod.vehicleId) // filter out empty pods
+                .forEach(pod => { // build a big map of all sites, that contain pods, that contain vehicles
+                    if (!siteMap[pod.siteName]) { // if site not yet in map add its details
+                        siteMap[pod.siteName] = {
+                            SiteName: pod.siteName,
+                            Latitude: pod.latitude,
+                            Longitude: pod.longitude,
+                            Address: pod.address,
+                            City: pod.city,
+                            PostCode: pod.postCode,
+                            Pods: []
+                        }
+                    }
+                    // Add the pod to this site
+                    siteMap[pod.siteName].Pods.push({
+                        PodId: pod.podId,
+                        PodName: pod.podName,
+                        // Add the Vehicle to the pod
+                        Vehicle: {
+                            VehicleId: pod.vehicleId,
+                            Name: pod.vehicleName,
+                            Make: pod.make,
+                            Model: pod.model,
+                            RegistrationPlate: pod.registrationPlate,
+                            Seats: pod.seats,
+                            Colour: pod.colour,
+                            PricePerHour: pod.pricePerHour,
+                            Category: pod.vehicleCategory
+                        }
+                    })
+                })
+            // Turn map into a simple list as map expects
+            let siteTree = []
+            for (let siteName in siteMap) siteTree.push(siteMap[siteName])
+            return siteTree
+        }
+
+        function fetchJsonThenInit() {
+            fetch('/api/pods')
+                // Get pod data from API and parse it as json
+                .then(function (response) {
+                    if (!response.ok) throw new Error('Pods network response not ok: ' + response.statusText)
+                    return response.json()
+                }).then(function (json) {
+                    // Parse Json pod data into a tree of sites that contain pods, that in turn contain vehicles
+                    siteData = parsePodDataToTreeOfSites(json)
+                    initAll()
+                }).catch(function (error) {
+                    console.log('Error while fetching pods', error)
+                })
+        }
+
+        window.initAll = fetchJsonThenInit
     })()
 </script>
-<script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places,geometry&loading=async"
-    defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places,geometry&loading=async" defer></script>

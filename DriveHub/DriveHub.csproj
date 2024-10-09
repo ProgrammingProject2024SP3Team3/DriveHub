@@ -13,6 +13,7 @@
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.22.0" />
 		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.20.0" />
 		<PackageReference Include="Azure.Storage.Queues" Version="12.20.0" />
+		<PackageReference Include="CsvHelper" Version="33.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.8" />
@@ -28,7 +29,6 @@
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.5" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
 		<PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -36,10 +36,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Update="Views\Bookings\Create.cshtml">
-		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</Content>
 		<Content Update="wwwroot\favicon.ico">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -47,7 +43,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Migrations\" />
+	  <None Update="Data\SeedData\Pods.csv">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Data\SeedData\Sites.csv">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Data\SeedData\VehicleRates.csv">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Data\SeedData\Vehicles.csv">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
 </Project>

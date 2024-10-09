@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace DriveHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240926050751_Initial")]
+    [Migration("20241005023646_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -29,7 +29,6 @@ namespace DriveHub.Migrations
             modelBuilder.Entity("DriveHubModel.Booking", b =>
                 {
                     b.Property<string>("BookingId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("BookingStatus")
@@ -38,7 +37,7 @@ namespace DriveHub.Migrations
 
                     b.Property<string>("EndPodId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
@@ -52,7 +51,7 @@ namespace DriveHub.Migrations
 
                     b.Property<string>("StartPodId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -63,35 +62,15 @@ namespace DriveHub.Migrations
 
                     b.HasKey("BookingId");
 
+                    b.HasIndex("EndPodId");
+
                     b.HasIndex("Id");
+
+                    b.HasIndex("StartPodId");
 
                     b.HasIndex("VehicleId");
 
                     b.ToTable("Bookings");
-                });
-
-            modelBuilder.Entity("DriveHubModel.Journey", b =>
-                {
-                    b.Property<string>("JourneyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("BookingId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("Money");
-
-                    b.HasKey("JourneyId");
-
-                    b.HasIndex("BookingId")
-                        .IsUnique();
-
-                    b.ToTable("Journeys");
                 });
 
             modelBuilder.Entity("DriveHubModel.Pod", b =>
@@ -114,7 +93,9 @@ namespace DriveHub.Migrations
 
                     b.HasIndex("SiteId");
 
-                    b.HasIndex("VehicleId");
+                    b.HasIndex("VehicleId")
+                        .IsUnique()
+                        .HasFilter("[VehicleId] IS NOT NULL");
 
                     b.ToTable("Pods");
                 });
@@ -135,11 +116,17 @@ namespace DriveHub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
                     b.Property<Point>("Location")
                         .IsRequired()
                         .HasColumnType("geography");
 
-                    b.Property<string>("PostalCode")
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("PostCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -158,11 +145,19 @@ namespace DriveHub.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Colour")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Make")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -181,8 +176,9 @@ namespace DriveHub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
+                    b.Property<string>("Year")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VehicleId");
 
@@ -432,32 +428,36 @@ namespace DriveHub.Migrations
 
             modelBuilder.Entity("DriveHubModel.Booking", b =>
                 {
+                    b.HasOne("DriveHubModel.Pod", "EndPod")
+                        .WithMany("EndPods")
+                        .HasForeignKey("EndPodId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
                     b.HasOne("DriveHubModel.ApplicationUser", "ApplicationUser")
                         .WithMany("Bookings")
                         .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DriveHubModel.Pod", "StartPod")
+                        .WithMany("StartPods")
+                        .HasForeignKey("StartPodId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
                     b.HasOne("DriveHubModel.Vehicle", "Vehicle")
                         .WithMany("Bookings")
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
 
+                    b.Navigation("EndPod");
+
+                    b.Navigation("StartPod");
+
                     b.Navigation("Vehicle");
-                });
-
-            modelBuilder.Entity("DriveHubModel.Journey", b =>
-                {
-                    b.HasOne("DriveHubModel.Booking", "Booking")
-                        .WithOne("Journey")
-                        .HasForeignKey("DriveHubModel.Journey", "BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("DriveHubModel.Pod", b =>
@@ -469,8 +469,8 @@ namespace DriveHub.Migrations
                         .IsRequired();
 
                     b.HasOne("DriveHubModel.Vehicle", "Vehicle")
-                        .WithMany()
-                        .HasForeignKey("VehicleId");
+                        .WithOne("Pod")
+                        .HasForeignKey("DriveHubModel.Pod", "VehicleId");
 
                     b.Navigation("Site");
 
@@ -539,9 +539,11 @@ namespace DriveHub.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DriveHubModel.Booking", b =>
+            modelBuilder.Entity("DriveHubModel.Pod", b =>
                 {
-                    b.Navigation("Journey");
+                    b.Navigation("EndPods");
+
+                    b.Navigation("StartPods");
                 });
 
             modelBuilder.Entity("DriveHubModel.Site", b =>
@@ -552,6 +554,8 @@ namespace DriveHub.Migrations
             modelBuilder.Entity("DriveHubModel.Vehicle", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Pod");
                 });
 
             modelBuilder.Entity("DriveHubModel.VehicleRate", b =>

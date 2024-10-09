@@ -9,6 +9,7 @@
  * as assessment work for COSC2650 Programming Project
  */
 
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -18,11 +19,32 @@ namespace DriveHubModel
 {
     public class Site
     {
+        public Site() { }
+
+        public Site(
+            string siteName,
+            string address,
+            string city,
+            string postcode,
+            double latitude,
+            double longitude
+            )
+        {
+            SiteName = siteName;
+            Address = address;
+            City = city;
+            PostCode = postcode;
+            Latitude = latitude;
+            Longitude = longitude;
+            Location = new Point(longitude, latitude) { SRID = 4326 };
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // Auto-incrementing int
         public int SiteId { get; set; }
 
         [Required]
+        [DisplayName("Site name")]
         public string SiteName { get; set; }
 
         [Required]
@@ -32,7 +54,11 @@ namespace DriveHubModel
         public string City { get; set; }
 
         [Required]
-        public string PostalCode { get; set; }
+        public string PostCode { get; set; }
+
+        public double Latitude { get; set; }
+
+        public double Longitude { get; set; }
 
         // NetTopologySuite spatial data
         [Required]

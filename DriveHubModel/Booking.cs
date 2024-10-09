@@ -19,7 +19,6 @@ namespace DriveHubModel
     public class Booking
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string BookingId { get; set; }
 
         [ForeignKey("Vehicle")]
@@ -42,15 +41,15 @@ namespace DriveHubModel
         public string EndPodId { get; set; }
 
         [Required]
-        [DataType(DataType.Date)]
+        [DataType(DataType.DateTime, ErrorMessage = "A start time is required")]
         [DisplayName("Start Time")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime StartTime { get; set; }
 
         [Required]
-        [DataType(DataType.Date)]
+        [DataType(DataType.DateTime)]
         [DisplayName("End Time")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime EndTime { get; set; }
 
         [Required]
@@ -65,10 +64,13 @@ namespace DriveHubModel
         public virtual ApplicationUser ApplicationUser { get; set; }
 
         [JsonIgnore]
-        public virtual Vehicle Vehicle { get; set; }
+        public virtual Pod StartPod { get; set; }
 
         [JsonIgnore]
-        public virtual Journey? Journey { get; set; }
+        public virtual Pod EndPod { get; set; }
+
+        [JsonIgnore]
+        public virtual Vehicle Vehicle { get; set; }
     }
 
     public enum BookingStatus

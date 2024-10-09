@@ -14,45 +14,28 @@ namespace Admin.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleRate> VehicleRates { get; set; }
         public DbSet<Booking> Bookings { get; set; }
-        public DbSet<Journey> Journeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // Define keys
+            modelBuilder.Entity<VehicleRate>()
+                .HasKey(c => c.VehicleRateId);
+
+            modelBuilder.Entity<Vehicle>()
+               .HasKey(c => c.VehicleId);
+
             modelBuilder.Entity<Site>()
                .HasKey(c => c.SiteId);
 
             modelBuilder.Entity<Pod>()
                .HasKey(c => c.PodId);
 
-            modelBuilder.Entity<Vehicle>()
-               .HasKey(c => c.VehicleId);
-
-            modelBuilder.Entity<VehicleRate>()
-                .HasKey(c => c.VehicleRateId);
-
             // Set "geography" column type for spatial data in the Site entity
             modelBuilder.Entity<Site>()
                .Property(l => l.Location)
                .HasColumnType("geography");
-
-            // Define relationships
-            modelBuilder.Entity<Site>()
-                .HasMany(c => c.Pods)
-                .WithOne(c => c.Site)
-                .HasForeignKey(c => c.SiteId);
-
-            modelBuilder.Entity<Pod>()
-                .HasOne(c => c.Site)
-                .WithMany(c => c.Pods)
-                .HasForeignKey(c => c.SiteId);
-
-            modelBuilder.Entity<Vehicle>()
-                .HasOne(c => c.VehicleRate)
-                .WithMany(c => c.Vehicles)
-                .HasForeignKey(c => c.VehicleRateId);
 
             modelBuilder.Entity<VehicleRate>()
                 .HasMany(c => c.Vehicles)
@@ -62,6 +45,31 @@ namespace Admin.Data
                 .Property(c => c.PricePerHour)
                 .HasColumnType("Money");
 
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(c => c.VehicleRate)
+                .WithMany(c => c.Vehicles)
+                .HasForeignKey(c => c.VehicleRateId);
+
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(c => c.Pod)
+                .WithOne(c => c.Vehicle)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            // Define relationships
+            modelBuilder.Entity<Site>()
+                .HasMany(c => c.Pods)
+                .WithOne(c => c.Site);
+
+            modelBuilder.Entity<Pod>()
+                .HasOne(c => c.Site)
+                .WithMany(c => c.Pods)
+                .HasForeignKey(c => c.SiteId);
+
+            modelBuilder.Entity<Pod>()
+                .HasOne(c => c.Vehicle)
+                .WithOne(c => c.Pod)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.ApplicationUser)
                 .WithMany(c => c.Bookings)
@@ -70,7 +78,20 @@ namespace Admin.Data
             modelBuilder.Entity<Booking>()
                 .HasOne(c => c.Vehicle)
                 .WithMany(c => c.Bookings)
-                .HasForeignKey(c => c.VehicleId);
+                .HasForeignKey(c => c.VehicleId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(c => c.StartPod)
+                .WithMany(c => c.StartPods)
+                .HasForeignKey(c => c.StartPodId)
+                .OnDelete(DeleteBehavior.ClientNoAction);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(c => c.EndPod)
+                .WithMany(c => c.EndPods)
+                .HasForeignKey(c => c.EndPodId)
+                .OnDelete(DeleteBehavior.ClientNoAction);
 
             modelBuilder.Entity<Booking>()
                 .Property(c => c.PricePerHour)
@@ -82,14 +103,6 @@ namespace Admin.Data
                 .HasConversion(
                     v => v.ToString(),
                     v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
-
-            modelBuilder.Entity<Journey>()
-                .HasOne(c => c.Booking)
-                .WithOne(c => c.Journey);
-
-            modelBuilder.Entity<Journey>()
-                .Property(c => c.Price)
-                .HasColumnType("Money");
         }
     }
 }
