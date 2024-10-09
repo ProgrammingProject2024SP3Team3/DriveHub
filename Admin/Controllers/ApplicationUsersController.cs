@@ -30,6 +30,7 @@ namespace Admin.Controllers
 
             var vehicleRate = await _context.Users
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (vehicleRate == null)
             {
                 return NotFound();
