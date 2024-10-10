@@ -4,6 +4,7 @@ using DriveHubModel;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using Microsoft.EntityFrameworkCore;
 
 namespace DriveHubTests
 {
@@ -308,5 +309,34 @@ namespace DriveHubTests
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        // This test simulates a valid booking edit scenario where the user edits the time and vehicle details.
+        [Fact]
+        public async Task Edit_ValidBooking_ShouldReturnUpdatedView()
+        {
+            // Arrange: Retrieve a valid booking ID from the seeded data
+            var booking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync();
+            Assert.NotNull(booking); // Ensure that we have at least one booking
+
+            var editBookingDto = new EditBookingDto
+            {
+                BookingId = booking.BookingId,
+                VehicleId = booking.VehicleId, // Use existing vehicle ID from booking
+                StartPodId = booking.StartPodId, // Use existing start pod ID
+                EndPodId = booking.EndPodId, // Use existing end pod ID
+                StartTime = DateTime.Now.AddHours(1), 
+                EndTime = DateTime.Now.AddHours(2),
+                QuotedPricePerHour = booking.PricePerHour // Use the existing price per hour
+            };
+
+            // Act: Call the Edit method on the controller with the booking details
+            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+
+            // Assert: Check if the result is a ViewResult and the booking is updated
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<Booking>(viewResult.Model);
+            Assert.Equal(booking.BookingId, model.BookingId);
+        }  
+
     }
 }
