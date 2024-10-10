@@ -420,6 +420,36 @@ namespace DriveHubTests
             Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys);
         }
 
+        [Fact]
+        public async Task Edit_Should_Fail_When_Booking_Time_Is_Greater_Than_7_Days()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Retrieve an existing booking
+            var booking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync();
+            Assert.NotNull(booking); // Ensure that we have a valid booking
+
+            var editBookingDto = new EditBookingDto
+            {
+                BookingId = booking.BookingId,
+                VehicleId = booking.VehicleId,
+                StartPodId = booking.StartPodId,
+                EndPodId = booking.EndPodId,
+                StartTime = DateTime.Now.AddDays(8), // Start time is more than 7 days in advance
+                EndTime = DateTime.Now.AddDays(8).AddHours(1),
+                QuotedPricePerHour = booking.PricePerHour
+            };
+
+            // Act: Call the Edit method
+            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+
+            // Assert: Ensure the model state is invalid
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
+            Assert.IsType<ViewResult>(result);
+        }
 
     }
 }
