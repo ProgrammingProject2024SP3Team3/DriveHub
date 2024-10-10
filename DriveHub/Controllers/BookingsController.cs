@@ -255,7 +255,7 @@ namespace DriveHub.Controllers
                 booking.StartTime = bookingDto.StartTime;
                 booking.EndTime = bookingDto.EndTime;
                 booking.PricePerHour = vehicle.VehicleRate.PricePerHour;
-                booking.BookingStatus = BookingStatus.InProgress;
+                booking.BookingStatus = BookingStatus.Booked;
                 _context.Add(booking);
                 _logger.LogInformation($"Added Booking OK");
 
