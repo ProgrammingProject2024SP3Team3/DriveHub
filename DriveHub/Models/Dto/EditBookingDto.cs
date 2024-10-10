@@ -20,12 +20,12 @@ namespace DriveHub.Models.Dto
         public string EndPodId { get; set; }
 
         [Required]
-        [DisplayName("start time")]
+        [DisplayName("Start time")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime StartTime { get; set; }
 
         [Required]
-        [DisplayName("end time")]
+        [DisplayName("End time")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime EndTime { get; set; }
 

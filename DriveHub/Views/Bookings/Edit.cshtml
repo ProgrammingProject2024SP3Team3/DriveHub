@@ -7,17 +7,19 @@
 <p>Edit your upcoming car booking's start/end time or drop off pod.</p>
 <form asp-action="Edit">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="BookingId"/>
+    <input type="hidden" asp-for="BookingId" />
     <input type="hidden" asp-for="VehicleId" />
     <input type="hidden" asp-for="StartPodId" />
     <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
     <div class="row">
         <div class="col-xs-12 col-lg-8">
             <div class="form-group mb-3">
-                <label>Vehicle</label>
-                <input class="form-control" value="@ViewBag.Vehicle from @ViewBag.StartPod" disabled />
+                Vehicle<br />
+                @ViewBag.Vehicle<br /><br />
+                Pod<br />
+                @ViewBag.StartPod
             </div>
-            <div class="form-group mb-3">
+            <div class="form-group">
                 <label asp-for="EndPodId" class="control-label"></label>
                 <select asp-for="EndPodId" class="form-control" asp-items="@ViewBag.Pods"></select>
                 <span asp-validation-for="EndPodId" class="text-danger"></span>
@@ -25,7 +27,7 @@
         </div>
         <div class="col-xs-12 col-lg-4 container-fluid pb-3">
             <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                                @ViewBag.VehicleId
+                @ViewBag.VehicleId
 }.jpg" style="max-width:350px;">
         </div>
     </div>
@@ -82,7 +84,7 @@
             // The raw search data converted to JSON (there is no customer entered data in this)
             // TODO: There is an assumption here that those who can enter Admin data are not trying to hack users, which may be unacceptable. We can manually create nodes and use textContent if admin XSS is a concern.
             let siteData
-        @* let siteData = @Html.Raw(JsonSerializer.Serialize(ViewData["siteData"])) *@
+                        @* let siteData = @Html.Raw(JsonSerializer.Serialize(ViewData["siteData"])) *@
                 // The google map object
                 let map;
             // All markers currently placed on the map
@@ -452,4 +454,4 @@
             }
         });
     </script>
-}
+                }
