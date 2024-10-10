@@ -13,6 +13,9 @@ namespace DriveHub.Models.Dto
         public string VehicleId { get; set; }
 
         [Required]
+        public string StartPodId { get; set; }
+
+        [Required]
         [DisplayName("Ending pod")]
         public string EndPodId { get; set; }
 

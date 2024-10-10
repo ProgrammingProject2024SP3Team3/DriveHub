@@ -1,51 +1,77 @@
 ﻿@model DriveHub.Models.Dto.EditBookingDto
+@{
+    ViewData["Title"] = "Edit";
+}
 
 <h1>Change booking details</h1>
 <p>Edit your upcoming car booking's start/end time or drop off pod.</p>
-
 <form asp-action="Edit">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="BookingId" value="@ViewBag.BookingId" />
-    <input type="hidden" asp-for="VehicleId" value="@ViewBag.VehicleId" />
-    <div class="form-group">
-        <input class="form-control" value="@ViewBag.Vehicle from @ViewBag.StartPod" disabled />
-    </div>
-    <div class="form-group">
-        <label asp-for="EndPodId" class="control-label"></label>
-        <select asp-for="EndPodId" class="form-control" asp-items="@ViewBag.Pods"></select>
-        <span asp-validation-for="EndPodId" class="text-danger"></span>
-    </div>
+    <input type="hidden" asp-for="BookingId"/>
+    <input type="hidden" asp-for="VehicleId" />
+    <input type="hidden" asp-for="StartPodId" />
+    <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
     <div class="row">
-        <div class="col">
+        <div class="col-xs-12 col-lg-8">
+            <div class="form-group mb-3">
+                <label>Vehicle</label>
+                <input class="form-control" value="@ViewBag.Vehicle from @ViewBag.StartPod" disabled />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="EndPodId" class="control-label"></label>
+                <select asp-for="EndPodId" class="form-control" asp-items="@ViewBag.Pods"></select>
+                <span asp-validation-for="EndPodId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-xs-12 col-lg-4 container-fluid pb-3">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
+                                @ViewBag.VehicleId
+}.jpg" style="max-width:350px;">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-xs-12 col-md-6 col-lg-4">
             <div class="form-group">
                 <label asp-for="StartTime" class="control-label"></label>
                 <input asp-for="StartTime" class="form-control" />
                 <span asp-validation-for="StartTime" class="text-danger"></span>
             </div>
-            <div class="col">
-                <div class="form-group">
-                    <label asp-for="EndTime" class="control-label"></label>
-                    <input asp-for="EndTime" class="form-control" />
-                    <span asp-validation-for="EndTime" class="text-danger"></span>
-                </div>
+        </div>
+        <div class="col-xs-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                <label asp-for="EndTime" class="control-label"></label>
+                <input asp-for="EndTime" class="form-control" />
+                <span asp-validation-for="EndTime" class="text-danger"></span>
             </div>
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label asp-for="QuotedPricePerHour" class="control-label"></label>
-        <input asp-for="QuotedPricePerHour" class="form-control" disabled />
-        <span asp-validation-for="QuotedPricePerHour" class="text-danger"></span>
+        <input asp-for="QuotedPricePerHour" class="form-control" value="$@ViewBag.PricePerHour.ToString("F2")" disabled />
     </div>
-    <div class="form-group">
+    <div class="form-group text-center">
+        <input type="submit" value="Edit" id="create-button" class="d-none btn btn-primary mb-4 fw-bold text-white fs-4" />
         <a asp-action="Search" id="cancel-button" class="btn btn-danger mb-4 fw-bold text-white fs-4">Cancel</a>
-        <input type="submit" value="Create" id="create-button" class="d-none btn btn-primary mb-4 fw-bold text-white fs-4" />
     </div>
 </form>
+
+<div class="mb-3">
+    <div class="p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Cost</div>
+    <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
+        <p class="mb-0">Per Hour:</p>
+        <p class="fw-bold fs-1">$<span id="price-per-hour">@ViewBag.PricePerHour.ToString("F2")</span><hr></p>
+        <hr />
+        <p class="mb-0">Total Cost:</p>
+        <p class="fw-bold fs-1 mb-6" id="total-cost">$0</p>
+        <span id="time-validation" class="text-danger"></span>
+    </div>
+</div>
 <div class="mb-4" id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>
 
-
 @section Scripts {
-     await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
     <script>
         // Wrap with an Immediately Invoked Function Expression (IIFE) so we don't pollute the client
@@ -425,5 +451,5 @@
                 }
             }
         });
-    </script>    
+    </script>
 }

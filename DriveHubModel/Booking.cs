@@ -76,6 +76,7 @@ namespace DriveHubModel
     public enum BookingStatus
     {
         InProgress,
+        Edited,
         Complete
     }
 }

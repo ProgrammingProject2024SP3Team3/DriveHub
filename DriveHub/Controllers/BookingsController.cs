@@ -38,7 +38,7 @@ namespace DriveHub.Controllers
         /// Return the error page when a booking action is not sane. Not publicly accessible.
         /// </summary>
         /// <returns>The error page</returns>
-        internal IActionResult Error()
+        private IActionResult Error()
         {
             return View();
         }
@@ -302,11 +302,6 @@ namespace DriveHub.Controllers
             return View(bookingDto);
         }
 
-        public IActionResult Done()
-        {
-            return View();
-        }
-
         // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -343,13 +338,15 @@ namespace DriveHub.Controllers
 
             // Create data object
             var editBookingDto = new EditBookingDto();
-            editBookingDto.BookingId = booking.Id;
+            editBookingDto.BookingId = booking.BookingId;
             editBookingDto.VehicleId = booking.VehicleId;
+            editBookingDto.StartPodId = booking.StartPodId;
             editBookingDto.EndPodId = booking.EndPodId;
             editBookingDto.StartTime = booking.StartTime;
             editBookingDto.EndTime = booking.EndTime;
             editBookingDto.QuotedPricePerHour = booking.PricePerHour;
 
+            ViewBag.BookingId = booking.BookingId;
             ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
             ViewBag.VehicleId = vehicle.VehicleId;
             ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
@@ -366,9 +363,9 @@ namespace DriveHub.Controllers
         // POST: Bookings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, BookingDto bookingDto)
+        public async Task<IActionResult> Edit(string id, EditBookingDto editBookingDto)
         {
-            if (id == null)
+            if (id != editBookingDto.BookingId)
             {
                 return NotFound();
             }
@@ -379,25 +376,51 @@ namespace DriveHub.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == bookingDto.VehicleId);
-            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
+            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == booking.VehicleId);
+            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == booking.StartPodId);
 
-            // Create data object
-            var editBookingDto = new EditBookingDto();
-            editBookingDto.BookingId = booking.Id;
-            editBookingDto.VehicleId = booking.VehicleId;
-            editBookingDto.EndPodId = booking.EndPodId;
-            editBookingDto.StartTime = booking.StartTime;
-            editBookingDto.EndTime = booking.EndTime;
-            editBookingDto.QuotedPricePerHour = booking.PricePerHour;
+            // Check if booking duration is less than 30 mins
+            var diff = editBookingDto.EndTime - editBookingDto.StartTime;
+            if (diff.TotalMinutes < 30)
+            {
+                _logger.LogWarning($"The minimum booking duration is 30 mins {editBookingDto.StartTime} {editBookingDto.EndTime}");
+                ModelState.AddModelError("EndTime", "The minimum booking duration is 30 mins");
+            }
+
+            // Check if booking is within one week from today
+            if (editBookingDto.StartTime > DateTime.Now.AddDays(7))
+            {
+                _logger.LogWarning($"Bookings cannot be made more than one week in advance. {editBookingDto.StartTime}");
+                ModelState.AddModelError("StartTime", "Bookings cannot be made more than one week in advance.");
+            }
+
+            // Check if start time is in the past
+            if (editBookingDto.StartTime < DateTime.Now)
+            {
+                _logger.LogWarning($"Start time must be in the future. {editBookingDto.StartTime}");
+                ModelState.AddModelError("StartTime", "Start time must be in the future.");
+            }
+
+            // Check if start time is after end time
+            if (editBookingDto.StartTime > editBookingDto.EndTime)
+            {
+                _logger.LogWarning($"Start time is after end time {editBookingDto.StartTime} {editBookingDto.EndTime}");
+                ModelState.AddModelError("StartTime", "Start time must be before end time");
+            }
+
+            if (ModelState.IsValid)
+            {
+                booking.EndPod = await _context.Pods.FirstOrDefaultAsync(c =>c.PodId == editBookingDto.EndPodId);
+                booking.StartTime = editBookingDto.StartTime;
+                booking.EndTime = editBookingDto.EndTime;
+                booking.BookingStatus = BookingStatus.Edited;
+                _context.Update(booking);
+                await _context.SaveChangesAsync();
+                return View("Details", booking);
+            }
 
             // Get start pod and empty pods
             var emptyPods = new List<PodVM>();
-            var startPodVM = new PodVM();
-            startPodVM.PodId = startPod.PodId;
-            startPodVM.PodName = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
-            emptyPods.Add(startPodVM);
-
             var pods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
             foreach (var pod in pods)
             {
@@ -408,10 +431,17 @@ namespace DriveHub.Controllers
             }
 
             ViewBag.BookingId = booking.BookingId;
-            ViewData["EndPodId"] = new SelectList(_context.Pods.Where(c => c.VehicleId == null), "PodId", "PodName", booking.EndPodId);
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
-            return View(booking);
+            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
+            ViewBag.VehicleId = vehicle.VehicleId;
+            ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
+            ViewBag.StartPodId = startPod.PodId;
+            ViewBag.StartSite = $"{startPod.Site.Address}, {startPod.Site.City}";
+            ViewBag.StartSiteLatitude = startPod.Site.Latitude;
+            ViewBag.StartSiteLongitude = startPod.Site.Longitude;
+            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
+            ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
+
+            return View(editBookingDto);
         }
 
         // GET: Bookings/Delete/5
@@ -447,7 +477,7 @@ namespace DriveHub.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Return(string id)
         {
-            throw new NotImplementedException();
+            return View();
         }
 
         private bool BookingExists(string id)

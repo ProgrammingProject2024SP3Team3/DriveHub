@@ -29,7 +29,7 @@
     {
         <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#252e31;">
             Status:
-            @Model.BookingStatus
+            @Model.BookingStatus.ToString()
         </div>
     }
 
@@ -71,20 +71,19 @@
                 <small>@endPod.Site.Address, @endPod.Site.City</small>
             </div>
         </div>
-        @if (Model.BookingStatus != BookingStatus.Complete)
-        {
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <a href="/Bookings/Edit/@Model.BookingId" class="btn btn-secondary">
-                    Edit Booking
-                </a>
-
-                <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Model.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
-                    <button type="submit" class="btn btn-danger">
-                        Return Vehicle
-                    </button>
-                </form>
-            </div>
+         <div class="d-flex justify-content-between align-items-center mt-4">
+        @if (@Model.StartTime > @DateTime.Now.AddMinutes(-15))
+        {           
+            <a asp-action="Edit" asp-route-id="@Model.BookingId" class="btn btn-primary p-3">
+                Edit Booking
+            </a>
         }
+         <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Model.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
+            <button type="submit" class="btn btn-danger p-3">
+                Return Vehicle
+            </button>
+         </form>
+     </div>
     </div>
 
     <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
