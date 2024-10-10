@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DriveHub.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
