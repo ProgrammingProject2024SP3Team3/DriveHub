@@ -38,7 +38,7 @@ namespace DriveHub.Controllers
         /// Return the error page when a booking action is not sane. Not publicly accessible.
         /// </summary>
         /// <returns>The error page</returns>
-        private IActionResult Error()
+        internal IActionResult Error()
         {
             return View();
         }
@@ -68,13 +68,6 @@ namespace DriveHub.Controllers
         /// <returns>A view showing in-progress bookings</returns>
         public async Task<IActionResult> CurrentBookings()
         {
-            string userId = _userManager.GetUserId(User);
-            if (userId == null)
-            {
-                _logger.LogError("CurrentBookings: User not logged in.");
-                return RedirectToAction(nameof(Error));
-            }
-
             var bookings = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.EndTime > DateTime.Now)
@@ -93,7 +86,6 @@ namespace DriveHub.Controllers
 
             return View(bookings);
         }
-
 
         public async Task<IActionResult> PastBookings()
         {
@@ -114,7 +106,6 @@ namespace DriveHub.Controllers
         public async Task<IActionResult> Details(string id)
         {
             var booking = await _context.Bookings
-                .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
@@ -280,6 +271,7 @@ namespace DriveHub.Controllers
 
             // -- Return a page with data and errors if the model is not valid --
             _logger.LogError($"There was an error with booking {bookingDto.ToString()}");
+
             // Get start pod and empty pods
             var emptyPods = new List<PodVM>();
             var startPodVM = new PodVM();
@@ -318,22 +310,108 @@ namespace DriveHub.Controllers
         // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            // TODO: need to get booking only if it belongs to logged in user
             var booking = await _context.Bookings.FindAsync(id);
             if (booking == null)
             {
                 return NotFound();
             }
 
-            return View(booking);
+            if (booking.Id != _userManager.GetUserId(User))
+            {
+                return NotFound();
+            }
+
+            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == booking.VehicleId);
+            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == booking.StartPodId);
+
+            if (vehicle == null || startPod == null)
+            {
+                return NotFound();
+            }
+
+            // Get start and empty pods
+            var emptyPods = new List<PodVM>();
+
+            var pods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
+            foreach (var pod in pods)
+            {
+                var podVM = new PodVM();
+                podVM.PodId = pod.PodId;
+                podVM.PodName = $"{pod.Site.SiteName} Pod #{pod.PodName}";
+                emptyPods.Add(podVM);
+            }
+
+            // Create data object
+            var editBookingDto = new EditBookingDto();
+            editBookingDto.BookingId = booking.Id;
+            editBookingDto.VehicleId = booking.VehicleId;
+            editBookingDto.EndPodId = booking.EndPodId;
+            editBookingDto.StartTime = booking.StartTime;
+            editBookingDto.EndTime = booking.EndTime;
+            editBookingDto.QuotedPricePerHour = booking.PricePerHour;
+
+            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
+            ViewBag.VehicleId = vehicle.VehicleId;
+            ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
+            ViewBag.StartPodId = startPod.PodId;
+            ViewBag.StartSite = $"{startPod.Site.Address}, {startPod.Site.City}";
+            ViewBag.StartSiteLatitude = startPod.Site.Latitude;
+            ViewBag.StartSiteLongitude = startPod.Site.Longitude;
+            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
+            ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
+
+            return View(editBookingDto);
         }
 
         // POST: Bookings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(BookingDto bookingDto)
+        public async Task<IActionResult> Edit(string id, BookingDto bookingDto)
         {
-            throw new NotImplementedException();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var booking = _context.Bookings.Find(id);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == bookingDto.VehicleId);
+            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
+
+            // Create data object
+            var editBookingDto = new EditBookingDto();
+            editBookingDto.BookingId = booking.Id;
+            editBookingDto.VehicleId = booking.VehicleId;
+            editBookingDto.EndPodId = booking.EndPodId;
+            editBookingDto.StartTime = booking.StartTime;
+            editBookingDto.EndTime = booking.EndTime;
+            editBookingDto.QuotedPricePerHour = booking.PricePerHour;
+
+            // Get start pod and empty pods
+            var emptyPods = new List<PodVM>();
+            var startPodVM = new PodVM();
+            startPodVM.PodId = startPod.PodId;
+            startPodVM.PodName = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
+            emptyPods.Add(startPodVM);
+
+            var pods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
+            foreach (var pod in pods)
+            {
+                var podVM = new PodVM();
+                podVM.PodId = pod.PodId;
+                podVM.PodName = $"{pod.Site.SiteName} Pod #{pod.PodName}";
+                emptyPods.Add(podVM);
+            }
+
+            ViewBag.BookingId = booking.BookingId;
+            ViewData["EndPodId"] = new SelectList(_context.Pods.Where(c => c.VehicleId == null), "PodId", "PodName", booking.EndPodId);
+            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
+            return View(booking);
         }
 
         // GET: Bookings/Delete/5

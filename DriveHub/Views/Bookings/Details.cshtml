@@ -18,7 +18,7 @@
 <h1 class="text-center">Booking Details</h1>
 <p class="text-center">Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
 <div class="booking-section mb-3">
-    @if (@Model.BookingStatus == BookingStatus.InProgress)
+    @if (Model.BookingStatus == BookingStatus.InProgress)
     {
         <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#FFBA17;">
             Status:
