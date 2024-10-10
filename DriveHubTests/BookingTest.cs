@@ -336,7 +336,36 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<Booking>(viewResult.Model);
             Assert.Equal(booking.BookingId, model.BookingId);
-        }  
+        }
+
+        
+        [Fact]
+        public async Task Edit_ShouldFail_WhenStartTimeIsInThePast()
+        {
+            // Arrange: Retrieve a valid booking ID from the seeded data
+            var booking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync();
+            Assert.NotNull(booking); // Ensure that we have at least one booking
+
+            var editBookingDto = new EditBookingDto
+            {
+                BookingId = booking.BookingId,
+                VehicleId = booking.VehicleId,
+                StartPodId = booking.StartPodId,
+                EndPodId = booking.EndPodId,
+                StartTime = DateTime.Now.AddHours(-1), // Set StartTime in the past
+                EndTime = DateTime.Now.AddHours(1),
+                QuotedPricePerHour = booking.PricePerHour
+            };
+
+            // Act: Call the Edit method
+            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+
+            // Assert: Ensure the model state is invalid
+            Assert.IsType<ViewResult>(result);
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
+        }
+        
 
     }
 }
