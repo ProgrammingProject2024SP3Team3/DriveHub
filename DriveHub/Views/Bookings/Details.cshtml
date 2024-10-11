@@ -6,7 +6,7 @@
     var vehicle = Model.Vehicle;
     var startPod = Model.StartPod;
     var endPod = Model.EndPod;
-    var totalPrice = (Model.EndTime - Model.StartTime).TotalHours * (double)Model.PricePerHour;
+    decimal totalPrice = (decimal)((Model.EndTime - Model.StartTime).TotalHours * (double)Model.PricePerHour);
 }
 
 <style>
@@ -15,10 +15,10 @@
     }
 </style>
 
-<h1 class="text-center">Booking Details</h1>
-<p class="text-center">Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
+<h1>Booking Details</h1>
+<p>Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
 <div class="booking-section mb-3">
-    @if (@Model.BookingStatus == BookingStatus.InProgress)
+    @if (Model.BookingStatus == BookingStatus.InProgress)
     {
         <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#FFBA17;">
             Status:
@@ -45,7 +45,7 @@
         </div>
         <div class="col-xs-12 col-md-4 container-fluid mb-3">
             <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                        @vehicle.VehicleId
+                            @vehicle.VehicleId
 }.jpg" style="max-width:250px;">
         </div>
     </div>
@@ -71,20 +71,23 @@
                 <small>@endPod.Site.Address, @endPod.Site.City</small>
             </div>
         </div>
-        @if (Model.BookingStatus != BookingStatus.Complete)
-        {
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <a href="/Bookings/Edit/@Model.BookingId" class="btn btn-secondary">
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            @if (@Model.StartTime > @DateTime.Now.AddMinutes(-15))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.BookingId" class="btn btn-primary p-3">
                     Edit Booking
                 </a>
-
+            }
+            @if (@Model.BookingStatus == BookingStatus.Started)
+            {
                 <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Model.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
-                    <button type="submit" class="btn btn-danger">
+                    <button type="submit" class="btn btn-danger p-3">
                         Return Vehicle
                     </button>
                 </form>
-            </div>
-        }
+            }
+
+        </div>
     </div>
 
     <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">

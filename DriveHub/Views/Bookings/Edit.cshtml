@@ -1,35 +1,455 @@
-﻿@model DriveHubModel.Booking
-
+﻿@model DriveHub.Models.Dto.EditBookingDto
 @{
-    ViewData["Title"] = "Change Booking Time";
+    ViewData["Title"] = "Edit";
 }
 
-<h1 class="text-center">Change Booking Time</h1>
-<p class="text-center">Edit your upcoming car booking's start and end times.</p>
-
-<form method="post">
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label for="StartTime" class="form-label">Booking Start</label>
-            <input type="datetime-local" class="form-control" id="StartTime" name="StartTime"
-                   value="@Model.StartTime.ToString("s")" step="any" />
+<h1>Change booking details</h1>
+<p>Edit your upcoming car booking's start/end time or drop off pod.</p>
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="BookingId" />
+    <input type="hidden" asp-for="VehicleId" />
+    <input type="hidden" asp-for="StartPodId" />
+    <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
+    <div class="row">
+        <div class="col-xs-12 col-lg-8">
+            <div class="form-group mb-3">
+                Vehicle<br />
+                @ViewBag.Vehicle<br /><br />
+                Pod<br />
+                @ViewBag.StartPod
+            </div>
+            <div class="form-group">
+                <label asp-for="EndPodId" class="control-label"></label>
+                <select asp-for="EndPodId" class="form-control" asp-items="@ViewBag.Pods"></select>
+                <span asp-validation-for="EndPodId" class="text-danger"></span>
+            </div>
         </div>
-        <div class="col-md-6">
-            <label for="EndTime" class="form-label">Booking End</label>
-            <input type="datetime-local" class="form-control" id="EndTime" name="EndTime"
-                   value="@Model.EndTime.ToString("s")" step="any" />
+        <div class="col-xs-12 col-lg-4 container-fluid pb-3">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg" style="max-width:350px;">
         </div>
     </div>
-    <div class="text-center mt-5 mb-3">
-        <input type="submit" value="Update Booking Time" class="btn btn-danger fw-bold text-white fs-4" />
+    <div class="row mb-3">
+        <div class="col-xs-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                <label asp-for="StartTime" class="control-label"></label>
+                <input asp-for="StartTime" class="form-control" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                <label asp-for="EndTime" class="control-label"></label>
+                <input asp-for="EndTime" class="form-control" />
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="QuotedPricePerHour" class="control-label"></label>
+        <input asp-for="QuotedPricePerHour" class="form-control" value="$@ViewBag.PricePerHour.ToString("F2")" disabled />
+    </div>
+    <div class="form-group text-center">
+        <input type="submit" value="Edit" id="create-button" class="d-none btn btn-primary mb-4 fw-bold text-white fs-4" />
+        <a asp-action="Index" id="cancel-button" class="btn btn-danger mb-4 fw-bold text-white fs-4">Cancel</a>
     </div>
 </form>
-<div class="text-end">
-    <a href="/Bookings/Details/@Model.BookingId">Back to Booking</a>
+
+<div class="mb-3">
+    <div class="p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Cost</div>
+    <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
+        <p class="mb-0">Per Hour:</p>
+        <p class="fw-bold fs-1">$<span id="price-per-hour">@ViewBag.PricePerHour.ToString("F2")</span><hr></p>
+        <hr />
+        <p class="mb-0">Total Cost:</p>
+        <p class="fw-bold fs-1 mb-6" id="total-cost">$0</p>
+        <span id="time-validation" class="text-danger"></span>
+    </div>
 </div>
+<div class="mb-4" id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Wrap with an Immediately Invoked Function Expression (IIFE) so we don't pollute the client
+        (function () {
+            // The maximum cars to display in the car list below the map
+            let MAX_CARS_TO_DISPLAY = 20
+
+            // The raw search data converted to JSON (there is no customer entered data in this)
+            // TODO: There is an assumption here that those who can enter Admin data are not trying to hack users, which may be unacceptable. We can manually create nodes and use textContent if admin XSS is a concern.
+            let siteData
+                        @* let siteData = @Html.Raw(JsonSerializer.Serialize(ViewData["siteData"])) *@
+                // The google map object
+                let map;
+            // All markers currently placed on the map
+            let markers = []
+            // The geolocation of the user
+            let geolocation = null
+            // The geolocation of the user's last location search or click on map
+            let searchLocation = null
+
+            // Update the map based on current data
+            function updateMap() {
+                // Early return if map not yet initialized
+                if (!map) return
+
+                // Clear old markers
+                for (let i = 0; i < markers.length; i++) markers[i].map = null
+                markers = []
+
+                console.log("Map update")
+                // The number of seats a user has selected in the drop down
+                let seatCount = document.getElementById('seatCountSelect').value
+
+                // Add all sites as markers
+                for (let site of siteData) {
+                    let marker = new google.maps.marker.AdvancedMarkerElement({
+                        map,
+                        title: site.SiteName,
+                        position: { lat: site.Latitude, lng: site.Longitude },
+                    })
+                    markers.push(marker)
+
+                    let infowindow = new google.maps.InfoWindow({
+                        content: `<strong>${site.SiteName} TODO: Big list of cars to book at this site</strong>`
+                    })
+
+                    marker.addListener("click", () => {
+                        infowindow.open(map, marker)
+                    })
+                }
+                // If a user has a recent searched address put a marker for it on the map
+                if (searchLocation) {
+                    let pinBackground = new google.maps.marker.PinElement({
+                        background: "#00A8E8",
+                        glyphColor: "white",
+                        borderColor: "#11B8E8"
+                    })
+                    let marker = new google.maps.marker.AdvancedMarkerElement({
+                        map,
+                        title: "Your Search Location",
+                        position: { lat: searchLocation.lat(), lng: searchLocation.lng() },
+                        content: pinBackground.element,
+                    })
+                    markers.push(marker)
+                }
+                // Rerender the list of nearest cars beneath the map
+                updateAndRenderCarList()
+            }
+
+            // Render the list of nearest cars underneath the map
+            function updateAndRenderCarList() {
+                let sites = [...siteData]
+                // If we have a search location, sort all sites by distance to that search location
+                if (searchLocation || geolocation) {
+                    // Calculate flight distance of site to current searchLocation (in kilometres)
+                    for (site of sites) {
+                        let sitePos = { lat: site.Latitude, lng: site.Longitude }
+                        // calculate the distance between the site and last search location, or the user's geolocation if no searches yet
+                        site.distanceInKMs = searchLocation ?
+                            (google.maps.geometry.spherical.computeDistanceBetween(searchLocation, sitePos)) / 1000
+                            : (google.maps.geometry.spherical.computeDistanceBetween({ lat: geolocation.latitude, lng: geolocation.longitude }, sitePos)) / 1000
+                    }
+                    // Sort all sites by distance to searchLocation
+                    sites.sort((siteA, siteB) => siteA.distanceInKMs - siteB.distanceInKMs)
+                }
+
+                let carListHTML = ''
+                let totalCarsDisplayed = 0
+
+                // Get the number of seats selected by the user
+                let numberOfSeats = document.getElementById('seatCountSelect').value
+
+                // Render a big horrible Raw HTML block for ever nearby car
+                // TODO: this is so ugly and it's a prime cleanup candidate once we're feature complete
+                for (let siteI = 0; siteI < sites.length && totalCarsDisplayed < MAX_CARS_TO_DISPLAY; siteI++) {
+                    let site = sites[siteI]
+                    for (let podI = 0; podI < site.Pods.length && totalCarsDisplayed < MAX_CARS_TO_DISPLAY; podI++) {
+                        let pod = site.Pods[podI]
+                        let car = pod.Vehicle
+                        // Skip cars with the wrong number of seats
+                        if (numberOfSeats !== 'any' && numberOfSeats != car.Seats) continue
+
+                        let locationText = `${site.SiteName}, ${site.City}`.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' ') // format location from db
+                        let timeText = ''
+                        if (site.distanceInKMs) {
+                            let kmph = 40 // kilometers per hour
+                            let timeInMinutes = 3 + site.distanceInKMs / kmph * 60
+                            // If less than 100kms give an estimated time
+                            if (site.distanceInKMs <= 100) {
+                                timeText += `Around ${(timeInMinutes && timeInMinutes.toFixed()) || '0'} mins (${(site.distanceInKMs && site.distanceInKMs.toFixed()) || '0'} kms) away from `
+                            } else {
+                                timeText += `${(site.distanceInKMs && site.distanceInKMs.toFixed()) || '0'} kms away from `
+                            }
+                        }
+                        carListHTML +=
+                            `<a class="text-decoration-none car-item" href="/Bookings/Create/${car.VehicleId}">
+                                <div class="row border my-3 container-fluid">
+                                    <div class="col-xs-12 col-sm-3 col-lg-4">
+                                        <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px;">
+                                    </div>
+                                    <div class="col-xs-12 col-sm-9 col-lg-8">
+                                        <div class="mb-0 text-decoration-none text-dark"><strong>${timeText}${locationText}</strong></div>
+                                        <div class="mb-0 text-decoration-none text-dark">${car.Name} the ${car.Make} ${car.Model}</div>
+                                    </div>
+                                </div>
+                            </a>`
+                        totalCarsDisplayed++;
+                    }
+                }
+                document.getElementById('car-list').innerHTML = carListHTML
+            }
+
+            // Init the Location search bar for the map
+            function initSearchBar(map) {
+                // Create the search box and link it to the UI element.
+                let input = document.getElementById("pac-input")
+                let searchBox = new google.maps.places.SearchBox(input)
+                // Bias the SearchBox results towards current map's viewport.
+                map.addListener("bounds_changed", () => {
+                    searchBox.setBounds(map.getBounds())
+                })
+                // Respond to user searches and move the map there
+                searchBox.addListener("places_changed", () => {
+                    let places = searchBox.getPlaces()
+                    // Don't change anything if search had 0 results
+                    if (places.length == 0) return
+                    // Only deal with the first place found
+                    let place = places[0]
+                    // Don't change anything if there is no geometry for the result
+                    if (!place.geometry || !place.geometry.location) {
+                        console.log("Returned place contains no geometry")
+                        return
+                    }
+                    // This is the google map viewport bounds
+                    let bounds = new google.maps.LatLngBounds()
+                    // Update to map bounds is different depending on the type of place returned
+                    if (place.geometry.viewport) {
+                        // Only geocodes have viewport.
+                        bounds.union(place.geometry.viewport)
+                    } else {
+                        bounds.extend(place.geometry.location)
+                    }
+                    // Add our first car site to the bounds (only if it exists)
+                    if (siteData[0]) {
+                        // TODO: this should be the nearest car site instead of just grabbing the first site
+                        // This will cause issues if melbourne is no longer the capital site for the company
+                        let siteWantedOnMap = siteData[0]
+                        bounds.extend(new google.maps.LatLng(siteWantedOnMap.Latitude, siteWantedOnMap.Longitude))
+                    }
+                    // update our Search Location with coords from Google
+                    searchLocation = place.geometry.location
+                    // Update the map with this changed searchLocation
+                    updateMap()
+                    // Fit the map viewport to our created bounds
+                    map.fitBounds(bounds)
+                })
+            }
+
+            // Init geolocation API that will give the user's current location
+            function initGeolocation(map) {
+                // on successfully getting user's geolocation
+                function updatePosition(position) {
+                    geolocation = position.coords
+                    console.log(position)
+                    updateMap()
+                }
+                function handleError(error) {
+                    console.log("Geolocation error: ", error)
+                }
+                if (navigator.geolocation) {
+                    // Start watching the user's position
+                    navigator.geolocation.getCurrentPosition(
+                        updatePosition,
+                        handleError,
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 5000, // Timeout in 5 seconds if geolocation doesn't work
+                            maximumAge: 1000 * 60 * 5 // cached results up to 5 minutes old is fine
+                        }
+                    )
+                } else {
+                    console.log("Error: No geolocation API enabled in browser")
+                }
+            }
+
+            // Init a click listener on the map that let's the user choose their search
+            function initMapClickListener(map) {
+                map.addListener("click", (mapsMouseEvent) => {
+                    // Get the latitude and longitude from the click event
+                    searchLocation = mapsMouseEvent.latLng
+                    updateMap()
+                })
+            }
+
+            function initAll() {
+                console.log(siteData)
+                // Init Google Map
+                map = new google.maps.Map(document.getElementById("map"), {
+                    // Center map on the first site or RMIT if no sites exist
+                    center: siteData[0] ? { lat: siteData[0].Latitude, lng: siteData[0].Longitude } : { lat: -37.8083331, lng: 144.9639386 },
+                    zoom: 12,
+                    mapTypeId: "roadmap",
+                    mapId: "DRIVEHUB_SEARCH",
+                    streetViewControl: false,
+                    clickableIcons: false
+                })
+                // Init location search bar
+                initSearchBar(map)
+                // Init Geolocation (user's lat/long from their GPS)
+                initGeolocation(map)
+                // Init a click listener on the map that let's the user choose their search
+                initMapClickListener(map)
+
+                // Update the map whenever the user picks another seat count
+                document.getElementById('seatCountSelect').addEventListener('change', updateMap)
+
+                updateMap()
+            }
+
+            // This parses the new Pod API into the form the map currently uses.
+            // NOTE: Naming is a bit odd because I originally based this map on C# classes
+            function parsePodDataToTreeOfSites(podData) {
+                let siteMap = {}
+                podData
+                    .filter(pod => pod.vehicleId) // filter out empty pods
+                    .forEach(pod => { // build a big map of all sites, that contain pods, that contain vehicles
+                        if (!siteMap[pod.siteName]) { // if site not yet in map add its details
+                            siteMap[pod.siteName] = {
+                                SiteName: pod.siteName,
+                                Latitude: pod.latitude,
+                                Longitude: pod.longitude,
+                                Address: pod.address,
+                                City: pod.city,
+                                PostCode: pod.postCode,
+                                Pods: []
+                            }
+                        }
+                        // Add the pod to this site
+                        siteMap[pod.siteName].Pods.push({
+                            PodId: pod.podId,
+                            PodName: pod.podName,
+                            // Add the Vehicle to the pod
+                            Vehicle: {
+                                VehicleId: pod.vehicleId,
+                                Name: pod.vehicleName,
+                                Make: pod.make,
+                                Model: pod.model,
+                                RegistrationPlate: pod.registrationPlate,
+                                Seats: pod.seats,
+                                Colour: pod.colour,
+                                PricePerHour: pod.pricePerHour,
+                                Category: pod.vehicleCategory
+                            }
+                        })
+                    })
+                // Turn map into a simple list as map expects
+                let siteTree = []
+                for (let siteName in siteMap) siteTree.push(siteMap[siteName])
+                return siteTree
+            }
+
+            function fetchJsonThenInit() {
+                fetch('/api/pods')
+                    // Get pod data from API and parse it as json
+                    .then(function (response) {
+                        if (!response.ok) throw new Error('Pods network response not ok: ' + response.statusText)
+                        return response.json()
+                    }).then(function (json) {
+                        // Parse Json pod data into a tree of sites that contain pods, that in turn contain vehicles
+                        siteData = parsePodDataToTreeOfSites(json)
+                        initAll()
+                    }).catch(function (error) {
+                        console.log('Error while fetching pods', error)
+                    })
+            }
+
+            window.initAll = fetchJsonThenInit
+        })()
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initAll&v=weekly&libraries=marker,places,geometry&loading=async" defer></script>
+    <script>
+        // Format the price above to AUD using the locale, style, and currency.
+        let AUDollar = new Intl.NumberFormat('en-AU', {
+            style: 'currency',
+            currency: 'AUD',
+        });
+        var quotedPricePerHour = @ViewBag.PricePerHour;
+        var quotedPrice = 0;
+        var startTime;
+        var endTime;
+
+        // window.onload = function(){
+        document.querySelector('#StartTime').addEventListener('change', function () {
+            startTime = this.value;
+            console.log(startTime);
+
+            if (endTime != null) {
+                var startDateTime = new Date(startTime);
+                var endDateTime = new Date(endTime);
+                if (endDateTime < startDateTime) {
+                    document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                    document.getElementById("total-cost").innerHTML = "$0.00";
+                    document.getElementById("time-validation").innerHTML = "Start time must be before end time";
+                    document.getElementById("create-button").classList = "text-center d-none";
+                    return;
+                }
+                if (startDateTime < new Date()) {
+                    document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                    document.getElementById("total-cost").innerHTML = "$0.00";
+                    document.getElementById("time-validation").innerHTML = "Start time must be in the future";
+                    document.getElementById("create-button").classList = "text-center d-none";
+                    return;
+                }
+                var diff = Math.abs(new Date(startTime) - new Date(endTime));
+                let minutes = Math.floor((diff / 1000) / 60);
+                quotedPrice = minutes * quotedPricePerHour / 60;
+                console.log("price = " + quotedPrice);
+                if (quotedPrice > 0) {
+                    document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
+                    document.getElementById("time-validation").innerHTML = "";
+                    document.getElementById("total-cost").classList = "fw-bold fs-1";
+                    document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
+                }
+            }
+        });
+
+        document.querySelector('#EndTime').addEventListener('change', function () {
+            endTime = this.value;
+            console.log(endTime);
+
+            if (startTime != null) {
+                var startDateTime = new Date(startTime);
+                var endDateTime = new Date(endTime);
+                if (endDateTime < startDateTime) {
+                    document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                    document.getElementById("total-cost").innerHTML = "$0.00";
+                    document.getElementById("time-validation").innerHTML = "Start time must be before end time";
+                    document.getElementById("create-button").classList = "text-center d-none";
+                    return;
+                }
+                if (startDateTime < new Date()) {
+                    document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
+                    document.getElementById("total-cost").innerHTML = "$0.00";
+                    document.getElementById("time-validation").innerHTML = "Start time must be in the future";
+                    document.getElementById("create-button").classList = "text-center d-none";
+                    return;
+                }
+                var diff = Math.abs(new Date(startTime) - new Date(endTime));
+                let minutes = Math.floor((diff / 1000) / 60);
+                quotedPrice = minutes * quotedPricePerHour / 60;
+                console.log("price = " + quotedPrice);
+                if (quotedPrice > 0) {
+                    document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
+                    document.getElementById("time-validation").innerHTML = "";
+                    document.getElementById("total-cost").classList = "fw-bold fs-1";
+                    document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
+                }
+            }
+        });
+    </script>
 }

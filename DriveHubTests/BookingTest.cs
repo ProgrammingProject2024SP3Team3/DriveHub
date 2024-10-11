@@ -4,6 +4,7 @@ using DriveHubModel;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using Microsoft.EntityFrameworkCore;
 
 namespace DriveHubTests
 {
@@ -308,5 +309,155 @@ namespace DriveHubTests
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        // This test simulates a valid booking edit scenario where the user edits the time and vehicle details.
+        [Fact]
+        public async Task Edit_ValidBooking_ShouldReturnUpdatedView()
+        {
+            // Arrange: Retrieve a valid booking from the database.
+            var booking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync();
+            Assert.NotNull(booking); // Ensure that we have at least one booking.
+
+            // Prepare the DTO for editing the booking with valid data.
+            var editBookingDto = new EditBookingDto
+            {
+                BookingId = booking.BookingId,
+                VehicleId = booking.VehicleId, // Use existing vehicle ID from booking.
+                StartPodId = booking.StartPodId, // Use existing start pod ID.
+                EndPodId = booking.EndPodId, // Use existing end pod ID.
+                StartTime = DateTime.Now.AddHours(1), // Set start time for the edit.
+                EndTime = DateTime.Now.AddHours(2), // Set end time for the edit.
+                QuotedPricePerHour = booking.PricePerHour // Use the existing price per hour.
+            };
+
+            // Act: Call the Edit method on the controller with the booking details.
+            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+
+            // Assert: Check if the result is a ViewResult and if the booking is updated.
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<Booking>(viewResult.Model);
+            Assert.Equal(booking.BookingId, model.BookingId); // Ensure the returned booking ID matches.
+        }
+
+        // This test verifies that attempting to set a start time in the past fails.
+        [Fact]
+        public async Task Edit_ShouldFail_WhenStartTimeIsInThePast()
+        {
+            // Arrange: Retrieve a valid booking from the database.
+            var booking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync();
+            Assert.NotNull(booking); // Ensure that we have at least one booking.
+
+            // Prepare the DTO for editing with an invalid past start time.
+            var editBookingDto = new EditBookingDto
+            {
+                BookingId = booking.BookingId,
+                VehicleId = booking.VehicleId,
+                StartPodId = booking.StartPodId,
+                EndPodId = booking.EndPodId,
+                StartTime = DateTime.Now.AddHours(-1), // Set StartTime in the past.
+                EndTime = DateTime.Now.AddHours(1),
+                QuotedPricePerHour = booking.PricePerHour
+            };
+
+            // Act: Call the Edit method.
+            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+
+            // Assert: Ensure the model state is invalid due to the past start time.
+            Assert.IsType<ViewResult>(result);
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys); // Check for specific validation error.
+        }
+        
+        // This test verifies that if the end time is set before the start time, the edit fails.
+        [Fact]
+        public async Task Edit_ShouldFail_WhenEndTimeIsBeforeStartTime()
+        {
+            // Arrange: Retrieve a valid booking from the database.
+            var booking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync();
+            Assert.NotNull(booking); // Ensure that we have at least one booking.
+
+            // Prepare the DTO for editing with end time before start time.
+            var editBookingDto = new EditBookingDto
+            {
+                BookingId = booking.BookingId,
+                VehicleId = booking.VehicleId,
+                StartPodId = booking.StartPodId,
+                EndPodId = booking.EndPodId,
+                StartTime = DateTime.Now.AddHours(2), // StartTime is after EndTime.
+                EndTime = DateTime.Now.AddHours(1),
+                QuotedPricePerHour = booking.PricePerHour
+            };
+
+            // Act: Call the Edit method.
+            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+
+            // Assert: Ensure the model state is invalid due to the end time being before the start time.
+            Assert.IsType<ViewResult>(result);
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys); // Check for specific validation error.
+        }
+
+        // This test verifies that editing a booking with less than a 30-minute duration fails.
+        [Fact]
+        public async Task Edit_ShouldFail_WhenBookingTimeLessThan30Minutes()
+        {
+            // Arrange: Retrieve a valid booking from the database.
+            var booking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync();
+            Assert.NotNull(booking); // Ensure that we have at least one booking.
+
+            // Prepare the DTO for editing with a booking duration less than 30 minutes.
+            var editBookingDto = new EditBookingDto
+            {
+                BookingId = booking.BookingId,
+                VehicleId = booking.VehicleId,
+                StartPodId = booking.StartPodId,
+                EndPodId = booking.EndPodId,
+                StartTime = DateTime.Now.AddMinutes(10),
+                EndTime = DateTime.Now.AddMinutes(20), // Booking time is less than 30 minutes.
+                QuotedPricePerHour = booking.PricePerHour
+            };
+
+            // Act: Call the Edit method.
+            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+
+            // Assert: Ensure the model state is invalid due to the insufficient booking duration.
+            Assert.IsType<ViewResult>(result);
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("EndTime", bookingTestFixtures.Controller.ModelState.Keys); // Check for specific validation error.
+        }
+
+        // This test verifies that attempting to edit a booking more than 7 days in advance fails.
+        [Fact]
+        public async Task Edit_Should_Fail_When_Booking_Time_Is_Greater_Than_7_Days()
+        {
+            // Arrange: Set up a mock authenticated user
+            var mockUser = bookingTestFixtures.CreateMockUser();
+            bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
+
+            // Arrange: Retrieve an existing booking
+            var booking = await bookingTestFixtures.Context.Bookings.FirstOrDefaultAsync();
+            Assert.NotNull(booking); // Ensure that we have a valid booking
+
+            // Prepare the DTO for editing with a start time greater than 7 days.
+            var editBookingDto = new EditBookingDto
+            {
+                BookingId = booking.BookingId,
+                VehicleId = booking.VehicleId,
+                StartPodId = booking.StartPodId,
+                EndPodId = booking.EndPodId,
+                StartTime = DateTime.Now.AddDays(8), // Start time is more than 7 days in advance
+                EndTime = DateTime.Now.AddDays(8).AddHours(1),
+                QuotedPricePerHour = booking.PricePerHour
+            };
+
+            // Act: Call the Edit method
+            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+
+            // Assert: Ensure the model state is invalid
+            Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
+            Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys);
+            Assert.IsType<ViewResult>(result);
+        }
+
     }
 }
