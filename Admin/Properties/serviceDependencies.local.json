@@ -15,19 +15,11 @@
       "connectionId": "DriveHubDb"
     },
     "mssql1": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/DriveHubDbAdmin_D20E364BAF",
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/DriveHubAdminDb_D20E364BAF",
       "secretStore": "LocalSecretsFile",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubAdminDb",
       "type": "mssql.azure",
-      "connectionId": "DriveHubDbAdmin"
-    },
-    "mssql3": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/ConnectionStringsAdminConnection_AE65BE4340",
-      "secretStore": "LocalSecretsFile",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubAdminDb",
-      "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:AdminConnection",
-      "dynamicId": null
+      "connectionId": "DriveHubAdminDb"
     }
   }
 }
