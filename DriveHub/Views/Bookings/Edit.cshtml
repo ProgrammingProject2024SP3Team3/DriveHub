@@ -26,9 +26,7 @@
             </div>
         </div>
         <div class="col-xs-12 col-lg-4 container-fluid pb-3">
-            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                @ViewBag.VehicleId
-}.jpg" style="max-width:350px;">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg" style="max-width:350px;">
         </div>
     </div>
     <div class="row mb-3">
@@ -53,7 +51,7 @@
     </div>
     <div class="form-group text-center">
         <input type="submit" value="Edit" id="create-button" class="d-none btn btn-primary mb-4 fw-bold text-white fs-4" />
-        <a asp-action="Search" id="cancel-button" class="btn btn-danger mb-4 fw-bold text-white fs-4">Cancel</a>
+        <a asp-action="Index" id="cancel-button" class="btn btn-danger mb-4 fw-bold text-white fs-4">Cancel</a>
     </div>
 </form>
 
@@ -454,4 +452,4 @@
             }
         });
     </script>
-                }
+}

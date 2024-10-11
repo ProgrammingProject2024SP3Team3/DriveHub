@@ -75,9 +75,10 @@ namespace DriveHubModel
 
     public enum BookingStatus
     {
-        Booked,
-        InProgress,
-        Edited,
-        Complete
+        InProgress, // An unpaid booking
+        Booked,     // A paid booking
+        Edited,     // A paid and edited booking
+        Started,    // The car has been picked up
+        Complete    // The car has been returned
     }
 }
