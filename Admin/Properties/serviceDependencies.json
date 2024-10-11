@@ -11,6 +11,11 @@
     "mssql1": {
       "type": "mssql",
       "connectionId": "DriveHubDbAdmin"
+    },
+    "mssql3": {
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:AdminConnection",
+      "dynamicId": null
     }
   }
 }

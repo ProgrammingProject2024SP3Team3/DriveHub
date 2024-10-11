@@ -1,25 +1,47 @@
 using Admin.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var adminString = builder.Configuration.GetConnectionString("DriveHubDbAdmin") ?? throw new InvalidOperationException("Connection string 'AdminConnection' not found.");
-var applicationString = builder.Configuration.GetConnectionString("DriveHubDb") ?? throw new InvalidOperationException("Connection string 'ApplicationConnection' not found.");
+var adminConnection = String.Empty;
+var appConnection = String.Empty;
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+    adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
+    appConnection = builder.Configuration.GetConnectionString("DriveHubDb");
+}
+else
+{
+    adminConnection = Environment.GetEnvironmentVariable("DriveHubAdminDb");
+    appConnection = Environment.GetEnvironmentVariable("DriveHubDb");
+}
 
 builder.Services.AddDbContext<AdminDbContext>(options =>
-    options.UseSqlServer(adminString));
+    options.UseSqlServer(adminConnection));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(applicationString, x => x.UseNetTopologySuite()));
-
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+    options.UseSqlServer(appConnection, x => x.UseNetTopologySuite()));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<AdminDbContext>();
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 builder.Services.AddControllersWithViews();
+
+// Store in session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    // Make the session cookie essential.
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddAzureClients(clientBuilder =>
 {
     clientBuilder.AddBlobServiceClient(builder.Configuration["VehiclePhotos:blob"]!, preferMsi: true);
@@ -41,12 +63,21 @@ else
     app.UseHsts();
 }
 
+// Localise to AU
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en-AU")
+});
+
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
