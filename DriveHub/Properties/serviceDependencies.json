@@ -4,19 +4,13 @@
       "type": "storage",
       "connectionId": "VehiclePhotos"
     },
-    "mssql2": {
-      "type": "mssql",
-      "connectionId": "DriveHubDb",
-      "dynamicId": null
-    },
-    "mssql1": {
-      "type": "mssql",
-      "connectionId": "ConnectionStrings:DefaultConnection",
-      "dynamicId": null
-    },
     "secrets1": {
       "type": "secrets",
       "connectionId": null
+    },
+    "mssql2": {
+      "type": "mssql",
+      "connectionId": "AZURE_SQL_CONNECTIONSTRING"
     }
   }
 }
