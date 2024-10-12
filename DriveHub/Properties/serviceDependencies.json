@@ -4,10 +4,6 @@
       "type": "storage",
       "connectionId": "VehiclePhotos"
     },
-    "secrets1": {
-      "type": "secrets",
-      "connectionId": null
-    },
     "mssql2": {
       "type": "mssql",
       "connectionId": "AZURE_SQL_CONNECTIONSTRING"

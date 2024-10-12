@@ -11,15 +11,21 @@
 
   <!-- Add the necessary test and mocking libraries -->
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.0" />   <!-- For code coverage -->
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" /> <!-- Identity for testing user management -->
+    <PackageReference Include="coverlet.collector" Version="6.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>   <!-- For code coverage -->
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" /> <!-- Identity for testing user management -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />  <!-- ASP.NET Core MVC for testing controllers -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" /> <!-- EF Core for database interactions -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.8" />  <!-- In-memory database for testing -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" /> <!-- .NET SDK for testing -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" /> <!-- EF Core for database interactions -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.10" />  <!-- In-memory database for testing -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" /> <!-- .NET SDK for testing -->
     <PackageReference Include="Moq" Version="4.20.72" />  <!-- Moq for mocking dependencies -->
-    <PackageReference Include="xunit" Version="2.5.3" />  <!-- xUnit test framework -->
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />  <!-- xUnit test runner -->
+    <PackageReference Include="xunit" Version="2.9.2" />  <!-- xUnit test framework -->
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>  <!-- xUnit test runner -->
   </ItemGroup>
 
   <!-- Ensure CSV files in the TestData folder are copied to the output directory -->

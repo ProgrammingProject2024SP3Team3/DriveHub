@@ -1,17 +1,25 @@
 {
   "dependencies": {
-    "secrets1": {
-      "secretStore": null,
-      "resourceId": null,
-      "type": "secrets.user",
-      "connectionId": null
-    },
     "mssql2": {
       "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/AZURE_SQL_CONNECTIONSTRING_E1E2A0CF83",
       "secretStore": "LocalSecretsFile",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubDb",
       "type": "mssql.azure",
       "connectionId": "AZURE_SQL_CONNECTIONSTRING"
+    },
+    "storage1": {
+      "ignored": "true",
+      "type": "storage",
+      "connectionId": "VehiclePhotos"
+    },
+    "secrets1": {
+      "ignored": "true",
+      "type": "secrets.keyVault"
+    },
+    "mssql1": {
+      "ignored": "true",
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:DefaultConnection"
     }
   }
 }
