@@ -29,7 +29,7 @@ else
     KeyVaultSecret driveHubAdminDbsecret = await client.GetSecretAsync("DriveHubAdminDb");
 
     appConnection = driveHubDbsecret.Value;
-    adminConnection = driveHubDbsecret.Value;
+    adminConnection = driveHubAdminDbsecret.Value;
 }
 
 // Configure logging

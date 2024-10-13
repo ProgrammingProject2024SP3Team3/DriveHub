@@ -15,19 +15,19 @@
       "connectionId": "vehiclephotos",
       "dynamicId": null
     },
-    "mssql1": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/ConnectionStringsDriveHubDb_7C04B09F15",
-      "secretStore": "AzureKeyVault",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubDb",
-      "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:DriveHubDb"
-    },
     "mssql2": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/ConnectionStringsDriveHubAdminDb_CAD14D4176",
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/DriveHubAdminDb_0E9DB4C3D6",
       "secretStore": "AzureKeyVault",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubAdminDb",
       "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:DriveHubAdminDb"
+      "connectionId": "DriveHubAdminDb"
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/DriveHubDb_A298B071EB",
+      "secretStore": "AzureKeyVault",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubDb",
+      "type": "mssql.azure",
+      "connectionId": "DriveHubDb"
     }
   }
 }
