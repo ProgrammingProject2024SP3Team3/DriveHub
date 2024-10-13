@@ -1,16 +1,10 @@
-using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using DriveHub.Data;
 using DriveHub.SeedData;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 

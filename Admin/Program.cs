@@ -4,26 +4,38 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var adminConnection = String.Empty;
 var appConnection = String.Empty;
+var adminConnection = String.Empty;
+
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-    adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
     appConnection = builder.Configuration.GetConnectionString("DriveHubDb");
+    adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
 }
 else
 {
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
-    //adminConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
-    //appConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
-    adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
-    appConnection = builder.Configuration.GetConnectionString("DriveHubDb");
+    // Set up Key Vault client
+    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+    builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+
+    var client = new SecretClient(keyVaultEndpoint, new DefaultAzureCredential());
+    KeyVaultSecret driveHubDbsecret = await client.GetSecretAsync("DriveHubDb");
+    KeyVaultSecret driveHubAdminDbsecret = await client.GetSecretAsync("DriveHubAdminDb");
+
+    appConnection = driveHubDbsecret.Value;
+    adminConnection = driveHubDbsecret.Value;
 }
+
+// Configure logging
+var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Retrieved admin connection string: {ConnectionString}", adminConnection);
+logger.LogInformation("Retrieved app connection string: {ConnectionString}", appConnection);
 
 builder.Services.AddDbContext<AdminDbContext>(options =>
     options.UseSqlServer(adminConnection));
