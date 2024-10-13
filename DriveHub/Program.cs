@@ -1,4 +1,3 @@
-using Azure.Identity;
 using DriveHub.Data;
 using DriveHub.SeedData;
 using Microsoft.AspNetCore.Identity;
@@ -17,19 +16,18 @@ if (builder.Environment.IsDevelopment())
 else
 {
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
-    //connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-    //connection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubDb");
     connection = builder.Configuration.GetConnectionString("DriveHubDb");
 }
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connection, x => x.UseNetTopologySuite()));
+// Configure logging.
+var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Retrieved connection string: {ConnectionString}", connection);
 
+// Continue your setup...
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection, x => x.UseNetTopologySuite()));
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
-
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
 builder.Services.AddControllersWithViews();
 
 // Store in session
@@ -46,7 +44,6 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
-
     // Populate database with seed data
     using (var scope = app.Services.CreateScope())
     {
@@ -57,7 +54,7 @@ if (app.Environment.IsDevelopment())
         }
         catch (Exception ex)
         {
-            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error has occurred while seeding the database.");
         }
     }
@@ -65,10 +62,8 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 app.Use(async (context, next) =>
 {
     await next();
@@ -84,20 +79,13 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("en-AU")
 });
-
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.UseSession();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
-
 app.Run();
