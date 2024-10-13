@@ -16,7 +16,7 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    //builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
     //connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
     connection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubDb");
 }

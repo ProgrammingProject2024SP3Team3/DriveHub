@@ -18,6 +18,7 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
     adminConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
     appConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
 }
