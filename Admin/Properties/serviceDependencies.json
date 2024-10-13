@@ -1,21 +1,22 @@
 {
   "dependencies": {
-    "storage1": {
-      "type": "storage",
-      "connectionId": "VehiclePhotos"
-    },
     "secrets1": {
       "type": "secrets",
       "connectionId": "VaultUri",
       "dynamicId": null
     },
-    "mssql2": {
-      "type": "mssql",
-      "connectionId": "DriveHubDb"
+    "storage1": {
+      "type": "storage",
+      "connectionId": "vehiclephotos",
+      "dynamicId": null
     },
     "mssql1": {
       "type": "mssql",
-      "connectionId": "DriveHubAdminDb"
+      "connectionId": "ConnectionStrings:DriveHubDb"
+    },
+    "mssql2": {
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:DriveHubAdminDb"
     }
   }
 }

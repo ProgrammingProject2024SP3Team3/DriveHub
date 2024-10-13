@@ -4,7 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<UserSecretsId>aspnet-DriveHub-946f6595-661c-49df-ad42-a0a826f8fbd8</UserSecretsId>
+		<UserSecretsId>aspnet-DriveHub-aaf180ad-a28e-458a-b6a7-3a0dd656901b</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,8 +24,8 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Abstractions" Version="8.0.10" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="8.0.10" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.6" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
@@ -33,34 +33,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\DriveHubModel\DriveHubModel.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Update="wwwroot\favicon.ico">
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Data\SeedData\Pods.csv">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="Data\SeedData\Sites.csv">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="Data\SeedData\VehicleRates.csv">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="Data\SeedData\Vehicles.csv">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Migrations\" />
-		<Folder Include="Properties\ServiceDependencies\local\" />
+	  <ProjectReference Include="..\DriveHubModel\DriveHubModel.csproj" />
 	</ItemGroup>
 
 </Project>

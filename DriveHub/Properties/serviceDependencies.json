@@ -1,16 +1,12 @@
 {
   "dependencies": {
-    "storage1": {
-      "type": "storage",
-      "connectionId": "VehiclePhotos"
-    },
-    "mssql2": {
-      "type": "mssql",
-      "connectionId": "AZURE_SQL_CONNECTIONSTRING"
-    },
     "secrets1": {
       "type": "secrets",
       "connectionId": "VaultUri"
+    },
+    "mssql1": {
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:DriveHubDb"
     }
   }
 }

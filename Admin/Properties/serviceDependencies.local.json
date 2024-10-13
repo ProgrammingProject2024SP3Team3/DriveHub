@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "storage1": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/VehiclePhotos_4BC7847D9D",
-      "secretStore": "LocalSecretsFile",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/drivehubstorage",
-      "type": "storage.azure",
-      "connectionId": "VehiclePhotos"
-    },
     "secrets1": {
       "secretStore": null,
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.KeyVault/vaults/DriveHubKeyVault",
@@ -14,19 +7,27 @@
       "connectionId": "VaultUri",
       "dynamicId": null
     },
-    "mssql2": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/DriveHubDb_A298B071EB",
+    "storage1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/vehiclephotos_BAFF1DC7FD",
+      "secretStore": "AzureKeyVault",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/drivehubstorage",
+      "type": "storage.azure",
+      "connectionId": "vehiclephotos",
+      "dynamicId": null
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/ConnectionStringsDriveHubDb_7C04B09F15",
       "secretStore": "AzureKeyVault",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubDb",
       "type": "mssql.azure",
-      "connectionId": "DriveHubDb"
+      "connectionId": "ConnectionStrings:DriveHubDb"
     },
-    "mssql1": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/DriveHubAdminDb_0E9DB4C3D6",
+    "mssql2": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/ConnectionStringsDriveHubAdminDb_CAD14D4176",
       "secretStore": "AzureKeyVault",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubAdminDb",
       "type": "mssql.azure",
-      "connectionId": "DriveHubAdminDb"
+      "connectionId": "ConnectionStrings:DriveHubAdminDb"
     }
   }
 }

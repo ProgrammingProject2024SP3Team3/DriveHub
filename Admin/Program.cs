@@ -22,7 +22,7 @@ if (builder.Environment.IsDevelopment())
 else
 {
     adminConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
-    appConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubDb");
+    appConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
 }
 
 builder.Services.AddDbContext<AdminDbContext>(options =>

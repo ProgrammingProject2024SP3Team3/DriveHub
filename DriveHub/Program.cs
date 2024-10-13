@@ -14,14 +14,14 @@ builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new VisualStudioCredent
 var connection = String.Empty;
 if (builder.Environment.IsDevelopment())
 {
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
     connection = builder.Configuration.GetConnectionString("DriveHubDb");
 }
 else
 {
     //builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
     //connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-    connection = Environment.GetEnvironmentVariable("ConnectionStrings:AZURE_SQL_CONNECTIONSTRING");
+    connection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubDb");
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
