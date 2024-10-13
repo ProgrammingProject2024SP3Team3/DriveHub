@@ -1,3 +1,4 @@
+using Azure.Identity;
 using DriveHub.Data;
 using DriveHub.SeedData;
 using Microsoft.AspNetCore.Identity;
@@ -5,6 +6,9 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new VisualStudioCredential());
 
 // Add services to the container.
 var connection = String.Empty;
@@ -17,7 +21,7 @@ else
 {
     //builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
     //connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-    connection = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_AZURE_SQL_CONNECTIONSTRING ");
+    connection = Environment.GetEnvironmentVariable("ConnectionStrings:AZURE_SQL_CONNECTIONSTRING");
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
