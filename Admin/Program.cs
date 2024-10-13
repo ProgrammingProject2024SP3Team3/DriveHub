@@ -21,8 +21,8 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    adminConnection = Environment.GetEnvironmentVariable("DriveHubAdminDb");
-    appConnection = Environment.GetEnvironmentVariable("DriveHubDb");
+    adminConnection = Environment.GetEnvironmentVariable("AZURE_SQL_SQL_1F661_CONNECTIONSTRING");
+    appConnection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
 }
 
 builder.Services.AddDbContext<AdminDbContext>(options =>
