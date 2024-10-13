@@ -1,13 +1,22 @@
+using Azure;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using DriveHub.Data;
 using DriveHub.SeedData;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connection = String.Empty;
+
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
@@ -15,16 +24,23 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
-    connection = builder.Configuration.GetConnectionString("DriveHubDb");
+    // Set up Key Vault client
+    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+    builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+
+    var client = new SecretClient(keyVaultEndpoint, new DefaultAzureCredential());
+    KeyVaultSecret secret = await client.GetSecretAsync("DriveHubDb");
+
+    connection = secret.Value;
 }
 
-// Configure logging.
+// Configure logging
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
 logger.LogInformation("Retrieved connection string: {ConnectionString}", connection);
 
 // Continue your setup...
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection, x => x.UseNetTopologySuite()));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connection, x => x.UseNetTopologySuite()));
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -64,6 +80,7 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
 app.Use(async (context, next) =>
 {
     await next();
