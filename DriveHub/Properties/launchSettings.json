@@ -16,7 +16,7 @@
       "applicationUrl": "http://localhost:5291",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://drivehubvault.vault.azure.net/",
+        "VaultUri": "https://drivehubkeyvault.vault.azure.net/",
         "AZURE_USERNAME": "S3863018@student.rmit.edu.au"
       }
     },
@@ -27,7 +27,7 @@
       "applicationUrl": "https://localhost:7087;http://localhost:5291",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://drivehubvault.vault.azure.net/",
+        "VaultUri": "https://drivehubkeyvault.vault.azure.net/",
         "AZURE_USERNAME": "S3863018@student.rmit.edu.au"
       }
     },
@@ -36,7 +36,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://drivehubvault.vault.azure.net/",
+        "VaultUri": "https://drivehubkeyvault.vault.azure.net/",
         "AZURE_USERNAME": "S3863018@student.rmit.edu.au"
       }
     }

@@ -7,6 +7,10 @@
     "mssql2": {
       "type": "mssql",
       "connectionId": "AZURE_SQL_CONNECTIONSTRING"
+    },
+    "secrets1": {
+      "type": "secrets",
+      "connectionId": "VaultUri"
     }
   }
 }

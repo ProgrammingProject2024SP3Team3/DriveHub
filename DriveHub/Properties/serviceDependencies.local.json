@@ -13,13 +13,10 @@
       "connectionId": "VehiclePhotos"
     },
     "secrets1": {
-      "ignored": "true",
-      "type": "secrets.keyVault"
-    },
-    "mssql1": {
-      "ignored": "true",
-      "type": "mssql",
-      "connectionId": "ConnectionStrings:DefaultConnection"
+      "secretStore": null,
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.KeyVault/vaults/DriveHubKeyVault",
+      "type": "secrets.keyVault",
+      "connectionId": "VaultUri"
     }
   }
 }
