@@ -19,8 +19,10 @@ if (builder.Environment.IsDevelopment())
 else
 {
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
-    adminConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
-    appConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
+    //adminConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
+    //appConnection = Environment.GetEnvironmentVariable("ConnectionStrings:DriveHubAdminDb");
+    adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
+    appConnection = builder.Configuration.GetConnectionString("DriveHubDb");
 }
 
 builder.Services.AddDbContext<AdminDbContext>(options =>
