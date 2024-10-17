@@ -70,23 +70,21 @@ namespace DriveHub.Controllers
         /// <returns>A view showing in-progress bookings</returns>
         public async Task<IActionResult> CurrentBookings()
         {
-            var bookings = await _context.Bookings
+            var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.EndTime > DateTime.Now)
+                .Where(c => c.ReservationExpires > DateTime.Now.AddMinutes(10))
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
-                .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
-            if (!bookings.Any())
+            if (booking == null)
             {
                 _logger.LogInformation("CurrentBookings: No active bookings found for the user.");
-                ViewBag.Message = "You have no current bookings.";
+                ViewBag.Message = "You have no current reservations.";
             }
 
-            return View(bookings);
+            return View(booking);
         }
 
         public async Task<IActionResult> PastBookings()
