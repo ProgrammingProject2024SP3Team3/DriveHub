@@ -103,6 +103,15 @@ namespace DriveHub.Data
                 .HasConversion(
                     v => v.ToString(),
                     v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
+
+            modelBuilder
+                .Entity<Booking>()
+                .HasOne(c => c.Receipt)
+                .WithOne(c => c.Booking);
+
+            modelBuilder.Entity<Receipt>()
+                .Property(c => c.Amount)
+                .HasColumnType("Money");
         }
     }
 }

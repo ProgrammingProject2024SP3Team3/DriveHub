@@ -17,6 +17,9 @@ using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
+    /// <summary>
+    /// Describes the current price per hour by vehicle category
+    /// </summary>
     [DisplayName("Price Category")]
     public class VehicleRate
     {
@@ -38,7 +41,7 @@ namespace DriveHubModel
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VehicleRateId { get; set; }
+        public string VehicleRateId { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
         public string Description { get; set; }

@@ -22,7 +22,11 @@ namespace DriveHub.Controllers
         public async Task<ActionResult<IEnumerable<PodApiDto>>> GetPods()
         {
             var dtos = new List<PodApiDto>();
-            var pods = await _context.Pods.Include(c => c.Site).Include(c => c.Vehicle).Include(c => c.Vehicle.VehicleRate).ToListAsync();
+            var pods = await _context.Pods
+                .Include(c => c.Site)
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .ToListAsync();
 
             foreach (var pod in pods)
             {
@@ -36,7 +40,12 @@ namespace DriveHub.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PodApiDto>> GetPod(string id)
         {
-            var pod = await _context.Pods.Where(c => c.PodId == id).Include(c => c.Site).Include(c => c.Vehicle).Include(c => c.Vehicle.VehicleRate).FirstOrDefaultAsync();
+            var pod = await _context.Pods
+                .Where(c => c.PodId == id)
+                .Include(c => c.Site)
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .FirstOrDefaultAsync();
 
             if (pod == null)
             {

@@ -2,11 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using DriveHub.Data;
 using DriveHubModel;
+using DriveHub.Models;
 using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DriveHub.Models.Dto;
 using Microsoft.AspNetCore.Identity;
+using System.Dynamic;
 
 namespace DriveHub.Controllers
 {
@@ -175,64 +177,22 @@ namespace DriveHub.Controllers
         // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BookingDto bookingDto)
+        public async Task<IActionResult> Create(ReservationDto reservationDto)
         {
-            _logger.LogInformation($"Received POST to make a booking");
-            _logger.LogInformation(bookingDto.ToString());
+            _logger.LogInformation($"Received POST to make a reservation");
+            _logger.LogInformation(reservationDto.ToString());
 
-            // Check if booking duration is less than 30 mins
-            var diff = bookingDto.EndTime - bookingDto.StartTime;
-            if (diff.TotalMinutes < 30)
-            {
-                _logger.LogWarning($"The minimum booking duration is 30 mins {bookingDto.StartTime} {bookingDto.EndTime}");
-                ModelState.AddModelError("EndTime", "The minimum booking duration is 30 mins");
-            }
-
-            // Check if booking is within one week from today
-            if (bookingDto.StartTime > DateTime.Now.AddDays(7))
-            {
-                _logger.LogWarning($"Bookings cannot be made more than one week in advance. {bookingDto.StartTime}");
-                ModelState.AddModelError("StartTime", "Bookings cannot be made more than one week in advance.");
-            }
-
-            // Check if start time is in the past
-            if (bookingDto.StartTime < DateTime.Now)
-            {
-                _logger.LogWarning($"Start time must be in the future. {bookingDto.StartTime}");
-                ModelState.AddModelError("StartTime", "Start time must be in the future.");
-            }
-
-            // Check if start time is after end time
-            if (bookingDto.StartTime > bookingDto.EndTime)
-            {
-                _logger.LogWarning($"Start time is after end time {bookingDto.StartTime} {bookingDto.EndTime}");
-                ModelState.AddModelError("StartTime", "Start time must be before end time");
-            }
-
-            // Custom logic to check for overlapping bookings in the database
-            //var conflictingBookings = _context.Bookings
-            //    .Where(b => b.VehicleId == bookingDto.VehicleId &&
-            //                ((b.StartTime <= bookingDto.EndTime && b.StartTime >= bookingDto.StartTime) ||
-            //                 (b.EndTime <= bookingDto.EndTime && b.EndTime >= bookingDto.StartTime)))
-            //    .Any();
-
-            //if (conflictingBookings)
-            //{
-            //    _logger.LogWarning($"The selected vehicle is already booked during this time range. {bookingDto.VehicleId}");
-            //    ModelState.AddModelError("VehicleId", "The selected vehicle is already booked during this time range.");
-            //}
-
-            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == bookingDto.VehicleId);
-            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
+            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == reservationDto.VehicleId);
+            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == reservationDto.StartPodId);
 
             // Prevent users from posting illegal data combinations
             if (vehicle == null ||
                 startPod == null ||
-                vehicle?.VehicleRate.PricePerHour != bookingDto.QuotedPricePerHour ||
+                vehicle?.VehicleRate.PricePerHour != reservationDto.QuotedPricePerHour ||
                 startPod.VehicleId != vehicle?.VehicleId
                 )
             {
-                _logger.LogError($"User has posted illegal data {bookingDto}");
+                _logger.LogError($"User has posted illegal data {reservationDto}");
                 return RedirectToAction(nameof(Error));
             }
 
@@ -247,15 +207,12 @@ namespace DriveHub.Controllers
             {
                 _logger.LogInformation($"Booking is valid");
                 Booking booking = new Booking();
-                booking.BookingId = Guid.NewGuid().ToString();
-                booking.VehicleId = bookingDto.VehicleId;
+                booking.BookingId = reservationDto.BookingId;
+                booking.VehicleId = reservationDto.VehicleId;
                 booking.Id = userId;
-                booking.StartPodId = bookingDto.StartPodId;
-                booking.EndPodId = bookingDto.EndPodId;
-                booking.StartTime = bookingDto.StartTime;
-                booking.EndTime = bookingDto.EndTime;
+                booking.StartPodId = reservationDto.StartPodId;
                 booking.PricePerHour = vehicle.VehicleRate.PricePerHour;
-                booking.BookingStatus = BookingStatus.Booked;
+                booking.BookingStatus = BookingStatus.Reserved;
                 _context.Add(booking);
                 _logger.LogInformation($"Added Booking OK");
 
@@ -270,7 +227,7 @@ namespace DriveHub.Controllers
             }
 
             // -- Return a page with data and errors if the model is not valid --
-            _logger.LogError($"There was an error with booking {bookingDto.ToString()}");
+            _logger.LogError($"There was an error with booking {reservationDto.ToString()}");
 
             // Get start pod and empty pods
             var emptyPods = new List<PodVM>();
@@ -299,7 +256,7 @@ namespace DriveHub.Controllers
             ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
             ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
 
-            return View(bookingDto);
+            return View(reservationDto);
         }
 
         // GET: Bookings/Edit/5
@@ -337,13 +294,10 @@ namespace DriveHub.Controllers
             }
 
             // Create data object
-            var editBookingDto = new EditBookingDto();
+            var editBookingDto = new ReservationDto();
             editBookingDto.BookingId = booking.BookingId;
             editBookingDto.VehicleId = booking.VehicleId;
             editBookingDto.StartPodId = booking.StartPodId;
-            editBookingDto.EndPodId = booking.EndPodId;
-            editBookingDto.StartTime = booking.StartTime;
-            editBookingDto.EndTime = booking.EndTime;
             editBookingDto.QuotedPricePerHour = booking.PricePerHour;
 
             ViewBag.BookingId = booking.BookingId;
@@ -363,9 +317,9 @@ namespace DriveHub.Controllers
         // POST: Bookings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, EditBookingDto editBookingDto)
+        public async Task<IActionResult> Edit(string id, ReservationDto bookingDto)
         {
-            if (id != editBookingDto.BookingId)
+            if (id != bookingDto.BookingId)
             {
                 return NotFound();
             }
@@ -379,41 +333,9 @@ namespace DriveHub.Controllers
             var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == booking.VehicleId);
             var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == booking.StartPodId);
 
-            // Check if booking duration is less than 30 mins
-            var diff = editBookingDto.EndTime - editBookingDto.StartTime;
-            if (diff.TotalMinutes < 30)
-            {
-                _logger.LogWarning($"The minimum booking duration is 30 mins {editBookingDto.StartTime} {editBookingDto.EndTime}");
-                ModelState.AddModelError("EndTime", "The minimum booking duration is 30 mins");
-            }
-
-            // Check if booking is within one week from today
-            if (editBookingDto.StartTime > DateTime.Now.AddDays(7))
-            {
-                _logger.LogWarning($"Bookings cannot be made more than one week in advance. {editBookingDto.StartTime}");
-                ModelState.AddModelError("StartTime", "Bookings cannot be made more than one week in advance.");
-            }
-
-            // Check if start time is in the past
-            if (editBookingDto.StartTime < DateTime.Now)
-            {
-                _logger.LogWarning($"Start time must be in the future. {editBookingDto.StartTime}");
-                ModelState.AddModelError("StartTime", "Start time must be in the future.");
-            }
-
-            // Check if start time is after end time
-            if (editBookingDto.StartTime > editBookingDto.EndTime)
-            {
-                _logger.LogWarning($"Start time is after end time {editBookingDto.StartTime} {editBookingDto.EndTime}");
-                ModelState.AddModelError("StartTime", "Start time must be before end time");
-            }
-
             if (ModelState.IsValid)
             {
-                booking.EndPod = await _context.Pods.FirstOrDefaultAsync(c =>c.PodId == editBookingDto.EndPodId);
-                booking.StartTime = editBookingDto.StartTime;
-                booking.EndTime = editBookingDto.EndTime;
-                booking.BookingStatus = BookingStatus.Edited;
+                booking.BookingStatus = BookingStatus.Reserved;
                 _context.Update(booking);
                 await _context.SaveChangesAsync();
                 return View("Details", booking);
@@ -441,7 +363,7 @@ namespace DriveHub.Controllers
             ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
             ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
 
-            return View(editBookingDto);
+            return View(bookingDto);
         }
 
         // GET: Bookings/Delete/5
@@ -483,6 +405,13 @@ namespace DriveHub.Controllers
         private bool BookingExists(string id)
         {
             return _context.Bookings.Any(e => e.BookingId.ToString() == id);
+        }
+
+        private static decimal BookingPriceCalculator(Vehicle vehicle, DateTime startTime, DateTime endTime)
+        {
+            var diff = endTime - startTime;
+            var price = (decimal)diff.TotalMinutes * vehicle.VehicleRate.PricePerHour / 60m;
+            return price;
         }
     }
 }

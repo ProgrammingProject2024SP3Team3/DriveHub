@@ -17,6 +17,9 @@ using NetTopologySuite.Geometries;
 
 namespace DriveHubModel
 {
+    /// <summary>
+    /// A physical location defined by latitude and longitude
+    /// </summary>
     public class Site
     {
         public Site() { }
@@ -60,9 +63,11 @@ namespace DriveHubModel
 
         public double Longitude { get; set; }
 
-        // NetTopologySuite spatial data
+        /// <summary>
+        /// NetTopologySuite spatial data
+        /// </summary>
         [Required]
-        public Point Location { get; set; }  // Spatial data
+        public Point Location { get; set; }
 
         // One-to-Many relationship: A Site can have many Pods
         [JsonIgnore]

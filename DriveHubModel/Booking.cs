@@ -13,13 +13,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DriveHubModel
 {
     public class Booking
     {
         [Key]
-        public string BookingId { get; set; }
+        public string BookingId { get; set; } = Guid.NewGuid().ToString();
+
+        [DisplayName("Reservation expiry")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}")]
+        public DateTime ReservationExpires { get; set; } = DateTime.Now.AddHours(1);
+
+        public string PaymentId { get; set; } = Guid.NewGuid().ToString();
 
         [ForeignKey("Vehicle")]
         [Required]
@@ -37,48 +44,84 @@ namespace DriveHubModel
 
         [ForeignKey("Pod")]
         [DisplayName("End Pod")]
-        [Required]
-        public string EndPodId { get; set; }
+        public string? EndPodId { get; set; }
 
-        [Required]
-        [DataType(DataType.DateTime, ErrorMessage = "A start time is required")]
+        [DataType(DataType.DateTime)]
         [DisplayName("Start Time")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
-        public DateTime StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
 
-        [Required]
         [DataType(DataType.DateTime)]
         [DisplayName("End Time")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
 
         [Required]
         [DataType(DataType.Currency)]
+        [DisplayName("Price p/h")]
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal PricePerHour { get; set; }
 
+        [MaybeNull]
+        [ForeignKey(nameof(Receipt))]
+        public int? ReceiptId { get; set; } = null!;
+
         [Required]
+        [DisplayName("Booking status")]
         public BookingStatus BookingStatus { get; set; }
 
         [JsonIgnore]
+        [DisplayName("User")]
         public virtual ApplicationUser ApplicationUser { get; set; }
 
         [JsonIgnore]
+        [DisplayName("Start pod")]
         public virtual Pod StartPod { get; set; }
 
         [JsonIgnore]
-        public virtual Pod EndPod { get; set; }
+        [DisplayName("End pod")]
+        public virtual Pod? EndPod { get; set; }
 
         [JsonIgnore]
         public virtual Vehicle Vehicle { get; set; }
+
+        [JsonIgnore]
+        public virtual Receipt? Receipt { get; set; }
     }
 
+    /// <summary>
+    /// Represents the current point in the Booking lifecycle
+    /// </summary>
     public enum BookingStatus
     {
-        InProgress, // An unpaid booking
-        Booked,     // A paid booking
-        Edited,     // A paid and edited booking
-        Started,    // The car has been picked up
-        Complete    // The car has been returned
+        /// <summary>
+        /// A reservation for one hr
+        /// </summary>
+        Reserved,
+
+        /// <summary>
+        /// The vehicle has been picked up
+        /// </summary>
+        Collected,
+
+        /// <summary>
+        /// The trip is complete but unpaid
+        /// </summary>
+        Unpaid,
+
+        /// <summary>
+        /// The trip has been completed and paid
+        /// </summary>
+        Complete,
+
+        /// <summary>
+        /// An expired reservation
+        /// </summary>
+        Expired,
+
+        /// <summary>
+        /// An cancelled reservation
+        /// </summary>
+        Cancelled
     }
 }

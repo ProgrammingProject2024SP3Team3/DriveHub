@@ -61,9 +61,9 @@ namespace DriveHub.SeedData
             }
             context.SaveChanges();
 
-            //context.Database.ExecuteSqlRaw(@"CREATE SPATIAL INDEX IX_Sites_Location 
-            //                               ON [Sites]([Location]) 
-            //                               USING GEOGRAPHY_AUTO_GRID;");
+            context.Database.ExecuteSqlRaw(@"CREATE SPATIAL INDEX IX_Sites_Location 
+                                           ON [Sites]([Location]) 
+                                           USING GEOGRAPHY_AUTO_GRID;");
 
             foreach (var pod in GetPods(logger))
             {
