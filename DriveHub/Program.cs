@@ -1,5 +1,6 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using DriveHub.BackgroundServices;
 using DriveHub.Data;
 using DriveHub.SeedData;
 using Microsoft.AspNetCore.Identity;
@@ -27,6 +28,10 @@ else
 
     connection = secret.Value;
 }
+
+// Add worker service to automatically run in the background.
+builder.Services.AddHostedService<ReservationExpiryService>();
+builder.Services.AddHttpContextAccessor();
 
 // Configure logging
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
