@@ -48,7 +48,7 @@ namespace DriveHub.BackgroundServices
                 reservation.BookingStatus = BookingStatus.Expired;
                 reservation.Vehicle.IsReserved = false;
                 context.Update(reservation);
-                _logger.LogInformation($"Updating booking {reservation.BookingId}");
+                _logger.LogInformation($"Updating booking {reservation.BookingId} for {reservation.VehicleId}");
             }
 
             await context.SaveChangesAsync(cancellationToken);
