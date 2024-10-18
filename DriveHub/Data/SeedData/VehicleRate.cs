@@ -15,7 +15,7 @@ namespace DriveHub.SeedData
 {
     public class VehicleRate
     {
-        public string VehicleRateId { get; set; }
+        public string VehicleRateId { get; set; } = Guid.NewGuid().ToString();
 
         public string Description { get; set; }
 
@@ -23,6 +23,6 @@ namespace DriveHub.SeedData
         public decimal PricePerHour { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime EffectiveDate { get; set; }
+        public DateTime EffectiveDate { get; set; } = DateTime.Now;
     }
 }

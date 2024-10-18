@@ -306,7 +306,7 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour // Use the existing price per hour.
             };
 
-            // Act: Call the ExtendReservation method on the controller with the booking details.
+            // Act: Call the Extend method on the controller with the booking details.
             var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Check if the result is a ViewResult and if the booking is updated.
@@ -332,7 +332,7 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the ExtendReservation method.
+            // Act: Call the Extend method.
             var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the past start time.
@@ -358,7 +358,7 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the ExtendReservation method.
+            // Act: Call the Extend method.
             var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the end time being before the start time.
@@ -384,7 +384,7 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the ExtendReservation method.
+            // Act: Call the Extend method.
             var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the insufficient booking duration.
@@ -414,7 +414,7 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the ExtendReservation method
+            // Act: Call the Extend method
             var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid

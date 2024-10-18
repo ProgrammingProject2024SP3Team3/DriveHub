@@ -14,6 +14,8 @@ namespace DriveHub.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleRate> VehicleRates { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<Receipt> Receipts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -106,8 +108,17 @@ namespace DriveHub.Data
 
             modelBuilder
                 .Entity<Booking>()
+                .HasOne(c => c.Invoice)
+                .WithOne(c => c.Booking);
+
+            modelBuilder
+                .Entity<Booking>()
                 .HasOne(c => c.Receipt)
                 .WithOne(c => c.Booking);
+
+            modelBuilder.Entity<Invoice>()
+                .Property(c => c.Amount)
+                .HasColumnType("Money");
 
             modelBuilder.Entity<Receipt>()
                 .Property(c => c.Amount)

@@ -51,13 +51,14 @@ namespace DriveHub.Controllers
             // Redirect if user has a current reserveration
             var hasReservation = _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.ReservationExpires > DateTime.Now.AddMinutes(10))
+                .Where(c => c.Expires > DateTime.Now.AddMinutes(10))
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Any();
 
             if (hasReservation)
             {
-                return RedirectToAction(nameof(CurrentReservation));
+                ViewBag.Message = "You have a current booking";
+                return RedirectToAction(nameof(Current));
             }
 
             var vehicles = await _context.Vehicles.Where(c => c.IsReserved == false).Include(c => c.VehicleRate).ToListAsync();
@@ -80,13 +81,14 @@ namespace DriveHub.Controllers
 
             var hasReservation = _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.ReservationExpires > DateTime.Now.AddMinutes(10))
+                .Where(c => c.Expires > DateTime.Now.AddMinutes(10))
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Any();
 
             if (hasReservation)
             {
-                return RedirectToAction(nameof(CurrentReservation));
+                ViewBag.Message = "You have a current booking";
+                return RedirectToAction(nameof(Current));
             }
 
             // Get a vehicle with its rate, pod and site
@@ -132,7 +134,8 @@ namespace DriveHub.Controllers
 
             if (hasReservation)
             {
-                return RedirectToAction(nameof(CurrentReservation));
+                ViewBag.Message = "You have a current booking";
+                return RedirectToAction(nameof(Current));
             }
 
             var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == reservationDto.VehicleId);
@@ -192,11 +195,11 @@ namespace DriveHub.Controllers
         /// Displays current (in-progress) bookings for the logged-in user.
         /// </summary>
         /// <returns>A view showing in-progress bookings</returns>
-        public async Task<IActionResult> CurrentReservation()
+        public async Task<IActionResult> Current()
         {
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.ReservationExpires > DateTime.Now.AddMinutes(10))
+                .Where(c => c.Expires > DateTime.Now.AddMinutes(10))
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Include(c => c.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
@@ -206,7 +209,8 @@ namespace DriveHub.Controllers
 
             if (booking == null)
             {
-                _logger.LogInformation("CurrentReservation: No active reservation found for the user.");
+                _logger.LogInformation("Current: No active reservation found for the user.");
+                ViewBag.Message = "You have no current booking";
                 return RedirectToAction(nameof(Search));
             }
 
@@ -217,34 +221,34 @@ namespace DriveHub.Controllers
         /// Displays current (in-progress) bookings for the logged-in user.
         /// </summary>
         /// <returns>A view showing in-progress bookings</returns>
-        public async Task<IActionResult> ExtendReservation(string id)
+        public async Task<IActionResult> Extend(string id)
         {
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.ReservationExpires > DateTime.Now)
+                .Where(c => c.Expires > DateTime.Now)
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .FirstOrDefaultAsync();
 
             if (booking == null)
             {
-                _logger.LogInformation("CurrentReservation: No active reservation found for the user.");
+                _logger.LogInformation("Current: No active reservation found for the user.");
                 return View(nameof(Error));
             }
 
-            booking.ReservationExpires = booking.ReservationExpires.AddMinutes(30);
+            booking.Expires = booking.Expires.AddMinutes(30);
             booking.IsExtended = true;
 
             _context.Update(booking);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(CurrentReservation));
+            return RedirectToAction(nameof(Current));
         }
 
-        public async Task<IActionResult> PastBookings()
+        public async Task<IActionResult> Past()
         {
             var bookings = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Where(c => c.BookingStatus != BookingStatus.Reserved)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
@@ -278,7 +282,7 @@ namespace DriveHub.Controllers
         }
 
         // GET: Bookings/Delete/5
-        public async Task<IActionResult> CancelReservation(string id)
+        public async Task<IActionResult> Cancel(string id)
         {
             if (id == null)
             {
@@ -304,7 +308,7 @@ namespace DriveHub.Controllers
 
             _context.Update(booking);
             _context.Update(vehicle);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return View("Index");
         }

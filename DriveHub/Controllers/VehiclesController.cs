@@ -43,7 +43,7 @@ namespace DriveHub.Controllers
 
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.ReservationExpires < DateTime.Now)
+                .Where(c => c.Expires < DateTime.Now)
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .FirstOrDefaultAsync(c => c.VehicleId == id);
 

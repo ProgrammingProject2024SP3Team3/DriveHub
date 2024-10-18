@@ -39,7 +39,7 @@ namespace DriveHubModel
 
         [DisplayName("Reservation expiry")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}")]
-        public DateTime ReservationExpires { get; set; } = DateTime.Now.AddHours(1);
+        public DateTime Expires { get; set; } = DateTime.Now.AddHours(1);
 
         public bool IsExtended { get; set; } = false;
 
@@ -80,8 +80,12 @@ namespace DriveHubModel
         public decimal PricePerHour { get; set; }
 
         [MaybeNull]
+        [ForeignKey(nameof(Invoice))]
+        public int? InvoiceNumber { get; set; } = null!;
+
+        [MaybeNull]
         [ForeignKey(nameof(Receipt))]
-        public int? ReceiptId { get; set; } = null!;
+        public int? ReceiptNumber { get; set; } = null!;
 
         [Required]
         [DisplayName("Booking status")]
@@ -101,6 +105,9 @@ namespace DriveHubModel
 
         [JsonIgnore]
         public virtual Vehicle Vehicle { get; set; }
+
+        [JsonIgnore]
+        public virtual Invoice? Invoice { get; set; } = null;
 
         [JsonIgnore]
         public virtual Receipt? Receipt { get; set; } = null;

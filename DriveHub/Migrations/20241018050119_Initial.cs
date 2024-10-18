@@ -53,7 +53,21 @@ namespace DriveHub.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Receipt",
+                name: "Invoices",
+                columns: table => new
+                {
+                    InvoiceNumber = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Amount = table.Column<decimal>(type: "Money", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoices", x => x.InvoiceNumber);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Receipts",
                 columns: table => new
                 {
                     ReceiptNumber = table.Column<int>(type: "int", nullable: false)
@@ -63,7 +77,7 @@ namespace DriveHub.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Receipt", x => x.ReceiptNumber);
+                    table.PrimaryKey("PK_Receipts", x => x.ReceiptNumber);
                 });
 
             migrationBuilder.CreateTable(
@@ -262,7 +276,7 @@ namespace DriveHub.Migrations
                 columns: table => new
                 {
                     BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ReservationExpires = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Expires = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsExtended = table.Column<bool>(type: "bit", nullable: false),
                     PaymentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -272,7 +286,8 @@ namespace DriveHub.Migrations
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
-                    ReceiptId = table.Column<int>(type: "int", nullable: true),
+                    InvoiceNumber = table.Column<int>(type: "int", nullable: true),
+                    ReceiptNumber = table.Column<int>(type: "int", nullable: true),
                     BookingStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -285,6 +300,11 @@ namespace DriveHub.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Bookings_Invoices_InvoiceNumber",
+                        column: x => x.InvoiceNumber,
+                        principalTable: "Invoices",
+                        principalColumn: "InvoiceNumber");
+                    table.ForeignKey(
                         name: "FK_Bookings_Pods_EndPodId",
                         column: x => x.EndPodId,
                         principalTable: "Pods",
@@ -295,9 +315,9 @@ namespace DriveHub.Migrations
                         principalTable: "Pods",
                         principalColumn: "PodId");
                     table.ForeignKey(
-                        name: "FK_Bookings_Receipt_ReceiptId",
-                        column: x => x.ReceiptId,
-                        principalTable: "Receipt",
+                        name: "FK_Bookings_Receipts_ReceiptNumber",
+                        column: x => x.ReceiptNumber,
+                        principalTable: "Receipts",
                         principalColumn: "ReceiptNumber");
                     table.ForeignKey(
                         name: "FK_Bookings_Vehicles_VehicleId",
@@ -356,11 +376,18 @@ namespace DriveHub.Migrations
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_ReceiptId",
+                name: "IX_Bookings_InvoiceNumber",
                 table: "Bookings",
-                column: "ReceiptId",
+                column: "InvoiceNumber",
                 unique: true,
-                filter: "[ReceiptId] IS NOT NULL");
+                filter: "[InvoiceNumber] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_ReceiptNumber",
+                table: "Bookings",
+                column: "ReceiptNumber",
+                unique: true,
+                filter: "[ReceiptNumber] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_StartPodId",
@@ -418,10 +445,13 @@ namespace DriveHub.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Invoices");
+
+            migrationBuilder.DropTable(
                 name: "Pods");
 
             migrationBuilder.DropTable(
-                name: "Receipt");
+                name: "Receipts");
 
             migrationBuilder.DropTable(
                 name: "Sites");
