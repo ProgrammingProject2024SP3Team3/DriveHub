@@ -199,7 +199,6 @@ namespace DriveHub.Controllers
         {
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.Expires > DateTime.Now.AddMinutes(10))
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Include(c => c.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
@@ -209,8 +208,31 @@ namespace DriveHub.Controllers
 
             if (booking == null)
             {
+                booking = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.BookingStatus == BookingStatus.Collected)
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .FirstOrDefaultAsync();
+            }
+
+            if (booking == null)
+            {
+                booking = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.BookingStatus == BookingStatus.Unpaid)
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .FirstOrDefaultAsync();
+            }
+
+            if (booking == null)
+            {
                 _logger.LogInformation("Current: No active reservation found for the user.");
-                ViewBag.Message = "You have no current booking";
                 return RedirectToAction(nameof(Search));
             }
 
@@ -249,6 +271,7 @@ namespace DriveHub.Controllers
             var bookings = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus != BookingStatus.Reserved)
+                .Where(c => c.BookingStatus != BookingStatus.Collected)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
@@ -284,6 +307,25 @@ namespace DriveHub.Controllers
         // GET: Bookings/Delete/5
         public async Task<IActionResult> Cancel(string id)
         {
+            var booking = await _context.Bookings
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.Vehicle)
+                .ThenInclude(d => d.VehicleRate)
+                .Include(c => c.Receipt)
+                .FirstOrDefaultAsync(m => m.BookingId == id);
+
+            return View(booking);
+        }
+
+        // POST: Bookings/Create
+        [HttpPost, ActionName("Cancel")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelConfirmed(string id)
+        {
+            _logger.LogInformation($"CancelConfirmed: Cancelling booking {id}.");
             if (id == null)
             {
                 return NotFound();
@@ -302,27 +344,26 @@ namespace DriveHub.Controllers
                 return NotFound();
             }
 
-            booking.BookingStatus = BookingStatus.Cancelled;
             var vehicle = await _context.Vehicles.FirstOrDefaultAsync(c => c.VehicleId == booking.VehicleId);
+
+            if (vehicle == null)
+            {
+                return View(nameof(Error));
+            }
+
+            booking.BookingStatus = BookingStatus.Cancelled;
             vehicle.IsReserved = false;
 
             _context.Update(booking);
             _context.Update(vehicle);
             await _context.SaveChangesAsync();
 
-            return View("Index");
+            return View(nameof(Index));
         }
 
         private bool BookingExists(string id)
         {
             return _context.Bookings.Any(e => e.BookingId.ToString() == id);
-        }
-
-        private static decimal BookingPriceCalculator(Vehicle vehicle, DateTime startTime, DateTime endTime)
-        {
-            var diff = endTime - startTime;
-            var price = (decimal)diff.TotalMinutes * vehicle.VehicleRate.PricePerHour / 60m;
-            return price;
         }
     }
 }

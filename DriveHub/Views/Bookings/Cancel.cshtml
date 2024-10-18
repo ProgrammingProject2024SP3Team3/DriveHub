@@ -1,7 +1,7 @@
 ﻿@model DriveHubModel.Booking
 @using DriveHubModel
 @{
-    ViewData["Title"] = "Current booking";
+    ViewData["Title"] = "Cancel booking";
 }
 
 <style>
@@ -12,7 +12,7 @@
 
 <h1>@ViewData["Title"]</h1>
 @ViewBag.Message
-<p>Your booking for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
+<p>Do you want to cancel your booking for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model?</p>
 <div class="booking-section mb-3">
     <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:green;">
         @Model.BookingStatus
@@ -41,23 +41,11 @@
         <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
     </div>
     <div class="text-center">
-        @if (Model.IsExtended == false)
-        {
-            <p class="pt-2">Need some extra time or want to cancel your booking?</p>
-            <a asp-action="Extend" asp-route-id="@Model.BookingId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
-                Extend booking for 30mins
-            </a>
-            <a asp-action="Cancel" asp-route-id="@Model.BookingId" class="btn btn-danger mb-4 fw-bold text-white fs-4">
-                Cancel booking
-            </a>
-        }
-        else
-        {
-            <p>Need to cancel your booking?</p>
-            <a asp-action="Cancel" asp-route-id="@Model.BookingId" class="btn btn-danger mb-4 fw-bold text-white fs-4">
-                Cancel booking
-            </a>
-        }
+        <form asp-action="Cancel">
+            <input type="hidden" asp-for="BookingId" />
+            <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
+            <input type="submit" value="Cancel" id="create-button" class="btn btn-danger mb-4 fw-bold text-white fs-4" />
+        </form>
         <hr />
     </div>
 </div>

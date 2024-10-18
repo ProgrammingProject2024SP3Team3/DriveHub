@@ -15,7 +15,7 @@ namespace DriveHub.SeedData
 {
     public class VehicleRate
     {
-        public string VehicleRateId { get; set; } = Guid.NewGuid().ToString();
+        public string VehicleRateId { get; set; }
 
         public string Description { get; set; }
 
