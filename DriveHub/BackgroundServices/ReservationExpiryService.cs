@@ -39,7 +39,7 @@ namespace DriveHub.BackgroundServices
 
             var reservations = await context.Bookings
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
-                .Where(c => c.Expires > DateTime.Now)
+                .Where(c => c.Expires < DateTime.Now)
                 .Include(c => c.Vehicle)
                 .ToListAsync();
 
@@ -48,7 +48,7 @@ namespace DriveHub.BackgroundServices
                 reservation.BookingStatus = BookingStatus.Expired;
                 reservation.Vehicle.IsReserved = false;
                 context.Update(reservation);
-                _logger.LogInformation($"Updating booking {reservation.BookingId}");
+                _logger.LogInformation($"Updating booking {reservation.BookingId} for {reservation.VehicleId}");
             }
 
             await context.SaveChangesAsync(cancellationToken);
