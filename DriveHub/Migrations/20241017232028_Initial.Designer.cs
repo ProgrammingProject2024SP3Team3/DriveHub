@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace DriveHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241017042333_Initial")]
+    [Migration("20241017232028_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -44,6 +44,9 @@ namespace DriveHub.Migrations
                     b.Property<string>("Id")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsExtended")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PaymentId")
                         .IsRequired()
@@ -179,6 +182,9 @@ namespace DriveHub.Migrations
                     b.Property<string>("Colour")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsReserved")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Make")
                         .IsRequired()

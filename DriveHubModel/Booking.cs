@@ -19,6 +19,21 @@ namespace DriveHubModel
 {
     public class Booking
     {
+        public Booking() { }
+
+        public Booking(
+            string id,
+            string vehicleId,
+            string startPodId,
+            decimal pricePerHour
+            )
+        {
+            Id = id;
+            VehicleId = vehicleId;
+            StartPodId = startPodId;
+            PricePerHour = pricePerHour;
+        }
+
         [Key]
         public string BookingId { get; set; } = Guid.NewGuid().ToString();
 
@@ -26,23 +41,25 @@ namespace DriveHubModel
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}")]
         public DateTime ReservationExpires { get; set; } = DateTime.Now.AddHours(1);
 
+        public bool IsExtended { get; set; } = false;
+
         public string PaymentId { get; set; } = Guid.NewGuid().ToString();
 
-        [ForeignKey("Vehicle")]
+        [ForeignKey(nameof(Vehicle))]
         [Required]
         public string VehicleId { get; set; }
 
-        [ForeignKey("ApplicationUser")]
+        [ForeignKey(nameof(ApplicationUser))]
         [DisplayName("User Id")]
         [Required]
         public string Id { get; set; }
 
-        [ForeignKey("Pod")]
+        [ForeignKey(nameof(Pod))]
         [DisplayName("Start Pod")]
         [Required]
         public string StartPodId { get; set; }
 
-        [ForeignKey("Pod")]
+        [ForeignKey(nameof(Pod))]
         [DisplayName("End Pod")]
         public string? EndPodId { get; set; }
 
@@ -68,7 +85,7 @@ namespace DriveHubModel
 
         [Required]
         [DisplayName("Booking status")]
-        public BookingStatus BookingStatus { get; set; }
+        public BookingStatus BookingStatus { get; set; } = BookingStatus.Reserved;
 
         [JsonIgnore]
         [DisplayName("User")]
@@ -80,13 +97,13 @@ namespace DriveHubModel
 
         [JsonIgnore]
         [DisplayName("End pod")]
-        public virtual Pod? EndPod { get; set; }
+        public virtual Pod? EndPod { get; set; } = null;
 
         [JsonIgnore]
         public virtual Vehicle Vehicle { get; set; }
 
         [JsonIgnore]
-        public virtual Receipt? Receipt { get; set; }
+        public virtual Receipt? Receipt { get; set; } = null;
     }
 
     /// <summary>

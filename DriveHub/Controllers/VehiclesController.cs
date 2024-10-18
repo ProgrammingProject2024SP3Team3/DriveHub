@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using DriveHub.Data;
 using Microsoft.AspNetCore.Identity;
+using DriveHubModel;
 
 namespace DriveHub.Controllers
 {
@@ -31,6 +32,7 @@ namespace DriveHub.Controllers
             }
 
             var vehicle = await _context.Vehicles
+                .Where(c => c.IsReserved == true)
                 .Include(v => v.VehicleRate)
                 .FirstOrDefaultAsync(m => m.VehicleId == id);
 
@@ -39,13 +41,16 @@ namespace DriveHub.Controllers
                 return NotFound();
             }
 
-            var userId = _userManager.GetUserId(User);
-
             var booking = await _context.Bookings
-                .Where(c => c.VehicleId == id)
-                .Where(c => c.Id == userId)
+                .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.ReservationExpires < DateTime.Now)
-                .FirstOrDefaultAsync();
+                .Where(c => c.BookingStatus == BookingStatus.Reserved)
+                .FirstOrDefaultAsync(c => c.VehicleId == id);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
 
             return View(vehicle);
         }
@@ -61,6 +66,7 @@ namespace DriveHub.Controllers
             var vehicle = await _context.Vehicles
                 .Include(v => v.VehicleRate)
                 .FirstOrDefaultAsync(m => m.VehicleId == id);
+
             if (vehicle == null)
             {
                 return NotFound();

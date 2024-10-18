@@ -29,6 +29,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.6" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+		<PackageReference Include="QuestPDF" Version="2024.10.1" />
 		<PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
 	</ItemGroup>
 

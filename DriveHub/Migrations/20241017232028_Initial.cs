@@ -211,6 +211,7 @@ namespace DriveHub.Migrations
                 {
                     VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsReserved = table.Column<bool>(type: "bit", nullable: false),
                     Make = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RegistrationPlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -262,6 +263,7 @@ namespace DriveHub.Migrations
                 {
                     BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ReservationExpires = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsExtended = table.Column<bool>(type: "bit", nullable: false),
                     PaymentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),

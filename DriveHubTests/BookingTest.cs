@@ -306,8 +306,8 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour // Use the existing price per hour.
             };
 
-            // Act: Call the Edit method on the controller with the booking details.
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the ExtendReservation method on the controller with the booking details.
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Check if the result is a ViewResult and if the booking is updated.
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -332,8 +332,8 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the Edit method.
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the ExtendReservation method.
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the past start time.
             Assert.IsType<ViewResult>(result);
@@ -358,8 +358,8 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the Edit method.
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the ExtendReservation method.
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the end time being before the start time.
             Assert.IsType<ViewResult>(result);
@@ -384,8 +384,8 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the Edit method.
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the ExtendReservation method.
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the insufficient booking duration.
             Assert.IsType<ViewResult>(result);
@@ -414,8 +414,8 @@ namespace DriveHubTests
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the Edit method
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the ExtendReservation method
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);

@@ -42,6 +42,9 @@ namespace DriveHub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsExtended")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PaymentId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -176,6 +179,9 @@ namespace DriveHub.Migrations
                     b.Property<string>("Colour")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsReserved")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Make")
                         .IsRequired()

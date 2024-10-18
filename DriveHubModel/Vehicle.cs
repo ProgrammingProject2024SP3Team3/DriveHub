@@ -83,6 +83,9 @@ namespace DriveHubModel
         public string VehicleRateId { get; set; }
 
         [Required]
+        public bool IsReserved { get; set; } = false;
+
+        [Required]
         public string Make { get; set; }
 
         [Required]
