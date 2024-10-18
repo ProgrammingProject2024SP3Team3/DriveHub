@@ -28,7 +28,9 @@
             <div class="form-control">@Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model. @Model.Vehicle.RegistrationPlate</div>
         </div>
         <div class="col-xs-12 col-md-4 container-fluid mb-3">
-            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Model.Vehicle.VehicleId}.jpg" style="max-width:250px;">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
+                    @Model.Vehicle.VehicleId
+}.jpg" style="max-width:250px;">
         </div>
         <div class="pb-2">
             <label for="StartTime" class="form-label">Reserved till</label>
@@ -41,9 +43,11 @@
         <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
     </div>
     <div class="text-center">
-        @if (Model.IsExtended == false)
+        @if (Model.IsExtended == false && Model.BookingStatus == BookingStatus.Reserved)
         {
-            <p class="pt-2">Need some extra time or want to cancel your booking?</p>
+            <a asp-controller="Vehicles" asp-action="Pickup" asp-route-id="@Model.VehicleId" class="btn btn-success mb-4 fw-bold text-white fs-4">
+                Pickup vehicle
+            </a>
             <a asp-action="Extend" asp-route-id="@Model.BookingId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
                 Extend booking for 30mins
             </a>
@@ -51,11 +55,19 @@
                 Cancel booking
             </a>
         }
-        else
+        else if (Model.BookingStatus == BookingStatus.Reserved)
         {
-            <p>Need to cancel your booking?</p>
+            <a asp-controller="Vehicles" asp-action="Pickup" asp-route-id="@Model.VehicleId" class="btn btn-success mb-4 fw-bold text-white fs-4">
+                Pickup vehicle
+            </a>
             <a asp-action="Cancel" asp-route-id="@Model.BookingId" class="btn btn-danger mb-4 fw-bold text-white fs-4">
                 Cancel booking
+            </a>
+        }
+        else if (Model.BookingStatus == BookingStatus.Collected)
+        {
+            <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
+                Return vehicle
             </a>
         }
         <hr />
