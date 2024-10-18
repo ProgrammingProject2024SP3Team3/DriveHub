@@ -39,7 +39,7 @@ namespace DriveHub.BackgroundServices
 
             var reservations = await context.Bookings
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
-                .Where(c => c.Expires > DateTime.Now)
+                .Where(c => c.Expires < DateTime.Now)
                 .Include(c => c.Vehicle)
                 .ToListAsync();
 
