@@ -23,6 +23,8 @@ namespace DriveHub.Controllers
         {
             var dtos = new List<PodApiDto>();
             var pods = await _context.Pods
+                .Where(c => c.Vehicle != null)
+                .Where(c => c.Vehicle.IsReserved == false)
                 .Include(c => c.Site)
                 .Include(c => c.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
