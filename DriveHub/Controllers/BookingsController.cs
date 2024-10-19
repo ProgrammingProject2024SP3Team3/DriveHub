@@ -48,11 +48,14 @@ namespace DriveHub.Controllers
         /// <returns>The vehicle search page</returns>
         public async Task<IActionResult> Search()
         {
-            // Redirect if user has a current reserveration
+            // Redirect if user has a current reservation
             var hasReservation = _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.Expires > DateTime.Now.AddMinutes(10))
-                .Where(c => c.BookingStatus == BookingStatus.Reserved)
+                .Where(
+                    c => c.BookingStatus == BookingStatus.Reserved ||
+                    c.BookingStatus == BookingStatus.Unpaid ||
+                    c.BookingStatus == BookingStatus.Collected
+                    )
                 .Any();
 
             if (hasReservation)
@@ -79,10 +82,14 @@ namespace DriveHub.Controllers
         {
             _logger.LogInformation($"Received a request to book vehicle {id}");
 
+            // Redirect if user has a current reserveration
             var hasReservation = _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.Expires > DateTime.Now.AddMinutes(10))
-                .Where(c => c.BookingStatus == BookingStatus.Reserved)
+                .Where(
+                    c => c.BookingStatus == BookingStatus.Reserved ||
+                    c.BookingStatus == BookingStatus.Unpaid ||
+                    c.BookingStatus == BookingStatus.Collected
+                    )
                 .Any();
 
             if (hasReservation)
@@ -129,7 +136,11 @@ namespace DriveHub.Controllers
             // Redirect if user has a current reserveration
             var hasReservation = _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Reserved)
+                .Where(
+                    c => c.BookingStatus == BookingStatus.Reserved ||
+                    c.BookingStatus == BookingStatus.Unpaid ||
+                    c.BookingStatus == BookingStatus.Collected
+                    )
                 .Any();
 
             if (hasReservation)
@@ -199,36 +210,16 @@ namespace DriveHub.Controllers
         {
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Reserved)
+                .Where(
+                    c => c.BookingStatus == BookingStatus.Reserved ||
+                    c.BookingStatus == BookingStatus.Unpaid ||
+                    c.BookingStatus == BookingStatus.Collected
+                    )
                 .Include(c => c.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
                 .FirstOrDefaultAsync();
-
-            if (booking == null)
-            {
-                booking = await _context.Bookings
-                .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Collected)
-                .Include(c => c.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
-                .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
-                .FirstOrDefaultAsync();
-            }
-
-            if (booking == null)
-            {
-                booking = await _context.Bookings
-                .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Unpaid)
-                .Include(c => c.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
-                .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
-                .FirstOrDefaultAsync();
-            }
 
             if (booking == null)
             {
@@ -247,7 +238,6 @@ namespace DriveHub.Controllers
         {
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.Expires > DateTime.Now)
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .FirstOrDefaultAsync();
 

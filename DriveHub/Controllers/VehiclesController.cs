@@ -23,39 +23,53 @@ namespace DriveHub.Controllers
             _userManager = userManager;
         }
 
-        // GET: Vehicles/Details/5
+        // GET: Vehicles/Pickup/5
         public async Task<IActionResult> Pickup(string id)
         {
+            _logger.LogInformation($"Picking up {id}");
+
             if (id == null)
             {
-                return NotFound();
+                _logger.LogInformation($"Bad vehicle id {id}");
+                return View(nameof(Error));
             }
 
-            var vehicle = await _context.Vehicles
-                .Where(c => c.IsReserved == true)
-                .Include(v => v.VehicleRate)
-                .FirstOrDefaultAsync(m => m.VehicleId == id);
+            var vehicle = await _context.Vehicles.FindAsync(id);
 
             if (vehicle == null)
             {
-                return NotFound();
+                _logger.LogInformation($"Vehicle not found {id}");
+                return View(nameof(Error));
             }
+
+            _logger.LogInformation($"Found vehicle {id}");
 
             var booking = await _context.Bookings
+                .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.Expires < DateTime.Now)
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
-                .FirstOrDefaultAsync(c => c.VehicleId == id);
+                .Include(c => c.StartPod)
+                .ThenInclude(c => c.Site)
+                .FirstOrDefaultAsync();
 
-            if (booking == null)
+            if (booking?.BookingId == null)
             {
-                return NotFound();
+                _logger.LogInformation($"Couldn't find booking for {id}");
+                return RedirectToAction("Search", "Bookings");
             }
 
-            return View(vehicle);
+            _logger.LogInformation($"Pickup OK - {booking.BookingId}");
+
+            booking.StartTime = DateTime.Now;
+            booking.BookingStatus = BookingStatus.Collected;
+
+            _context.Update(booking);
+            await _context.SaveChangesAsync();
+
+            return View(booking);
         }
 
-        // GET: Vehicles/Details/5
+        // GET: Vehicles/Dropoff/5
         public async Task<IActionResult> Dropoff(string id)
         {
             if (id == null)
@@ -73,6 +87,15 @@ namespace DriveHub.Controllers
             }
 
             return View(vehicle);
+        }
+
+        /// <summary>
+        /// Return the error page when a pickup/dropoff action is not sane. Not publicly accessible.
+        /// </summary>
+        /// <returns>The error page</returns>
+        private IActionResult Error()
+        {
+            return View();
         }
 
         private bool VehicleExists(string id)

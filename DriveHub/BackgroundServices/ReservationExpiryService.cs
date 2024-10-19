@@ -42,7 +42,7 @@ namespace DriveHub.BackgroundServices
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Where(c => c.Expires < dateTime)
                 .Include(c => c.Vehicle)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             foreach (var reservation in reservations)
             {
