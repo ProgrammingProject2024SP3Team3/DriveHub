@@ -26,29 +26,30 @@ namespace DriveHub.BackgroundServices
 
                 _logger.LogInformation("ReservationExpiry service is waiting a minute.");
 
-                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
             }
         }
 
         private async Task DoWork(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("ReservationExpiry service is working.");
+            var dateTime = DateTime.Now;
+            _logger.LogInformation($"ReservationExpiry service is working at {dateTime}.");
 
             using var scope = _services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             var reservations = await context.Bookings
-                .Where(c => c.Expires < DateTime.Now)
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
+                .Where(c => c.Expires < dateTime)
                 .Include(c => c.Vehicle)
-                .ToListAsync(cancellationToken);
+                .ToListAsync();
 
             foreach (var reservation in reservations)
             {
                 reservation.BookingStatus = BookingStatus.Expired;
                 reservation.Vehicle.IsReserved = false;
                 context.Update(reservation);
-                _logger.LogInformation($"Updating booking {reservation.BookingId} for {reservation.VehicleId}");
+                _logger.LogInformation($"Expiring booking {reservation.BookingId} for {reservation.VehicleId}");
             }
 
             await context.SaveChangesAsync(cancellationToken);
