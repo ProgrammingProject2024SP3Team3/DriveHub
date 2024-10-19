@@ -31,7 +31,7 @@ namespace DriveHubModel
         [DataType(DataType.DateTime)]
         [DisplayName("Receipt date")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]
-        public DateTime DateTime { get; set; }
+        public DateTime DateTime { get; set; } = DateTime.Now;
 
         [Required]
         [DataType(DataType.Currency)]

@@ -30,7 +30,7 @@ namespace DriveHub.Controllers
 
             if (id == null)
             {
-                _logger.LogInformation($"Bad vehicle id {id}");
+                _logger.LogWarning($"Bad vehicle id {id}");
                 return View(nameof(Error));
             }
 
@@ -38,7 +38,7 @@ namespace DriveHub.Controllers
 
             if (vehicle == null)
             {
-                _logger.LogInformation($"Vehicle not found {id}");
+                _logger.LogWarning($"Vehicle not found {id}");
                 return View(nameof(Error));
             }
 
@@ -54,7 +54,7 @@ namespace DriveHub.Controllers
 
             if (booking?.BookingId == null)
             {
-                _logger.LogInformation($"Couldn't find booking for {id}");
+                _logger.LogWarning($"Couldn't find booking for {id}");
                 return RedirectToAction("Search", "Bookings");
             }
 
@@ -72,21 +72,52 @@ namespace DriveHub.Controllers
         // GET: Vehicles/Dropoff/5
         public async Task<IActionResult> Dropoff(string id)
         {
+            _logger.LogInformation($"Dropping off {id}");
+
             if (id == null)
             {
-                return NotFound();
+                _logger.LogWarning($"Bad vehicle id {id}");
+                return View(nameof(Error));
             }
 
-            var vehicle = await _context.Vehicles
-                .Include(v => v.VehicleRate)
-                .FirstOrDefaultAsync(m => m.VehicleId == id);
+            var vehicle = await _context.Vehicles.FindAsync(id);
 
             if (vehicle == null)
             {
-                return NotFound();
+                _logger.LogWarning($"Vehicle not found {id}");
+                return View(nameof(Error));
             }
 
-            return View(vehicle);
+            _logger.LogInformation($"Found vehicle {id}");
+
+            var booking = await _context.Bookings
+                .Where(c => c.VehicleId == id)
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.BookingStatus == BookingStatus.Collected)
+                .Include(c => c.StartPod)
+                .ThenInclude(c => c.Site)
+                .FirstOrDefaultAsync();
+
+            if (booking?.BookingId == null || booking.StartTime == null)
+            {
+                _logger.LogWarning($"Couldn't find booking for {id}");
+                return RedirectToAction("Search", "Bookings");
+            }
+
+            booking.EndTime = DateTime.Now;
+            booking.BookingStatus = BookingStatus.Unpaid;
+            var invoice = new Invoice();
+            var diff = (decimal)((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalHours;
+            invoice.Amount = diff * booking.PricePerHour;
+            booking.Invoice = invoice;
+
+            _context.Add(invoice);
+            _context.Update(booking);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Drop off OK - {booking.BookingId}");
+
+            return View(booking);
         }
 
         /// <summary>

@@ -1,72 +1,91 @@
-﻿@model DriveHubModel.Vehicle
-
+﻿@model DriveHubModel.Booking
+@using DriveHubModel
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Drop off a vehicle";
 }
 
-<h1>Details</h1>
+<style>
+    .booking-section {
+        background-color: #f8f9fa;
+    }
+</style>
 
-<div>
-    <h4>Vehicle</h4>
+<h1>@ViewData["Title"]</h1>
+<p>Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
+<div class="booking-section mb-3">
+    <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:orange;">
+        @Model.BookingStatus
+    </div>
+    <div class="d-flex align-items-center mb-3">
+        <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
+        <p class="mb-0">Pickup DriveHub @Model.StartPod.Site.SiteName Pod #@Model.StartPod.PodName</p>
+    </div>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Make)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Make)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Model)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Model)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RegistrationPlate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RegistrationPlate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.State)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.State)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Year)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Year)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Seats)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Seats)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Colour)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Colour)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.VehicleRate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.VehicleRate.VehicleRateId)
-        </dd>
-    </dl>
+    <div class="row">
+        <div class="col-xs-12 col-md-8 mb-3">
+            <label class="form-label">Car</label>
+            <div class="form-control">@Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model @Model.Vehicle.RegistrationPlate</div>
+        </div>
+        <div class="col-xs-12 col-md-4 container-fluid mb-3">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
+                                                                                @Model.Vehicle.VehicleId
+}.jpg" style="max-width:250px;">
+        </div>
+        <hr />
+    </div>
+    <div class="p-3">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="ReservationExpires" class="form-label">Reserved till</label>
+                <input class="form-control" name="ReservationExpires"
+                       value="@Model.Expires" disabled />
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="StartTime" class="form-label">Booking Start</label>
+                    <input class="form-control" id="StartTime" name="StartTime"
+                           value="@Model.StartTime" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label for="EndTime" class="form-label">Booking End</label>
+                    <input class="form-control" id="EndTime" name="EndTime"
+                           value="@Model.EndTime" disabled />
+                </div>
+            </div>
+            <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
+                <p class="mb-0">Per Hour:</p>
+                <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
+                <p class="mb-0">Total:</p>
+                <p class="fw-bold fs-1">$@Model.Invoice?.Amount.ToString("F2")</p>
+                <hr />
+            </div>
+            <div>
+                <a asp-controller="Bookings" asp-action="Pay" asp-route-id="@Model.BookingId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
+                   Pay now
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.VehicleId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    <script>
+        function initMap() {
+            // Init Google Map
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: @Model.StartPod.Site.Latitude, lng: @Model.StartPod.Site.Longitude },
+                zoom: 19,
+                mapTypeId: "roadmap",
+                mapId: "DRIVEHUB_DETAILS"
+            });
+            new google.maps.marker.AdvancedMarkerElement({
+                map,
+                title: "Vehicle",
+                position: { lat: @Model.StartPod.Site.Latitude, lng: @Model.StartPod.Site.Longitude }
+            })
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
+            defer>
+    </script>
+}

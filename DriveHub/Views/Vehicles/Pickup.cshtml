@@ -1,7 +1,7 @@
 ﻿@model DriveHubModel.Booking
 @using DriveHubModel
 @{
-    ViewData["Title"] = "Booking Details";
+    ViewData["Title"] = "Pickup vehicle";
 }
 
 <style>
@@ -56,8 +56,6 @@
                 <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
                     <p class="mb-0">Per Hour:</p>
                     <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
-                    <p class="mb-0">Total:</p>
-                    <p class="fw-bold fs-1">$@Model.Receipt?.Amount.ToString("F2")</p>
                     <hr />
                 </div>
             </div>

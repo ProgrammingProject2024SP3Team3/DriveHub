@@ -47,7 +47,7 @@
         </div>
         <div class="col-xs-12 col-md-4 container-fluid mb-3">
             <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                    @Model.Vehicle.VehicleId
+                        @Model.Vehicle.VehicleId
 }.jpg" style="max-width:250px;">
         </div>
         <div class="pb-2">
@@ -86,6 +86,12 @@
         {
             <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
                 Return vehicle
+            </a>
+        }
+        else if (Model.BookingStatus == BookingStatus.Unpaid)
+        {
+            <a asp-controller="Bookings" asp-action="Pay" asp-route-id="@Model.BookingId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
+                Pay now
             </a>
         }
         <hr />

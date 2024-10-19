@@ -351,6 +351,15 @@ namespace DriveHub.Controllers
             return View(nameof(Index));
         }
 
+        /// <summary>
+        /// Return the error page when a booking action is not sane. Not publicly accessible.
+        /// </summary>
+        /// <returns>The error page</returns>
+        private IActionResult Pay()
+        {
+            return View();
+        }
+
         private bool BookingExists(string id)
         {
             return _context.Bookings.Any(e => e.BookingId.ToString() == id);
