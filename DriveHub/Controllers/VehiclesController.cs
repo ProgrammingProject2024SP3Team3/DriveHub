@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using DriveHub.Data;
 using Microsoft.AspNetCore.Identity;
 using DriveHubModel;
+using static QuestPDF.Helpers.Colors;
 
 namespace DriveHub.Controllers
 {
@@ -94,6 +95,8 @@ namespace DriveHub.Controllers
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Collected)
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(c => c.Site)
                 .FirstOrDefaultAsync();
@@ -104,8 +107,15 @@ namespace DriveHub.Controllers
                 return RedirectToAction("Search", "Bookings");
             }
 
+            var emptyPods = await _context.Pods.Where(c => c.VehicleId != null).Include(c => c.Site).ToListAsync();
+            Random rnd = new Random();
+            var randPod = emptyPods[rnd.Next(emptyPods.Count())];
+
             booking.EndTime = DateTime.Now;
             booking.BookingStatus = BookingStatus.Unpaid;
+            booking.Vehicle.IsReserved = false;
+            booking.EndPod = randPod;
+
             var invoice = new Invoice();
             var diff = (decimal)((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalHours;
             invoice.Amount = diff * booking.PricePerHour;

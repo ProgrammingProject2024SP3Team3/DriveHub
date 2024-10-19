@@ -19,6 +19,10 @@ using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
+
+    /// <summary>
+    /// A vehiclel in the DriveHub fleet.
+    /// </summary>
     public class Vehicle
     {
         public Vehicle() { }

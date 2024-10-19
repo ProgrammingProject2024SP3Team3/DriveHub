@@ -300,11 +300,8 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
-                .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
                 .ThenInclude(d => d.VehicleRate)
-                .Include(c => c.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
 
             return View(booking);
