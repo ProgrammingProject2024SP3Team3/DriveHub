@@ -23,6 +23,6 @@ namespace DriveHub.SeedData
         public decimal PricePerHour { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime EffectiveDate { get; set; }
+        public DateTime EffectiveDate { get; set; } = DateTime.Now;
     }
 }

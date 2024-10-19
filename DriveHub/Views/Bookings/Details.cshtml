@@ -3,10 +3,32 @@
 @{
     ViewData["Title"] = "Booking Details";
 
-    var vehicle = Model.Vehicle;
-    var startPod = Model.StartPod;
-    var endPod = Model.EndPod;
-    decimal totalPrice = (decimal)((Model.EndTime - Model.StartTime).TotalHours * (double)Model.PricePerHour);
+    string colour = "";
+
+    switch (Model.BookingStatus)
+    {
+        case BookingStatus.Reserved:
+            colour = "green";
+            break;
+        case BookingStatus.Collected:
+            colour = "blue";
+            break;
+        case BookingStatus.Unpaid:
+            colour = "orange";
+            break;
+        case BookingStatus.Complete:
+            colour = "black";
+            break;
+        case BookingStatus.Expired:
+            colour = "red";
+            break;
+        case BookingStatus.Cancelled:
+            colour = "red";
+            break;
+        default:
+            colour = "white";
+            break;
+    }
 }
 
 <style>
@@ -15,98 +37,67 @@
     }
 </style>
 
-<h1>Booking Details</h1>
+<h1>@ViewData["Title"]</h1>
 <p>Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
 <div class="booking-section mb-3">
-    @if (Model.BookingStatus == BookingStatus.InProgress)
-    {
-        <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:blue;">
-            Status:
-            In progress
-        </div>
-    }
-    else
-    {
-        <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:#252e31;">
-            Status:
-            @Model.BookingStatus
-        </div>
-    }
-
+    <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:@colour;">
+        @Model.BookingStatus
+    </div>
     <div class="d-flex align-items-center mb-3">
         <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-        <p class="mb-0">Pickup DriveHub @startPod.Site.SiteName Pod #@startPod.PodName</p>
+        <p class="mb-0">Pickup DriveHub @Model.StartPod.Site.SiteName Pod #@Model.StartPod.PodName</p>
     </div>
     <hr />
     <div class="row">
         <div class="col-xs-12 col-md-8 mb-3">
             <label class="form-label">Car</label>
-            <div class="form-control">@vehicle.Name the @vehicle.Make @vehicle.Model. @Model.Vehicle.RegistrationPlate</div>
+            <div class="form-control">@Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model @Model.Vehicle.RegistrationPlate</div>
         </div>
         <div class="col-xs-12 col-md-4 container-fluid mb-3">
             <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                            @vehicle.VehicleId
+                                                            @Model.Vehicle.VehicleId
 }.jpg" style="max-width:250px;">
         </div>
+        <hr />
     </div>
-    <hr />
     <div class="p-3">
         <div class="row g-3">
             <div class="col-md-6">
-                <label for="StartTime" class="form-label">Booking Start</label>
-                <input type="datetime-local" class="form-control" id="StartTime" name="StartTime"
-                       value="@Model.StartTime.ToString("s")" disabled />
+                <label for="ReservationExpires" class="form-label">Reserved till</label>
+                <input class="form-control" name="ReservationExpires"
+                       value="@Model.Expires" disabled />
             </div>
-            <div class="col-md-6">
-                <label for="EndTime" class="form-label">Booking End</label>
-                <input type="datetime-local" class="form-control" id="EndTime" name="EndTime"
-                       value="@Model.EndTime.ToString("s")" disabled />
+            </<div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="StartTime" class="form-label">Booking Start</label>
+                        <input class="form-control" id="StartTime" name="StartTime"
+                               value="@Model.StartTime" disabled />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="EndTime" class="form-label">Booking End</label>
+                        <input class="form-control" id="EndTime" name="EndTime"
+                               value="@Model.EndTime" disabled />
+                    </div>
+                </div>
+                <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
+                    <p class="mb-0">Per Hour:</p>
+                    <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
+                    <p class="mb-0">Total:</p>
+                    <p class="fw-bold fs-1">$@Model.Receipt?.Amount.ToString("F2")</p>
+                    <hr />
+                </div>
             </div>
-        </div>
-
-        <div class="d-flex align-items-center my-3">
-            <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-            <div>
-                <p class="mb-0">Return DriveHub @endPod.Site.SiteName Pod #@endPod.PodName</p>
-                <small>@endPod.Site.Address, @endPod.Site.City</small>
-            </div>
-        </div>
-        <div class="d-flex justify-content-between align-items-center mt-4">
-            @if (@Model.StartTime > @DateTime.Now.AddMinutes(-15))
-            {
-                <a asp-action="Edit" asp-route-id="@Model.BookingId" class="btn btn-primary p-3">
-                    Edit Booking
-                </a>
-            }
-            @if (@Model.BookingStatus == BookingStatus.Started)
-            {
-                <form method="post" asp-controller="Bookings" asp-action="Return" asp-route-id="@Model.BookingId" onsubmit="return confirm('Are you sure you want to return this Vehicle now?');">
-                    <button type="submit" class="btn btn-danger p-3">
-                        Return Vehicle
-                    </button>
-                </form>
-            }
-
         </div>
     </div>
-
-    <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
-        <p class="mb-0">Per Hour:</p>
-        <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")/hr</p>
-        <hr />
-        <p class="mb-0">Total Cost:</p>
-        <p class="fw-bold fs-1 mb-0">$@totalPrice.ToString("F2")</p>
-    </div>
+    <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 </div>
-
-<div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
-
 @section Scripts {
     <script>
         function initMap() {
             // Init Google Map
             const map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude },
+                center: { lat: @Model.StartPod.Site.Latitude, lng: @Model.StartPod.Site.Longitude },
                 zoom: 19,
                 mapTypeId: "roadmap",
                 mapId: "DRIVEHUB_DETAILS"
@@ -114,7 +105,7 @@
             new google.maps.marker.AdvancedMarkerElement({
                 map,
                 title: "Vehicle",
-                position: { lat: @startPod.Site.Latitude, lng: @startPod.Site.Longitude }
+                position: { lat: @Model.StartPod.Site.Latitude, lng: @Model.StartPod.Site.Longitude }
             })
         }
     </script>

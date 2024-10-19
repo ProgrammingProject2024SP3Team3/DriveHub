@@ -12,7 +12,6 @@ namespace DriveHubTests
     {
         private readonly BookingTestFixtures bookingTestFixtures;
 
-
         public BookingTests()
         {
             bookingTestFixtures = new BookingTestFixtures();
@@ -60,13 +59,11 @@ namespace DriveHubTests
             bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up valid booking data
-            var bookingDto = new BookingDto
+            var bookingDto = new ReservationDto
             {
+                BookingId = Guid.NewGuid().ToString(),
                 VehicleId = "5780bc06-a5e2-4598-9eea-7cb90b55e169", // Ensure valid vehicle ID
                 StartPodId = "77be04ce-fa47-4d5e-81b9-9e8de26230e1", // Ensure valid pod ID
-                EndPodId = "77be04ce-fa47-4d5e-81b9-9e8de26230e1", // Ensure valid pod ID
-                StartTime = DateTime.Now.AddHours(1), // Ensure time within validation
-                EndTime = DateTime.Now.AddHours(2),
                 QuotedPricePerHour = 27.50m
             };
 
@@ -86,13 +83,10 @@ namespace DriveHubTests
             bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up invalid booking data with past StartTime
-            var bookingDto = new BookingDto
+            var bookingDto = new ReservationDto
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
                 StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                EndPodId = "4121be84-af99-4be1-80b9-5c4fd2117567",
-                StartTime = DateTime.Now.AddHours(-1), // Start time in the past
-                EndTime = DateTime.Now.AddHours(1),
                 QuotedPricePerHour = 20.50m
             };
 
@@ -113,13 +107,10 @@ namespace DriveHubTests
             bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up invalid booking data with past StartTime
-            var bookingDto = new BookingDto
+            var bookingDto = new ReservationDto
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
                 StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                StartTime = DateTime.Now.AddMinutes(10),
-                EndTime = DateTime.Now.AddMinutes(15),
                 QuotedPricePerHour = 20.50m
             };
 
@@ -139,13 +130,10 @@ namespace DriveHubTests
             bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up invalid booking data with past StartTime
-            var bookingDto = new BookingDto
+            var bookingDto = new ReservationDto
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
                 StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                StartTime = DateTime.Now.AddMinutes(10),
-                EndTime = DateTime.Now.AddMinutes(45),
                 QuotedPricePerHour = 5
             };
 
@@ -164,13 +152,10 @@ namespace DriveHubTests
             bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up illegal booking data with bad pod and vehicle combinations
-            var bookingDto = new BookingDto
+            var bookingDto = new ReservationDto
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
                 StartPodId = "5f0244c5-765c-41b5-a4ee-5c01badd5ad6",
-                EndPodId = "5f0244c5-765c-41b5-a4ee-5c01badd5ad6",
-                StartTime = DateTime.Now.AddMinutes(10),
-                EndTime = DateTime.Now.AddMinutes(15),
                 QuotedPricePerHour = 20.50m
             };
 
@@ -189,13 +174,10 @@ namespace DriveHubTests
             bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up invalid booking data with past StartTime
-            var bookingDto = new BookingDto
+            var bookingDto = new ReservationDto
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
                 StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                StartTime = DateTime.Now.AddMinutes(60),
-                EndTime = DateTime.Now.AddMinutes(10),
                 QuotedPricePerHour = 20.50m
             };
 
@@ -216,13 +198,10 @@ namespace DriveHubTests
             bookingTestFixtures.SetMockUserToContext(bookingTestFixtures.Controller, mockUser);
 
             // Arrange: Set up invalid booking data with past StartTime
-            var bookingDto = new BookingDto
+            var bookingDto = new ReservationDto
             {
                 VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
                 StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                EndPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-                StartTime = DateTime.Now.AddDays(7).AddMinutes(30),
-                EndTime = DateTime.Now.AddDays(8),
                 QuotedPricePerHour = 20.50m
             };
 
@@ -257,7 +236,7 @@ namespace DriveHubTests
         //    await bookingTestFixtures.Context.SaveChangesAsync();
 
         //    // Arrange: Attempt to create a booking with conflicting times
-        //    var bookingDto = new BookingDto
+        //    var bookingDto = new ReservationDto
         //    {
         //        VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
         //        StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
@@ -319,19 +298,16 @@ namespace DriveHubTests
             Assert.NotNull(booking); // Ensure that we have at least one booking.
 
             // Prepare the DTO for editing the booking with valid data.
-            var editBookingDto = new EditBookingDto
+            var editBookingDto = new ReservationDto
             {
                 BookingId = booking.BookingId,
                 VehicleId = booking.VehicleId, // Use existing vehicle ID from booking.
                 StartPodId = booking.StartPodId, // Use existing start pod ID.
-                EndPodId = booking.EndPodId, // Use existing end pod ID.
-                StartTime = DateTime.Now.AddHours(1), // Set start time for the edit.
-                EndTime = DateTime.Now.AddHours(2), // Set end time for the edit.
                 QuotedPricePerHour = booking.PricePerHour // Use the existing price per hour.
             };
 
-            // Act: Call the Edit method on the controller with the booking details.
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the Extend method on the controller with the booking details.
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Check if the result is a ViewResult and if the booking is updated.
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -348,26 +324,23 @@ namespace DriveHubTests
             Assert.NotNull(booking); // Ensure that we have at least one booking.
 
             // Prepare the DTO for editing with an invalid past start time.
-            var editBookingDto = new EditBookingDto
+            var editBookingDto = new ReservationDto
             {
                 BookingId = booking.BookingId,
                 VehicleId = booking.VehicleId,
                 StartPodId = booking.StartPodId,
-                EndPodId = booking.EndPodId,
-                StartTime = DateTime.Now.AddHours(-1), // Set StartTime in the past.
-                EndTime = DateTime.Now.AddHours(1),
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the Edit method.
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the Extend method.
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the past start time.
             Assert.IsType<ViewResult>(result);
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
             Assert.Contains("StartTime", bookingTestFixtures.Controller.ModelState.Keys); // Check for specific validation error.
         }
-        
+
         // This test verifies that if the end time is set before the start time, the edit fails.
         [Fact]
         public async Task Edit_ShouldFail_WhenEndTimeIsBeforeStartTime()
@@ -377,19 +350,16 @@ namespace DriveHubTests
             Assert.NotNull(booking); // Ensure that we have at least one booking.
 
             // Prepare the DTO for editing with end time before start time.
-            var editBookingDto = new EditBookingDto
+            var editBookingDto = new ReservationDto
             {
                 BookingId = booking.BookingId,
                 VehicleId = booking.VehicleId,
                 StartPodId = booking.StartPodId,
-                EndPodId = booking.EndPodId,
-                StartTime = DateTime.Now.AddHours(2), // StartTime is after EndTime.
-                EndTime = DateTime.Now.AddHours(1),
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the Edit method.
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the Extend method.
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the end time being before the start time.
             Assert.IsType<ViewResult>(result);
@@ -406,19 +376,16 @@ namespace DriveHubTests
             Assert.NotNull(booking); // Ensure that we have at least one booking.
 
             // Prepare the DTO for editing with a booking duration less than 30 minutes.
-            var editBookingDto = new EditBookingDto
+            var editBookingDto = new ReservationDto
             {
                 BookingId = booking.BookingId,
                 VehicleId = booking.VehicleId,
                 StartPodId = booking.StartPodId,
-                EndPodId = booking.EndPodId,
-                StartTime = DateTime.Now.AddMinutes(10),
-                EndTime = DateTime.Now.AddMinutes(20), // Booking time is less than 30 minutes.
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the Edit method.
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the Extend method.
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid due to the insufficient booking duration.
             Assert.IsType<ViewResult>(result);
@@ -439,19 +406,16 @@ namespace DriveHubTests
             Assert.NotNull(booking); // Ensure that we have a valid booking
 
             // Prepare the DTO for editing with a start time greater than 7 days.
-            var editBookingDto = new EditBookingDto
+            var editBookingDto = new ReservationDto
             {
                 BookingId = booking.BookingId,
                 VehicleId = booking.VehicleId,
                 StartPodId = booking.StartPodId,
-                EndPodId = booking.EndPodId,
-                StartTime = DateTime.Now.AddDays(8), // Start time is more than 7 days in advance
-                EndTime = DateTime.Now.AddDays(8).AddHours(1),
                 QuotedPricePerHour = booking.PricePerHour
             };
 
-            // Act: Call the Edit method
-            var result = await bookingTestFixtures.Controller.Edit(booking.BookingId, editBookingDto);
+            // Act: Call the Extend method
+            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
 
             // Assert: Ensure the model state is invalid
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);

@@ -75,12 +75,15 @@ namespace DriveHubModel
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VehicleId { get; set; }
+        public string VehicleId { get; set; } = Guid.NewGuid().ToString();
 
         [ForeignKey("VehicleRate")]
         [DisplayName("Price Category")]
         [Required]
         public string VehicleRateId { get; set; }
+
+        [Required]
+        public bool IsReserved { get; set; } = false;
 
         [Required]
         public string Make { get; set; }
