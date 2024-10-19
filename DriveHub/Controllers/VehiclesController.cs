@@ -34,7 +34,9 @@ namespace DriveHub.Controllers
                 return View(nameof(Error));
             }
 
-            if (VehicleExists(id))
+            var vehicle = await _context.Vehicles.FindAsync(id);
+
+            if (vehicle == null)
             {
                 _logger.LogInformation($"Vehicle not found {id}");
                 return View(nameof(Error));
@@ -45,9 +47,10 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.Expires < DateTime.Now)
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
-                .FirstOrDefaultAsync();                
+                .Include(c => c.StartPod)
+                .ThenInclude(c => c.Site)
+                .FirstOrDefaultAsync();
 
             if (booking?.BookingId == null)
             {
@@ -59,6 +62,9 @@ namespace DriveHub.Controllers
 
             booking.StartTime = DateTime.Now;
             booking.BookingStatus = BookingStatus.Collected;
+
+            _context.Update(booking);
+            await _context.SaveChangesAsync();
 
             return View(booking);
         }

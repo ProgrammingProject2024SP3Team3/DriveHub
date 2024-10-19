@@ -38,10 +38,10 @@ namespace DriveHub.BackgroundServices
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             var reservations = await context.Bookings
-                .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Where(c => c.Expires < DateTime.Now)
+                .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Include(c => c.Vehicle)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             foreach (var reservation in reservations)
             {
