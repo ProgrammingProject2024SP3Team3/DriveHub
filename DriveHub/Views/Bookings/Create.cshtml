@@ -28,9 +28,7 @@
             <a asp-action="Search" class="small text-right mt-1 btn btn-primary">Find another car close by?</a>
         </div>
         <div class="col container-fluid pb-3">
-            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                        @ViewBag.VehicleId
-}.jpg" style="max-width:350px;">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg" style="max-width:350px;">
         </div>
     </div>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>

@@ -55,6 +55,9 @@ namespace DriveHub.Migrations
                     b.Property<decimal>("PricePerHour")
                         .HasColumnType("Money");
 
+                    b.Property<decimal>("PricePerMinute")
+                        .HasColumnType("Money");
+
                     b.Property<string>("StartPodId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -96,9 +99,6 @@ namespace DriveHub.Migrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("MinutesUsed")
-                        .HasColumnType("int");
 
                     b.HasKey("InvoiceNumber");
 
@@ -263,10 +263,17 @@ namespace DriveHub.Migrations
                     b.Property<DateTime>("EffectiveDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PriceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PricePerHour")
                         .HasColumnType("Money");
 
-                    b.Property<string>("ProductId")
+                    b.Property<decimal>("PricePerMinute")
+                        .HasColumnType("Money");
+
+                    b.Property<string>("TestPriceId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

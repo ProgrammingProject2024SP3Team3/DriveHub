@@ -76,9 +76,11 @@ namespace DriveHub.Migrations
                 columns: table => new
                 {
                     VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProductId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PriceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TestPriceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
+                    PricePerMinute = table.Column<decimal>(type: "Money", nullable: false),
                     EffectiveDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -259,6 +261,7 @@ namespace DriveHub.Migrations
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
+                    PricePerMinute = table.Column<decimal>(type: "Money", nullable: false),
                     BookingStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -295,7 +298,6 @@ namespace DriveHub.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    MinutesUsed = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<decimal>(type: "Money", nullable: false)
                 },
                 constraints: table =>

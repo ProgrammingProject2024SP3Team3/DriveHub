@@ -20,6 +20,12 @@
             colour = "white";
             break;
     }
+
+    string GetCurrentPrice(DateTime startTime, decimal pricePerMinute)
+    {
+        var diff = (decimal)(DateTime.Now - startTime).TotalMinutes;
+        return (pricePerMinute * diff).ToString("F2");
+    }
 }
 
 <style>
@@ -45,9 +51,7 @@
             <div class="form-control">@Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model. @Model.Vehicle.RegistrationPlate</div>
         </div>
         <div class="col-xs-12 col-md-4 container-fluid mb-3">
-            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                        @Model.Vehicle.VehicleId
-}.jpg" style="max-width:250px;">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Model.Vehicle.VehicleId}.jpg" style="max-width:250px;">
         </div>
         <div class="pb-2">
             <label for="ReservationExpires" class="form-label">Reserved till</label>
@@ -71,7 +75,14 @@
         <p class="mb-0">Per Hour (pro-rata):</p>
         <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
         <p class="mb-0">Total:</p>
-        <p class="fw-bold fs-1">$@Model.Invoice?.Amount.ToString("F2")</p>
+        @if (Model.Invoice?.Amount != null)
+        {
+            <p class="fw-bold fs-1">$@Model.Invoice?.Amount.ToString("F2")</p>
+        }
+        else if (Model.StartTime != null)
+        {
+            <p class="fw-bold fs-1">$@GetCurrentPrice((DateTime)Model.StartTime, Model.PricePerMinute)</p>
+        }
     </div>
     <div class="text-center">
         @if (!Model.IsExtended && Model.BookingStatus == BookingStatus.Reserved)

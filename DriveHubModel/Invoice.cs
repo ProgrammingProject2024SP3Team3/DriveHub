@@ -38,9 +38,6 @@ namespace DriveHubModel
         public DateTime DateTime { get; set; } = DateTime.Now;
 
         [Required]
-        public int MinutesUsed { get; set; }
-
-        [Required]
         [DataType(DataType.Currency)]
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal Amount { get; set; }

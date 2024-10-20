@@ -47,6 +47,10 @@ namespace DriveHub.Data
                 .Property(c => c.PricePerHour)
                 .HasColumnType("Money");
 
+            modelBuilder.Entity<VehicleRate>()
+                .Property(c => c.PricePerMinute)
+                .HasColumnType("Money");
+
             modelBuilder.Entity<Vehicle>()
                 .HasOne(c => c.VehicleRate)
                 .WithMany(c => c.Vehicles)
@@ -97,6 +101,10 @@ namespace DriveHub.Data
 
             modelBuilder.Entity<Booking>()
                 .Property(c => c.PricePerHour)
+                .HasColumnType("Money");
+
+            modelBuilder.Entity<Booking>()
+                .Property(c => c.PricePerMinute)
                 .HasColumnType("Money");
 
             modelBuilder

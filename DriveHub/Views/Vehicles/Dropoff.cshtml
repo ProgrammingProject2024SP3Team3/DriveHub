@@ -63,7 +63,7 @@
                 <form asp-controller="Bookings" asp-action="Pay">
                     <input type="hidden" asp-for="BookingId" />
                     <input type="submit" value="Pay" class="btn btn-danger mb-4 fw-bold text-white fs-4" />
-                    <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
+                    <a asp-controller="Bookings" asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
                 </form>
             </div>
         </div>

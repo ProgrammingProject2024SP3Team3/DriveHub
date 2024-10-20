@@ -114,11 +114,12 @@ namespace DriveHub.Controllers
             booking.EndTime = DateTime.Now;
             booking.BookingStatus = BookingStatus.Unpaid;
             booking.Vehicle.IsReserved = false;
+            booking.Vehicle.Pod = randPod;
             booking.EndPod = randPod;
 
             var invoice = new Invoice();
             var diff = (decimal)((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes;
-            invoice.Amount = diff * booking.PricePerHour / 60;
+            invoice.Amount = diff * booking.PricePerMinute;
             booking.Invoice = invoice;
 
             _context.Add(invoice);

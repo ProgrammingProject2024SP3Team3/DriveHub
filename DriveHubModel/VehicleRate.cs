@@ -28,16 +28,20 @@ namespace DriveHubModel
         [SetsRequiredMembers]
         public VehicleRate(
             string vehicleRateId,
-            string productId,
+            string priceId,
+            string testPriceId,
             string description,
             decimal pricePerHour,
+            decimal pricePerMinute,
             DateTime effectiveDate
             )
         {
             VehicleRateId = vehicleRateId;
-            ProductId = productId;
+            PriceId = priceId;
+            TestPriceId = testPriceId;
             Description = description;
             PricePerHour = pricePerHour;
+            PricePerMinute = pricePerMinute;
             EffectiveDate = effectiveDate;
         }
 
@@ -46,7 +50,10 @@ namespace DriveHubModel
         public string VehicleRateId { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
-        public string ProductId { get; set; }
+        public string PriceId { get; set; }
+
+        [Required]
+        public string TestPriceId { get; set; }
 
         [Required]
         public string Description { get; set; }
@@ -56,6 +63,10 @@ namespace DriveHubModel
         [DisplayFormat(DataFormatString = "{0:C}")]
         [DisplayName("Price per hour")]
         public decimal PricePerHour { get; set; }
+
+        [Required]
+        [DataType(DataType.Currency)]
+        public decimal PricePerMinute { get; set; }
 
         [Required]
         [DataType(DataType.Date)]

@@ -25,13 +25,15 @@ namespace DriveHubModel
             string id,
             string vehicleId,
             string startPodId,
-            decimal pricePerHour
+            decimal pricePerHour,
+            decimal pricePerMinute
             )
         {
             Id = id;
             VehicleId = vehicleId;
             StartPodId = startPodId;
             PricePerHour = pricePerHour;
+            PricePerMinute = pricePerMinute;
         }
 
         [Key]
@@ -78,6 +80,10 @@ namespace DriveHubModel
         [DisplayName("Price p/h")]
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal PricePerHour { get; set; }
+
+        [Required]
+        [DataType(DataType.Currency)]
+        public decimal PricePerMinute { get; set; }
 
         [Required]
         [DisplayName("Booking status")]

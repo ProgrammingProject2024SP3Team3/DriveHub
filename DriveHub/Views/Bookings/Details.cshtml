@@ -29,6 +29,12 @@
             colour = "white";
             break;
     }
+
+    string GetCurrentPrice(DateTime startTime, decimal pricePerMinute)
+    {
+        var diff = (decimal)(DateTime.Now - startTime).TotalMinutes;
+        return (pricePerMinute * diff).ToString();
+    }
 }
 
 <style>
@@ -55,7 +61,7 @@
         </div>
         <div class="col-xs-12 col-md-4 container-fluid mb-3">
             <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                                                                            @Model.Vehicle.VehicleId
+                            @Model.Vehicle.VehicleId
 }.jpg" style="max-width:250px;">
         </div>
         <hr />
@@ -83,10 +89,21 @@
                 <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
                     <p class="mb-0">Per Hour (pro-rata):</p>
                     <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
-                    <p class="mb-0">Total:</p>
-                    <p class="fw-bold fs-1">$@Model.Invoice?.Amount.ToString("F2")</p>
-                    <p class="mb-0">Total paid:</p>
-                    <p class="fw-bold fs-1">$@Model.Receipt?.Amount.ToString("F2")</p>
+                    @if (Model.Invoice?.Amount != null)
+                    {
+                        <p class="mb-0">Total:</p>
+                        <p class="fw-bold fs-1">$@Model.Invoice?.Amount.ToString("F2")</p>
+                    }
+                    else if (Model.StartTime != null)
+                    {
+                        <p class="mb-0">Current price:</p>
+                        <p class="fw-bold fs-1">$@GetCurrentPrice((DateTime)Model.StartTime, Model.PricePerMinute)</p>
+                    }
+                    @if (Model.Receipt?.Amount != null)
+                    {
+                        <p class="mb-0">Total paid:</p>
+                        <p class="fw-bold fs-1">$@Model.Receipt?.Amount.ToString("F2")</p>
+                    }
                     <hr />
                 </div>
                 <div class="text-center">

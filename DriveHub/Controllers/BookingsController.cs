@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using DriveHub.Models.Dto;
 using Microsoft.AspNetCore.Identity;
 using Stripe.Checkout;
+using Stripe;
 
 namespace DriveHub.Controllers
 {
@@ -174,7 +175,8 @@ namespace DriveHub.Controllers
                     _userManager.GetUserId(User),
                     reservationDto.VehicleId,
                     reservationDto.StartPodId,
-                    vehicle.VehicleRate.PricePerHour
+                    vehicle.VehicleRate.PricePerHour,
+                    vehicle.VehicleRate.PricePerMinute
                     );
 
                 booking.Vehicle = vehicle;
@@ -361,15 +363,16 @@ namespace DriveHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Pay(string BookingId)
         {
-            _logger.LogInformation($"Pay: Paying booking {BookingId}.");
+            _logger.LogInformation($"Pay: Starting payment process for booking {BookingId}.");
 
-            if (string.IsNullOrEmpty(BookingId))
+            if (string.IsNullOrWhiteSpace(BookingId))
             {
                 _logger.LogWarning("Pay: BookingId is null or empty.");
                 return View(nameof(Error));
             }
 
             var booking = await _context.Bookings
+                .AsNoTracking()
                 .Where(c => c.BookingId == BookingId)
                 .Include(c => c.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
@@ -382,12 +385,15 @@ namespace DriveHub.Controllers
                 return View(nameof(Error));
             }
 
-            // Setup the payment
-            var priceId = booking.Vehicle.VehicleRate.ProductId;
+            // Use TestPriceId for development, and PriceId for production
+            var priceId = booking.Vehicle.VehicleRate.TestPriceId;
             var quantity = Convert.ToInt32(((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes);
-            var apiKey = _configuration.GetValue<string>("StripeKey"); // Prod and Test key in configuration
+
+            var apiKey = _configuration.GetValue<string>("StripeKey");
             var client = new Stripe.StripeClient(apiKey);
-            var domain = _configuration.GetValue<string>("Domain"); // Domain in configuration
+            var domain = _configuration.GetValue<string>("Domain");
+
+            _logger.LogInformation($"Using price ID: {priceId}");
 
             var options = new SessionCreateOptions
             {
@@ -400,8 +406,8 @@ namespace DriveHub.Controllers
                     },
                 },
                 Mode = "payment",
-                SuccessUrl = $"{domain}/Payments/Success",
-                CancelUrl = $"{domain}/Payments/Cancel",
+                SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
+                CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
             };
 
             try
@@ -409,11 +415,17 @@ namespace DriveHub.Controllers
                 var service = new SessionService(client);
                 Session session = service.Create(options);
                 Response.Headers.Append("Location", session.Url);
+                _logger.LogInformation("Pay: Stripe session created successfully.");
                 return new StatusCodeResult(303);
+            }
+            catch (StripeException ex)
+            {
+                _logger.LogError(ex, "Pay: Error creating Stripe session.");
+                return View(nameof(Error));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Pay: Error creating Stripe session.");
+                _logger.LogError(ex, "Pay: Unexpected error.");
                 return View(nameof(Error));
             }
         }
