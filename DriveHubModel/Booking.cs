@@ -103,6 +103,11 @@ namespace DriveHubModel
 
         [JsonIgnore]
         public virtual Receipt? Receipt { get; set; } = null;
+
+        public override string ToString()
+        {
+            return $"{BookingId} {VehicleId} {Id} {BookingStatus}";
+        }
     }
 
     /// <summary>

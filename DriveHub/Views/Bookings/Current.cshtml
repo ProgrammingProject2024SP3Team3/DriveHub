@@ -99,7 +99,7 @@
         }
         else if (Model.BookingStatus == BookingStatus.Collected)
         {
-            <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
+            <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" class="btn btn-success mb-4 fw-bold text-white fs-4">
                 Return vehicle
             </a>
             <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
@@ -108,7 +108,7 @@
         {
             <form asp-action="Pay">
                 <input type="hidden" asp-for="BookingId" />
-                <input type="submit" value="Pay" class="btn btn-danger mb-4 fw-bold text-white fs-4" />
+                <input type="submit" value="Pay" class="btn btn-success mb-4 fw-bold text-white fs-4" />
                 <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
             </form>
         }

@@ -16,16 +16,19 @@ namespace DriveHub.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IConfiguration _configuration;
 
         public BookingsController(
             ApplicationDbContext context,
             ILogger<BookingsController> logger,
-            UserManager<IdentityUser> userManager
+            UserManager<IdentityUser> userManager,
+            IConfiguration configuration
         )
         {
             _context = context;
             _logger = logger;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         // GET: Bookings
@@ -212,7 +215,8 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(
-                    c => c.BookingStatus == BookingStatus.Reserved ||
+                    c =>
+                    c.BookingStatus == BookingStatus.Reserved ||
                     c.BookingStatus == BookingStatus.Unpaid ||
                     c.BookingStatus == BookingStatus.Collected
                     )
@@ -353,57 +357,67 @@ namespace DriveHub.Controllers
         /// Pay an invoice
         /// </summary>
         /// <returns>StatusCodeResult</returns>
-        [HttpPost, ActionName("Pay")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        private async Task<IActionResult> Pay(string bookingId)
+        public async Task<IActionResult> Pay(string BookingId)
         {
-            if (bookingId == null)
+            _logger.LogInformation($"Pay: Paying booking {BookingId}.");
+
+            if (string.IsNullOrEmpty(BookingId))
             {
+                _logger.LogWarning("Pay: BookingId is null or empty.");
                 return View(nameof(Error));
             }
 
             var booking = await _context.Bookings
+                .Where(c => c.BookingId == BookingId)
                 .Include(c => c.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.Invoice)
-                .FirstOrDefaultAsync(c => c.BookingId == bookingId);
+                .FirstOrDefaultAsync();
 
-
-            if (booking == null || booking.StartTime == null || booking.EndTime == null)
+            if (booking == null)
             {
+                _logger.LogWarning($"Pay: Booking not found for BookingId: {BookingId}");
                 return View(nameof(Error));
             }
 
+            // Setup the payment
             var priceId = booking.Vehicle.VehicleRate.ProductId;
             var quantity = Convert.ToInt32(((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes);
+            var apiKey = _configuration.GetValue<string>("StripeKey"); // Prod and Test key in configuration
+            var client = new Stripe.StripeClient(apiKey);
+            var domain = _configuration.GetValue<string>("Domain"); // Domain in configuration
 
-            if (booking.Invoice?.Amount != quantity * booking.Vehicle.VehicleRate.PricePerHour / 60)
-            {
-                return View(nameof(Error));
-            }
-
-            //var domain = "https://drivehub.au";
-            var domain = "https://localhost:7045";
             var options = new SessionCreateOptions
             {
                 LineItems = new List<SessionLineItemOptions>
                 {
-                  new SessionLineItemOptions
-                  {
-                    Price = priceId,
-                    Quantity = quantity,
-                  },
+                    new SessionLineItemOptions
+                    {
+                        Price = priceId,
+                        Quantity = quantity,
+                    },
                 },
                 Mode = "payment",
-                SuccessUrl = domain + "/Payments/Success",
-                CancelUrl = domain + "/Payments/Cancel",
+                SuccessUrl = $"{domain}/Payments/Success",
+                CancelUrl = $"{domain}/Payments/Cancel",
             };
-            var service = new SessionService();
-            Session session = service.Create(options);
 
-            Response.Headers.Append("Location", session.Url);
-            return new StatusCodeResult(303);
+            try
+            {
+                var service = new SessionService(client);
+                Session session = service.Create(options);
+                Response.Headers.Append("Location", session.Url);
+                return new StatusCodeResult(303);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Pay: Error creating Stripe session.");
+                return View(nameof(Error));
+            }
         }
+
 
         private bool BookingExists(string id)
         {

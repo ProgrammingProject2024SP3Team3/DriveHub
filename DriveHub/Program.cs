@@ -19,6 +19,8 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
+
     // Set up Key Vault client
     var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
     builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());

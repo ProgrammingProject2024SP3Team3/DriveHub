@@ -55,7 +55,7 @@
         </div>
         <div class="col-xs-12 col-md-4 container-fluid mb-3">
             <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                                                                        @Model.Vehicle.VehicleId
+                                                                            @Model.Vehicle.VehicleId
 }.jpg" style="max-width:250px;">
         </div>
         <hr />
@@ -85,7 +85,7 @@
                     <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
                     <p class="mb-0">Total:</p>
                     <p class="fw-bold fs-1">$@Model.Invoice?.Amount.ToString("F2")</p>
-                    <p class="mb-0">Tota paid:</p>
+                    <p class="mb-0">Total paid:</p>
                     <p class="fw-bold fs-1">$@Model.Receipt?.Amount.ToString("F2")</p>
                     <hr />
                 </div>
@@ -124,7 +124,7 @@
                     {
                         <form asp-action="Pay">
                             <input type="hidden" asp-for="BookingId" />
-                            <input type="submit" value="Pay" class="btn btn-danger mb-4 fw-bold text-white fs-4" />
+                            <input type="submit" value="Pay" class="btn btn-success mb-4 fw-bold text-white fs-4" />
                             <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
                         </form>
                     }
