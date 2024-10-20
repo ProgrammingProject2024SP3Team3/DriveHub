@@ -17,6 +17,8 @@ namespace DriveHub.SeedData
     {
         public string VehicleRateId { get; set; }
 
+        public string ProductId { get; set; }
+
         public string Description { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:C}")]

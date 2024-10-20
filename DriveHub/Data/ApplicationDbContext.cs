@@ -117,8 +117,16 @@ namespace DriveHub.Data
                 .WithOne(c => c.Booking);
 
             modelBuilder.Entity<Invoice>()
+                .HasOne(c => c.Booking)
+                .WithOne(c => c.Invoice);
+
+            modelBuilder.Entity<Invoice>()
                 .Property(c => c.Amount)
                 .HasColumnType("Money");
+
+            modelBuilder.Entity<Receipt>()
+                .HasOne(c => c.Booking)
+                .WithOne(c => c.Receipt);
 
             modelBuilder.Entity<Receipt>()
                 .Property(c => c.Amount)

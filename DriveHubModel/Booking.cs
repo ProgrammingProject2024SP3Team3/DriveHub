@@ -79,14 +79,6 @@ namespace DriveHubModel
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal PricePerHour { get; set; }
 
-        [MaybeNull]
-        [ForeignKey(nameof(Invoice))]
-        public int? InvoiceNumber { get; set; } = null!;
-
-        [MaybeNull]
-        [ForeignKey(nameof(Receipt))]
-        public int? ReceiptNumber { get; set; } = null!;
-
         [Required]
         [DisplayName("Booking status")]
         public BookingStatus BookingStatus { get; set; } = BookingStatus.Reserved;

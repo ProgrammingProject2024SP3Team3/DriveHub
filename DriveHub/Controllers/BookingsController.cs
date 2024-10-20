@@ -95,7 +95,7 @@ namespace DriveHub.Controllers
 
             if (hasReservation)
             {
-                ViewBag.Message = "You have a current booking";
+                ViewBag.Message = "User has a current booking";
                 return RedirectToAction(nameof(Current));
             }
 
@@ -220,6 +220,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
                 .FirstOrDefaultAsync();
 
             if (booking == null)
@@ -268,13 +269,13 @@ namespace DriveHub.Controllers
                 .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
                 .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .ToListAsync();
 
             return View(bookings);
         }
 
-        // GET: Bookings/Details/5
         public async Task<IActionResult> Details(string id)
         {
             var booking = await _context.Bookings
@@ -284,6 +285,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
                 .ThenInclude(d => d.VehicleRate)
+                .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
 
@@ -295,7 +297,6 @@ namespace DriveHub.Controllers
             return View(booking);
         }
 
-        // GET: Bookings/Delete/5
         public async Task<IActionResult> Cancel(string id)
         {
             var booking = await _context.Bookings
@@ -308,7 +309,6 @@ namespace DriveHub.Controllers
             return View(booking);
         }
 
-        // POST: Bookings/Create
         [HttpPost, ActionName("Cancel")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelConfirmed(string id)
@@ -350,23 +350,48 @@ namespace DriveHub.Controllers
         }
 
         /// <summary>
-        /// Return the error page when a booking action is not sane. Not publicly accessible.
+        /// Pay an invoice
         /// </summary>
-        /// <returns>The error page</returns>
+        /// <returns>StatusCodeResult</returns>
         [HttpPost, ActionName("Pay")]
         [ValidateAntiForgeryToken]
-        private IActionResult Pay(Invoice invoice)
+        private async Task<IActionResult> Pay(string bookingId)
         {
-            var domain = "https://drivehub.au";
+            if (bookingId == null)
+            {
+                return View(nameof(Error));
+            }
+
+            var booking = await _context.Bookings
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .Include(c => c.Invoice)
+                .FirstOrDefaultAsync(c => c.BookingId == bookingId);
+
+
+            if (booking == null || booking.StartTime == null || booking.EndTime == null)
+            {
+                return View(nameof(Error));
+            }
+
+            var priceId = booking.Vehicle.VehicleRate.ProductId;
+            var quantity = Convert.ToInt32(((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes);
+
+            if (booking.Invoice?.Amount != quantity * booking.Vehicle.VehicleRate.PricePerHour / 60)
+            {
+                return View(nameof(Error));
+            }
+
+            //var domain = "https://drivehub.au";
+            var domain = "https://localhost:7045";
             var options = new SessionCreateOptions
             {
                 LineItems = new List<SessionLineItemOptions>
                 {
                   new SessionLineItemOptions
                   {
-                    // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                    Price = "{{PRICE_ID}}",
-                    Quantity = 1,
+                    Price = priceId,
+                    Quantity = quantity,
                   },
                 },
                 Mode = "payment",
@@ -378,7 +403,6 @@ namespace DriveHub.Controllers
 
             Response.Headers.Append("Location", session.Url);
             return new StatusCodeResult(303);
-            //return View();
         }
 
         private bool BookingExists(string id)

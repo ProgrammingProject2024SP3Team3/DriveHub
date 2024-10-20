@@ -28,12 +28,14 @@ namespace DriveHubModel
         [SetsRequiredMembers]
         public VehicleRate(
             string vehicleRateId,
+            string productId,
             string description,
             decimal pricePerHour,
             DateTime effectiveDate
             )
         {
             VehicleRateId = vehicleRateId;
+            ProductId = productId;
             Description = description;
             PricePerHour = pricePerHour;
             EffectiveDate = effectiveDate;
@@ -42,6 +44,9 @@ namespace DriveHubModel
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VehicleRateId { get; set; } = Guid.NewGuid().ToString();
+
+        [Required]
+        public string ProductId { get; set; }
 
         [Required]
         public string Description { get; set; }

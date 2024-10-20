@@ -28,6 +28,10 @@ namespace DriveHubModel
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ReceiptNumber { get; set; }
 
+        [Required]
+        [ForeignKey(nameof(Booking))]
+        public string BookingId { get; set; }
+
         [DataType(DataType.DateTime)]
         [DisplayName("Receipt date")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy h:mm tt}", ApplyFormatInEditMode = true)]

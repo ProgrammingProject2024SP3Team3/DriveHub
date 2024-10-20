@@ -117,8 +117,8 @@ namespace DriveHub.Controllers
             booking.EndPod = randPod;
 
             var invoice = new Invoice();
-            var diff = (decimal)((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalHours;
-            invoice.Amount = diff * booking.PricePerHour;
+            var diff = (decimal)((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes;
+            invoice.Amount = diff * booking.PricePerHour / 60;
             booking.Invoice = invoice;
 
             _context.Add(invoice);

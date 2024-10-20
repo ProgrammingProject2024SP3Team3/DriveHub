@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace DriveHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241018050119_Initial")]
+    [Migration("20241020082816_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -48,9 +48,6 @@ namespace DriveHub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("InvoiceNumber")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsExtended")
                         .HasColumnType("bit");
 
@@ -60,9 +57,6 @@ namespace DriveHub.Migrations
 
                     b.Property<decimal>("PricePerHour")
                         .HasColumnType("Money");
-
-                    b.Property<int?>("ReceiptNumber")
-                        .HasColumnType("int");
 
                     b.Property<string>("StartPodId")
                         .IsRequired()
@@ -80,14 +74,6 @@ namespace DriveHub.Migrations
                     b.HasIndex("EndPodId");
 
                     b.HasIndex("Id");
-
-                    b.HasIndex("InvoiceNumber")
-                        .IsUnique()
-                        .HasFilter("[InvoiceNumber] IS NOT NULL");
-
-                    b.HasIndex("ReceiptNumber")
-                        .IsUnique()
-                        .HasFilter("[ReceiptNumber] IS NOT NULL");
 
                     b.HasIndex("StartPodId");
 
@@ -107,10 +93,20 @@ namespace DriveHub.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("Money");
 
+                    b.Property<string>("BookingId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("MinutesUsed")
+                        .HasColumnType("int");
+
                     b.HasKey("InvoiceNumber");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
 
                     b.ToTable("Invoices");
                 });
@@ -152,10 +148,17 @@ namespace DriveHub.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("Money");
 
+                    b.Property<string>("BookingId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
                     b.HasKey("ReceiptNumber");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
 
                     b.ToTable("Receipts");
                 });
@@ -265,6 +268,10 @@ namespace DriveHub.Migrations
 
                     b.Property<decimal>("PricePerHour")
                         .HasColumnType("Money");
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VehicleRateId");
 
@@ -502,14 +509,6 @@ namespace DriveHub.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DriveHubModel.Invoice", "Invoice")
-                        .WithOne("Booking")
-                        .HasForeignKey("DriveHubModel.Booking", "InvoiceNumber");
-
-                    b.HasOne("DriveHubModel.Receipt", "Receipt")
-                        .WithOne("Booking")
-                        .HasForeignKey("DriveHubModel.Booking", "ReceiptNumber");
-
                     b.HasOne("DriveHubModel.Pod", "StartPod")
                         .WithMany("StartPods")
                         .HasForeignKey("StartPodId")
@@ -525,13 +524,20 @@ namespace DriveHub.Migrations
 
                     b.Navigation("EndPod");
 
-                    b.Navigation("Invoice");
-
-                    b.Navigation("Receipt");
-
                     b.Navigation("StartPod");
 
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Invoice", b =>
+                {
+                    b.HasOne("DriveHubModel.Booking", "Booking")
+                        .WithOne("Invoice")
+                        .HasForeignKey("DriveHubModel.Invoice", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("DriveHubModel.Pod", b =>
@@ -549,6 +555,17 @@ namespace DriveHub.Migrations
                     b.Navigation("Site");
 
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Receipt", b =>
+                {
+                    b.HasOne("DriveHubModel.Booking", "Booking")
+                        .WithOne("Receipt")
+                        .HasForeignKey("DriveHubModel.Receipt", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("DriveHubModel.Vehicle", b =>
@@ -613,10 +630,11 @@ namespace DriveHub.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DriveHubModel.Invoice", b =>
+            modelBuilder.Entity("DriveHubModel.Booking", b =>
                 {
-                    b.Navigation("Booking")
-                        .IsRequired();
+                    b.Navigation("Invoice");
+
+                    b.Navigation("Receipt");
                 });
 
             modelBuilder.Entity("DriveHubModel.Pod", b =>
@@ -624,12 +642,6 @@ namespace DriveHub.Migrations
                     b.Navigation("EndPods");
 
                     b.Navigation("StartPods");
-                });
-
-            modelBuilder.Entity("DriveHubModel.Receipt", b =>
-                {
-                    b.Navigation("Booking")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("DriveHubModel.Site", b =>

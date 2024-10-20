@@ -40,24 +40,27 @@
                 <input class="form-control" name="ReservationExpires"
                        value="@Model.Expires" disabled />
             </div>
-            </<div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="StartTime" class="form-label">Booking Start</label>
-                        <input class="form-control" id="StartTime" name="StartTime"
-                               value="@Model.StartTime" disabled />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="EndTime" class="form-label">Booking End</label>
-                        <input class="form-control" id="EndTime" name="EndTime"
-                               value="@Model.EndTime" disabled />
-                    </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="StartTime" class="form-label">Booking Start</label>
+                    <input class="form-control" id="StartTime" name="StartTime"
+                            value="@Model.StartTime" disabled />
                 </div>
-                <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
-                    <p class="mb-0">Per Hour:</p>
-                    <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
-                    <hr />
+                <div class="col-md-6">
+                    <label for="EndTime" class="form-label">Booking End</label>
+                    <input class="form-control" id="EndTime" name="EndTime"
+                            value="@Model.EndTime" disabled />
                 </div>
+            </div>
+            <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
+                <p class="mb-0">Per Hour:</p>
+                <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
+                <hr />
+            </div>
+            <div class="text-center">
+                <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
+                    Return vehicle
+                </a>
             </div>
         </div>
     </div>
