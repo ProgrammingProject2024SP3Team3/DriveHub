@@ -6,6 +6,7 @@ using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using DriveHub.Models.Dto;
 using Microsoft.AspNetCore.Identity;
+using Stripe.Checkout;
 
 namespace DriveHub.Controllers
 {
@@ -352,9 +353,32 @@ namespace DriveHub.Controllers
         /// Return the error page when a booking action is not sane. Not publicly accessible.
         /// </summary>
         /// <returns>The error page</returns>
-        private IActionResult Pay()
+        [HttpPost, ActionName("Pay")]
+        [ValidateAntiForgeryToken]
+        private IActionResult Pay(Invoice invoice)
         {
-            return View();
+            var domain = "https://drivehub.au";
+            var options = new SessionCreateOptions
+            {
+                LineItems = new List<SessionLineItemOptions>
+                {
+                  new SessionLineItemOptions
+                  {
+                    // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                    Price = "{{PRICE_ID}}",
+                    Quantity = 1,
+                  },
+                },
+                Mode = "payment",
+                SuccessUrl = domain + "/Payments/Success",
+                CancelUrl = domain + "/Payments/Cancel",
+            };
+            var service = new SessionService();
+            Session session = service.Create(options);
+
+            Response.Headers.Append("Location", session.Url);
+            return new StatusCodeResult(303);
+            //return View();
         }
 
         private bool BookingExists(string id)
