@@ -120,6 +120,7 @@ namespace DriveHub.Controllers
             var invoice = new Invoice();
             var diff = (decimal)((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes;
             invoice.Amount = diff * booking.PricePerMinute;
+            if (invoice.Amount < 0.5m) { invoice.Amount = 0.5m; }
             booking.Invoice = invoice;
 
             _context.Add(invoice);
