@@ -114,7 +114,7 @@ namespace DriveHub.Controllers
             booking.EndTime = DateTime.Now;
             booking.BookingStatus = BookingStatus.Unpaid;
             booking.Vehicle.IsReserved = false;
-            vehicle.Pod = randPod;
+            randPod.Vehicle = vehicle;
             booking.EndPod = randPod;
 
             var invoice = new Invoice();
@@ -125,7 +125,7 @@ namespace DriveHub.Controllers
 
             _context.Add(invoice);
             _context.Update(booking);
-            _context.Update(vehicle);
+            _context.Update(randPod);
             await _context.SaveChangesAsync();
 
             _logger.LogInformation($"Drop off OK - {booking.BookingId}");

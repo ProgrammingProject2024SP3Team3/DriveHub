@@ -379,27 +379,15 @@ namespace DriveHub.Controllers
                 .Include(c => c.Invoice)
                 .FirstOrDefaultAsync();
 
-            if (booking == null)
+            if (booking == null || booking.Invoice == null)
             {
                 _logger.LogWarning($"Pay: Booking not found for BookingId: {BookingId}");
                 return View(nameof(Error));
             }
 
-            // Use TestPriceId for development, and PriceId for production
-            var priceId = booking.Vehicle.VehicleRate.TestPriceId;
-            var quantity = Convert.ToInt32(((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes);
-
-            // Min stripe charge = $0.50
-            if (quantity * booking.Vehicle.VehicleRate.PricePerMinute < 0.5m)
-            {
-                quantity = 2;
-            }
-
             var apiKey = _configuration.GetValue<string>("StripeKey");
-            var client = new Stripe.StripeClient(apiKey);
+            var client = new StripeClient(apiKey);
             var domain = _configuration.GetValue<string>("Domain");
-
-            _logger.LogInformation($"Using price ID: {priceId}");
 
             var options = new SessionCreateOptions
             {
@@ -407,15 +395,23 @@ namespace DriveHub.Controllers
                 {
                     new SessionLineItemOptions
                     {
-                        Price = priceId,
-                        Quantity = quantity,
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            Currency = "aud", // Australian dollars
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = $"DriveHub - {booking.BookingId}", // Give the transaction a name
+                                Description = "Payment for your next Drivehub ride", // transaction description
+                            },
+                            UnitAmount = (long)booking.Invoice.Amount * 100 // total cost in cents (not dollars)
+                        },
+                        Quantity = 1,
                     },
                 },
                 Mode = "payment",
                 SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
                 CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
             };
-
             try
             {
                 var service = new SessionService(client);
