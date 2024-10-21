@@ -389,6 +389,12 @@ namespace DriveHub.Controllers
             var priceId = booking.Vehicle.VehicleRate.TestPriceId;
             var quantity = Convert.ToInt32(((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes);
 
+            // Min stripe charge = $0.50
+            if (quantity * booking.Vehicle.VehicleRate.PricePerMinute < 0.5m)
+            {
+                quantity = 2;
+            }
+
             var apiKey = _configuration.GetValue<string>("StripeKey");
             var client = new Stripe.StripeClient(apiKey);
             var domain = _configuration.GetValue<string>("Domain");
