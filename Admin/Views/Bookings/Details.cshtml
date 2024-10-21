@@ -10,53 +10,83 @@
     <h4>Booking</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Expires)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Expires)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.StartTime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.StartTime)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.EndTime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.EndTime)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.PricePerHour)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.PricePerHour)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.BookingStatus)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.BookingStatus)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ApplicationUser)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApplicationUser.Id)
+        <dd class="col-sm-10">
+            @ViewBag.User
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.StartPod)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StartPod.PodId)
+        <dd class="col-sm-10">
+            Pod @Model.StartPod.PodName at @Model.StartPod.Site.SiteName
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.EndPod)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EndPod.PodId)
+        <dd class="col-sm-10">
+            @Model.EndPod?.PodName
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Vehicle)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Vehicle.VehicleId)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Vehicle.Name)
+        </dd>
+        <dt class="col-sm-2">
+            Inv#
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Invoice?.InvoiceNumber
+        </dd>
+        <dt class="col-sm-2">
+            Rec#
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Receipt?.ReceiptNumber
+        </dd>
+        <dt class="col-sm-2">
+            Total
+        </dt>
+        <dd class="col-sm-10">
+            $@Model.Invoice?.Amount.ToString("F2")
+        </dd>
+        <dt class="col-sm-2">
+            Balance
+        </dt>
+        <dd class="col-sm-10">
+            $@((Model.Invoice?.Amount - Model.Receipt?.Amount).ToString())
         </dd>
     </dl>
 </div>

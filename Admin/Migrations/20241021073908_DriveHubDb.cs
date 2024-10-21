@@ -7,7 +7,7 @@ using NetTopologySuite.Geometries;
 namespace Admin.Migrations
 {
     /// <inheritdoc />
-    public partial class Application : Migration
+    public partial class DriveHubDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -76,8 +76,11 @@ namespace Admin.Migrations
                 columns: table => new
                 {
                     VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PriceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TestPriceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
+                    PricePerMinute = table.Column<decimal>(type: "Money", nullable: false),
                     EffectiveDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -197,6 +200,7 @@ namespace Admin.Migrations
                 {
                     VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsReserved = table.Column<bool>(type: "bit", nullable: false),
                     Make = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RegistrationPlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -247,13 +251,17 @@ namespace Admin.Migrations
                 columns: table => new
                 {
                     BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Expires = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsExtended = table.Column<bool>(type: "bit", nullable: false),
+                    PaymentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VehicleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     StartPodId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    EndPodId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndPodId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
+                    PricePerMinute = table.Column<decimal>(type: "Money", nullable: false),
                     BookingStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -280,6 +288,48 @@ namespace Admin.Migrations
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
                         principalColumn: "VehicleId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Invoices",
+                columns: table => new
+                {
+                    InvoiceNumber = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Amount = table.Column<decimal>(type: "Money", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoices", x => x.InvoiceNumber);
+                    table.ForeignKey(
+                        name: "FK_Invoices_Bookings_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "Bookings",
+                        principalColumn: "BookingId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Receipts",
+                columns: table => new
+                {
+                    ReceiptNumber = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Amount = table.Column<decimal>(type: "Money", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Receipts", x => x.ReceiptNumber);
+                    table.ForeignKey(
+                        name: "FK_Receipts_Bookings_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "Bookings",
+                        principalColumn: "BookingId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -342,6 +392,12 @@ namespace Admin.Migrations
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Invoices_BookingId",
+                table: "Invoices",
+                column: "BookingId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Pods_SiteId",
                 table: "Pods",
                 column: "SiteId");
@@ -352,6 +408,12 @@ namespace Admin.Migrations
                 column: "VehicleId",
                 unique: true,
                 filter: "[VehicleId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Receipts_BookingId",
+                table: "Receipts",
+                column: "BookingId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_VehicleRateId",
@@ -378,10 +440,16 @@ namespace Admin.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Bookings");
+                name: "Invoices");
+
+            migrationBuilder.DropTable(
+                name: "Receipts");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Bookings");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

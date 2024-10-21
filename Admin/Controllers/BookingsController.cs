@@ -39,14 +39,22 @@ namespace Admin.Controllers
             }
 
             var booking = await _context.Bookings
-                .Include(b => b.EndPod)
                 .Include(b => b.StartPod)
+                .ThenInclude(c => c.Site)
+                .Include(b => b.EndPod)
+                .ThenInclude(c => c.Site)
                 .Include(b => b.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .Include(b => b.Invoice)
+                .Include(b => b.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
+
             if (booking == null)
             {
                 return NotFound();
             }
+
+            ViewBag.User = (await _context.Users.FindAsync(booking.Id)).UserName;
 
             return View(booking);
         }

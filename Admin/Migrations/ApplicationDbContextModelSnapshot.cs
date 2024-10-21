@@ -18,7 +18,7 @@ namespace Admin.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -33,24 +33,36 @@ namespace Admin.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EndPodId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("EndTime")
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Expires")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Id")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsExtended")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PricePerHour")
+                        .HasColumnType("Money");
+
+                    b.Property<decimal>("PricePerMinute")
                         .HasColumnType("Money");
 
                     b.Property<string>("StartPodId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("VehicleId")
@@ -70,10 +82,35 @@ namespace Admin.Migrations
                     b.ToTable("Bookings");
                 });
 
+            modelBuilder.Entity("DriveHubModel.Invoice", b =>
+                {
+                    b.Property<int>("InvoiceNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceNumber"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("Money");
+
+                    b.Property<string>("BookingId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("InvoiceNumber");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
+                    b.ToTable("Invoices");
+                });
+
             modelBuilder.Entity("DriveHubModel.Pod", b =>
                 {
                     b.Property<string>("PodId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PodName")
@@ -95,6 +132,32 @@ namespace Admin.Migrations
                         .HasFilter("[VehicleId] IS NOT NULL");
 
                     b.ToTable("Pods");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Receipt", b =>
+                {
+                    b.Property<int>("ReceiptNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptNumber"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("Money");
+
+                    b.Property<string>("BookingId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ReceiptNumber");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
+                    b.ToTable("Receipts");
                 });
 
             modelBuilder.Entity("DriveHubModel.Site", b =>
@@ -145,6 +208,9 @@ namespace Admin.Migrations
                     b.Property<string>("Colour")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsReserved")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Make")
                         .IsRequired()
@@ -197,8 +263,19 @@ namespace Admin.Migrations
                     b.Property<DateTime>("EffectiveDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PriceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PricePerHour")
                         .HasColumnType("Money");
+
+                    b.Property<decimal>("PricePerMinute")
+                        .HasColumnType("Money");
+
+                    b.Property<string>("TestPriceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VehicleRateId");
 
@@ -428,8 +505,7 @@ namespace Admin.Migrations
                     b.HasOne("DriveHubModel.Pod", "EndPod")
                         .WithMany("EndPods")
                         .HasForeignKey("EndPodId")
-                        .OnDelete(DeleteBehavior.ClientNoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("DriveHubModel.ApplicationUser", "ApplicationUser")
                         .WithMany("Bookings")
@@ -457,6 +533,17 @@ namespace Admin.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("DriveHubModel.Invoice", b =>
+                {
+                    b.HasOne("DriveHubModel.Booking", "Booking")
+                        .WithOne("Invoice")
+                        .HasForeignKey("DriveHubModel.Invoice", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+                });
+
             modelBuilder.Entity("DriveHubModel.Pod", b =>
                 {
                     b.HasOne("DriveHubModel.Site", "Site")
@@ -472,6 +559,17 @@ namespace Admin.Migrations
                     b.Navigation("Site");
 
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("DriveHubModel.Receipt", b =>
+                {
+                    b.HasOne("DriveHubModel.Booking", "Booking")
+                        .WithOne("Receipt")
+                        .HasForeignKey("DriveHubModel.Receipt", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("DriveHubModel.Vehicle", b =>
@@ -534,6 +632,13 @@ namespace Admin.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DriveHubModel.Booking", b =>
+                {
+                    b.Navigation("Invoice");
+
+                    b.Navigation("Receipt");
                 });
 
             modelBuilder.Entity("DriveHubModel.Pod", b =>

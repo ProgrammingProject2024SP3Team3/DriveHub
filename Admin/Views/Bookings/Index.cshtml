@@ -62,7 +62,7 @@
                     @item.StartPod.Site.SiteName #@item.StartPod.PodName
                 </td>
                 <td>
-                    @item.EndPod.Site.SiteName #@item.EndPod.PodName
+                    @item.EndPod?.Site.SiteName #@item.EndPod?.PodName
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Vehicle.Name)
