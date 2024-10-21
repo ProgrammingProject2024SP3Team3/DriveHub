@@ -28,9 +28,7 @@
             <a asp-action="Search" class="small text-right mt-1 btn btn-primary">Find another car close by?</a>
         </div>
         <div class="col container-fluid pb-3">
-            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                        @ViewBag.VehicleId
-}.jpg" style="max-width:350px;">
+            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg" style="max-width:350px;">
         </div>
     </div>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -39,7 +37,7 @@
     <div class="booking-section mb-3">
         <div class="p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Cost</div>
         <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
-            <p class="mb-0">Per Hour:</p>
+            <p class="mb-0">Per Hour (pro-rata):</p>
             <p class="fw-bold fs-1">$<span id="price-per-hour">@ViewBag.PricePerHour.ToString("F2")</span><hr></p>
             <hr />
         </div>

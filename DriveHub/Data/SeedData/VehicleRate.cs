@@ -17,10 +17,17 @@ namespace DriveHub.SeedData
     {
         public string VehicleRateId { get; set; }
 
+        public string PriceId { get; set; }
+
+        public string TestPriceId { get; set; }
+
         public string Description { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal PricePerHour { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:C}")]
+        public decimal PricePerMinute { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime EffectiveDate { get; set; } = DateTime.Now;

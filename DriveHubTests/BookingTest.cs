@@ -214,47 +214,6 @@ namespace DriveHubTests
             Assert.IsType<ViewResult>(result);
         }
 
-        // NOTE: This test conflicts with the M3 booking logic. We might need to implement this logic in M4.
-        // M3 Fact: A vehicle in a pod is available for booking.
-        // M3 Fact: If a vehicle has-a booking, then it does not have-a pod.
-        //[Fact]
-        //public async Task Create_ShouldFail_WhenBookingConflictsWithExistingBooking()
-        //{
-        //    // Arrange: Seed a conflicting booking
-        //    bookingTestFixtures.Context.Bookings.Add(new Booking
-        //    {
-        //        BookingId = Guid.NewGuid().ToString(),
-        //        VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
-        //        StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-        //        EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068",
-        //        StartTime = DateTime.Now.AddHours(1),
-        //        EndTime = DateTime.Now.AddHours(3),
-        //        PricePerHour = 20,
-        //        BookingStatus = BookingStatus.InProgress,
-        //        Id = "test-user-id" // Ensure this matches the expected user ID
-        //    });
-        //    await bookingTestFixtures.Context.SaveChangesAsync();
-
-        //    // Arrange: Attempt to create a booking with conflicting times
-        //    var bookingDto = new ReservationDto
-        //    {
-        //        VehicleId = "236d7fac-7e6f-4856-9203-de65bc9e7545",
-        //        StartPodId = "48ef47b8-95f2-42ac-a17d-7fc596dce08d",
-        //        EndPodId = "e9de308d-c76f-4c3e-98b0-a9911fcaa068",
-        //        StartTime = DateTime.Now.AddHours(2), // Overlaps with existing booking
-        //        EndTime = DateTime.Now.AddHours(4),
-        //        QuotedPricePerHour = 20
-        //    };
-
-        //    // Act
-        //    var result = await bookingTestFixtures.Controller.Create(bookingDto);
-
-        //    // Assert: Check for conflict in ModelState
-        //    var viewResult = Assert.IsType<ViewResult>(result);
-        //    Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);
-        //    Assert.Contains("VehicleId", bookingTestFixtures.Controller.ModelState.Keys);
-        //}
-
         [Fact]
         public async Task Details_ShouldReturnBooking_WhenExists()
         {
@@ -307,7 +266,7 @@ namespace DriveHubTests
             };
 
             // Act: Call the Extend method on the controller with the booking details.
-            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
+            var result = await bookingTestFixtures.Controller.Extend(booking.BookingId);
 
             // Assert: Check if the result is a ViewResult and if the booking is updated.
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -333,7 +292,7 @@ namespace DriveHubTests
             };
 
             // Act: Call the Extend method.
-            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
+            var result = await bookingTestFixtures.Controller.Extend(booking.BookingId);
 
             // Assert: Ensure the model state is invalid due to the past start time.
             Assert.IsType<ViewResult>(result);
@@ -359,7 +318,7 @@ namespace DriveHubTests
             };
 
             // Act: Call the Extend method.
-            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
+            var result = await bookingTestFixtures.Controller.Extend(booking.BookingId);
 
             // Assert: Ensure the model state is invalid due to the end time being before the start time.
             Assert.IsType<ViewResult>(result);
@@ -385,7 +344,7 @@ namespace DriveHubTests
             };
 
             // Act: Call the Extend method.
-            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
+            var result = await bookingTestFixtures.Controller.Extend(booking.BookingId);
 
             // Assert: Ensure the model state is invalid due to the insufficient booking duration.
             Assert.IsType<ViewResult>(result);
@@ -415,7 +374,7 @@ namespace DriveHubTests
             };
 
             // Act: Call the Extend method
-            var result = await bookingTestFixtures.Controller.ExtendReservation(booking.BookingId, editBookingDto);
+            var result = await bookingTestFixtures.Controller.Extend(booking.BookingId);
 
             // Assert: Ensure the model state is invalid
             Assert.False(bookingTestFixtures.Controller.ModelState.IsValid);

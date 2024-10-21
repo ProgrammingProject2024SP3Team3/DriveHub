@@ -25,13 +25,15 @@ namespace DriveHubModel
             string id,
             string vehicleId,
             string startPodId,
-            decimal pricePerHour
+            decimal pricePerHour,
+            decimal pricePerMinute
             )
         {
             Id = id;
             VehicleId = vehicleId;
             StartPodId = startPodId;
             PricePerHour = pricePerHour;
+            PricePerMinute = pricePerMinute;
         }
 
         [Key]
@@ -79,13 +81,9 @@ namespace DriveHubModel
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal PricePerHour { get; set; }
 
-        [MaybeNull]
-        [ForeignKey(nameof(Invoice))]
-        public int? InvoiceNumber { get; set; } = null!;
-
-        [MaybeNull]
-        [ForeignKey(nameof(Receipt))]
-        public int? ReceiptNumber { get; set; } = null!;
+        [Required]
+        [DataType(DataType.Currency)]
+        public decimal PricePerMinute { get; set; }
 
         [Required]
         [DisplayName("Booking status")]
@@ -111,6 +109,11 @@ namespace DriveHubModel
 
         [JsonIgnore]
         public virtual Receipt? Receipt { get; set; } = null;
+
+        public override string ToString()
+        {
+            return $"{BookingId} {VehicleId} {Id} {BookingStatus}";
+        }
     }
 
     /// <summary>

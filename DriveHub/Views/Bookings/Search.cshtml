@@ -8,9 +8,18 @@
 }
 
 <style>
+    a.car-item {
+        color:black;
+    }
+
     a.car-item :hover {
-        color: #1470b5;
-        background-color: #dddddd;
+        background-color: #eeeeee;
+        color: orange;
+    }
+
+    .img-fluid, img-fluid {
+        border-radius: 15px;
+        vertical-align: middle;
     }
 </style>
 
@@ -155,16 +164,16 @@
                         }
                         carListHTML +=
                             `<a class="text-decoration-none car-item" href="/Bookings/Create/${car.VehicleId}">
-                                                    <div class="row border my-3 container-fluid">
-                                                        <div class="col-xs-12 col-sm-3 col-lg-4">
-                                                            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px;">
-                                                        </div>
-                                                        <div class="col-xs-12 col-sm-9 col-lg-8">
-                                                            <div class="mb-0 text-decoration-none text-dark"><strong>${timeText}${locationText}</strong></div>
-                                                            <div class="mb-0 text-decoration-none text-dark">${car.Name} the ${car.Make} ${car.Model}</div>
-                                                        </div>
-                                                    </div>
-                                                    </a>`
+                                <div class="row border my-3 container-fluid">
+                                    <div class="col-xs-12 col-sm-3 col-lg-4">
+                                        <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px;">
+                                    </div>
+                                    <div class="col-xs-12 col-sm-9 col-lg-8">
+                                        <div class="mb-0 text-decoration-none"><strong>${timeText}${locationText}</strong></div>
+                                        <div class="mb-0 text-decoration-none">${car.Name} the ${car.Make} ${car.Model}</div>
+                                    </div>
+                                </div>
+                            </a>`
                         totalCarsDisplayed++;
                     }
                 }

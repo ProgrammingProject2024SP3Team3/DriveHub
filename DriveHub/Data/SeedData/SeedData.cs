@@ -21,8 +21,11 @@ namespace DriveHub.SeedData
             {
                 var vehicleRateDb = new DriveHubModel.VehicleRate(
                     vehicleRate.VehicleRateId,
+                    vehicleRate.PriceId,
+                    vehicleRate.TestPriceId,
                     vehicleRate.Description,
                     vehicleRate.PricePerHour,
+                    vehicleRate.PricePerMinute,
                     vehicleRate.EffectiveDate
                     );
                 context.Add(vehicleRateDb);

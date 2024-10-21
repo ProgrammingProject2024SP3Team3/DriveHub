@@ -6,6 +6,8 @@ using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using DriveHub.Models.Dto;
 using Microsoft.AspNetCore.Identity;
+using Stripe.Checkout;
+using Stripe;
 
 namespace DriveHub.Controllers
 {
@@ -15,16 +17,19 @@ namespace DriveHub.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IConfiguration _configuration;
 
         public BookingsController(
             ApplicationDbContext context,
             ILogger<BookingsController> logger,
-            UserManager<IdentityUser> userManager
+            UserManager<IdentityUser> userManager,
+            IConfiguration configuration
         )
         {
             _context = context;
             _logger = logger;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         // GET: Bookings
@@ -94,7 +99,7 @@ namespace DriveHub.Controllers
 
             if (hasReservation)
             {
-                ViewBag.Message = "You have a current booking";
+                ViewBag.Message = "User has a current booking";
                 return RedirectToAction(nameof(Current));
             }
 
@@ -170,7 +175,8 @@ namespace DriveHub.Controllers
                     _userManager.GetUserId(User),
                     reservationDto.VehicleId,
                     reservationDto.StartPodId,
-                    vehicle.VehicleRate.PricePerHour
+                    vehicle.VehicleRate.PricePerHour,
+                    vehicle.VehicleRate.PricePerMinute
                     );
 
                 booking.Vehicle = vehicle;
@@ -211,7 +217,8 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(
-                    c => c.BookingStatus == BookingStatus.Reserved ||
+                    c =>
+                    c.BookingStatus == BookingStatus.Reserved ||
                     c.BookingStatus == BookingStatus.Unpaid ||
                     c.BookingStatus == BookingStatus.Collected
                     )
@@ -219,6 +226,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
                 .FirstOrDefaultAsync();
 
             if (booking == null)
@@ -267,13 +275,13 @@ namespace DriveHub.Controllers
                 .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
                 .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .ToListAsync();
 
             return View(bookings);
         }
 
-        // GET: Bookings/Details/5
         public async Task<IActionResult> Details(string id)
         {
             var booking = await _context.Bookings
@@ -283,6 +291,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
                 .ThenInclude(d => d.VehicleRate)
+                .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
 
@@ -294,23 +303,18 @@ namespace DriveHub.Controllers
             return View(booking);
         }
 
-        // GET: Bookings/Delete/5
         public async Task<IActionResult> Cancel(string id)
         {
             var booking = await _context.Bookings
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
-                .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
                 .ThenInclude(d => d.VehicleRate)
-                .Include(c => c.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
 
             return View(booking);
         }
 
-        // POST: Bookings/Create
         [HttpPost, ActionName("Cancel")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelConfirmed(string id)
@@ -350,6 +354,88 @@ namespace DriveHub.Controllers
 
             return View(nameof(Index));
         }
+
+        /// <summary>
+        /// Pay an invoice
+        /// </summary>
+        /// <returns>StatusCodeResult</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Pay(string BookingId)
+        {
+            _logger.LogInformation($"Pay: Starting payment process for booking {BookingId}.");
+
+            if (string.IsNullOrWhiteSpace(BookingId))
+            {
+                _logger.LogWarning("Pay: BookingId is null or empty.");
+                return View(nameof(Error));
+            }
+
+            var booking = await _context.Bookings
+                .AsNoTracking()
+                .Where(c => c.BookingId == BookingId)
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .Include(c => c.Invoice)
+                .FirstOrDefaultAsync();
+
+            if (booking == null)
+            {
+                _logger.LogWarning($"Pay: Booking not found for BookingId: {BookingId}");
+                return View(nameof(Error));
+            }
+
+            // Use TestPriceId for development, and PriceId for production
+            var priceId = booking.Vehicle.VehicleRate.TestPriceId;
+            var quantity = Convert.ToInt32(((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes);
+
+            // Min stripe charge = $0.50
+            if (quantity * booking.Vehicle.VehicleRate.PricePerMinute < 0.5m)
+            {
+                quantity = 2;
+            }
+
+            var apiKey = _configuration.GetValue<string>("StripeKey");
+            var client = new Stripe.StripeClient(apiKey);
+            var domain = _configuration.GetValue<string>("Domain");
+
+            _logger.LogInformation($"Using price ID: {priceId}");
+
+            var options = new SessionCreateOptions
+            {
+                LineItems = new List<SessionLineItemOptions>
+                {
+                    new SessionLineItemOptions
+                    {
+                        Price = priceId,
+                        Quantity = quantity,
+                    },
+                },
+                Mode = "payment",
+                SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
+                CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
+            };
+
+            try
+            {
+                var service = new SessionService(client);
+                Session session = service.Create(options);
+                Response.Headers.Append("Location", session.Url);
+                _logger.LogInformation("Pay: Stripe session created successfully.");
+                return new StatusCodeResult(303);
+            }
+            catch (StripeException ex)
+            {
+                _logger.LogError(ex, "Pay: Error creating Stripe session.");
+                return View(nameof(Error));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Pay: Unexpected error.");
+                return View(nameof(Error));
+            }
+        }
+
 
         private bool BookingExists(string id)
         {
