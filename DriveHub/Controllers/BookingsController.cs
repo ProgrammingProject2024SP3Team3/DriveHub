@@ -440,13 +440,19 @@ namespace DriveHub.Controllers
         {
             Settings.License = LicenseType.Community;
 
-            var invoice = await _context.Invoices
-                .Where(c => c.InvoiceNumber == id)
-                .Include(c => c.Booking)
-                .ThenInclude(s => s.Vehicle)
+            var booking = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.Invoice.InvoiceNumber == id)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
+                .Include(c => c.Receipt)
                 .FirstOrDefaultAsync();
 
-            if (invoice == null || invoice.Booking.Id != _userManager.GetUserId(User))
+            if (booking == null || booking.Id != _userManager.GetUserId(User))
             {
                 _logger.LogWarning($"Invoice not found: {id}");
                 return NotFound();
@@ -456,7 +462,7 @@ namespace DriveHub.Controllers
 
             try
             {
-                var doc = new InvoiceDocument(invoice);
+                var doc = new InvoiceDocument(booking);
                 var pdf = doc.GeneratePdf();
                 return File(pdf, "application/pdf", $"DriveHub Inv{id}.pdf");
             }

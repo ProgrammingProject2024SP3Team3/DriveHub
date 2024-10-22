@@ -44,6 +44,7 @@ namespace DriveHub.Models.DocumentModels
                 .Page(page =>
                 {
                     page.Margin(50);
+                    page.Size(PageSizes.A4.Landscape());
                     page.Header().Element(ComposeHeader);
                     page.Content().Element(ComposeContent);
                     page.Footer().AlignCenter().Text(text =>
@@ -72,7 +73,7 @@ namespace DriveHub.Models.DocumentModels
                 });
                 if (LogoImage != null)
                 {
-                    row.ConstantItem(100).Image(LogoImage);
+                    row.ConstantItem(75).Image(LogoImage);
                 }
             });
         }
@@ -100,8 +101,8 @@ namespace DriveHub.Models.DocumentModels
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn(); // Start Time
-                    columns.RelativeColumn(); // Description
+                    columns.RelativeColumn(2); // Start Time
+                    columns.RelativeColumn(4); // Trip
                     columns.RelativeColumn(); // Minutes Used
                     columns.RelativeColumn(); // Price Per Minute
                     columns.RelativeColumn(); // Total
@@ -110,7 +111,7 @@ namespace DriveHub.Models.DocumentModels
                 table.Header(header =>
                 {
                     header.Cell().Text("Start Time").Style(headerStyle);
-                    header.Cell().Text("Description").Style(headerStyle);
+                    header.Cell().Text("Trip").Style(headerStyle);
                     header.Cell().Text("Minutes").Style(headerStyle);
                     header.Cell().Text("Price Per Minute").Style(headerStyle);
                     header.Cell().AlignRight().Text("Total").Style(headerStyle);
@@ -122,7 +123,7 @@ namespace DriveHub.Models.DocumentModels
                 {
                     var totalMinutes = (int)Math.Round((((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes), 0);
                     table.Cell().Element(CellStyle).Text($"{booking.StartTime}");
-                    table.Cell().Element(CellStyle).Text("DriveHub ride share");
+                    table.Cell().Element(CellStyle).Text($"{booking.StartPod.Site.SiteName} to {booking.EndPod?.Site.SiteName}");
                     table.Cell().Element(CellStyle).Text($"{totalMinutes}");
                     table.Cell().Element(CellStyle).Text($"{booking.PricePerMinute:C}");
                     table.Cell().Element(CellStyle).AlignRight().Text($"{booking.Invoice?.Amount:C}");

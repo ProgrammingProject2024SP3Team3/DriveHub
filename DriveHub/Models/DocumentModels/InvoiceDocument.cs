@@ -8,7 +8,7 @@ namespace DriveHub.Models.DocumentModels
     public class InvoiceDocument : IDocument
     {
         public static Image LogoImage { get; }
-        public Invoice Model { get; }
+        public Booking Model { get; }
 
         public int TotalMinutes { get; set; }
 
@@ -26,10 +26,10 @@ namespace DriveHub.Models.DocumentModels
             }
         }
 
-        public InvoiceDocument(Invoice model)
+        public InvoiceDocument(Booking model)
         {
             Model = model;
-            TotalMinutes = (int)Math.Round((((DateTime)model.Booking.EndTime - (DateTime)model.Booking.StartTime).TotalMinutes), 0);
+            TotalMinutes = (int)Math.Round((((DateTime)Model.EndTime - (DateTime)Model.StartTime).TotalMinutes), 0);
         }
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
@@ -57,17 +57,17 @@ namespace DriveHub.Models.DocumentModels
                 row.RelativeItem().Column(column =>
                 {
                     column
-                        .Item().Text($"Invoice #{Model.InvoiceNumber}")
+                        .Item().Text($"Invoice #{Model.Invoice.InvoiceNumber}")
                         .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
                     column.Item().Text(text =>
                     {
                         text.Span("Issue date: ").SemiBold();
-                        text.Span($"{Model.DateTime:d}");
+                        text.Span($"{Model.Invoice.DateTime:d}");
                     });
                 });
                 if (LogoImage != null)
                 {
-                    row.ConstantItem(100).Image(LogoImage);
+                    row.ConstantItem(75).Image(LogoImage);
                 }
             });
         }
@@ -83,7 +83,7 @@ namespace DriveHub.Models.DocumentModels
                     row.ConstantItem(50);
                 });
                 column.Item().Element(ComposeTable);
-                column.Item().PaddingRight(5).AlignRight().Text($"Total paid: {Model.Amount:C}").SemiBold();
+                column.Item().PaddingRight(5).AlignRight().Text($"Total paid: {Model.Invoice.Amount:C}").SemiBold();
             });
         }
 
@@ -94,26 +94,26 @@ namespace DriveHub.Models.DocumentModels
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
+                    columns.RelativeColumn(3);  // Start Time
+                    columns.RelativeColumn(4);  // Trip
+                    columns.RelativeColumn();   // Minutes
+                    columns.RelativeColumn();   // Price p/m
                 });
 
                 table.Header(header =>
                 {
                     header.Cell().Text("Start Time").Style(headerStyle);
-                    header.Cell().Text("Description").Style(headerStyle);
+                    header.Cell().Text("Trip").Style(headerStyle);
                     header.Cell().Text("Minutes Used").Style(headerStyle);
                     header.Cell().AlignRight().Text("Price Per Minute").Style(headerStyle);
 
                     header.Cell().ColumnSpan(4).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
                 });
 
-                table.Cell().Element(CellStyle).Text($"{Model.Booking.StartTime}");
-                table.Cell().Element(CellStyle).Text("DriveHub ride share");
+                table.Cell().Element(CellStyle).Text($"{Model.StartTime}");
+                table.Cell().Element(CellStyle).Text($"{Model.StartPod.Site.SiteName} to {Model.EndPod?.Site.SiteName}");
                 table.Cell().Element(CellStyle).Text($"{TotalMinutes}");
-                table.Cell().Element(CellStyle).AlignRight().Text($"{Model.Booking.PricePerMinute * 1:C}");
+                table.Cell().Element(CellStyle).AlignRight().Text($"{Model.PricePerMinute * 1:C}");
 
                 static IContainer CellStyle(IContainer container) =>
                     container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
