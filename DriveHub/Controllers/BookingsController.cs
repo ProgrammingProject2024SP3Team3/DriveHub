@@ -452,7 +452,7 @@ namespace DriveHub.Controllers
                 .Include(c => c.Receipt)
                 .FirstOrDefaultAsync();
 
-            if (booking == null || booking.Id != _userManager.GetUserId(User))
+            if (booking == null || booking.Receipt == null)
             {
                 _logger.LogWarning($"Invoice not found: {id}");
                 return NotFound();
@@ -479,8 +479,7 @@ namespace DriveHub.Controllers
 
             var bookings = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus != BookingStatus.Reserved)
-                .Where(c => c.BookingStatus != BookingStatus.Collected)
+                .Where(c => c.BookingStatus == BookingStatus.Complete)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)

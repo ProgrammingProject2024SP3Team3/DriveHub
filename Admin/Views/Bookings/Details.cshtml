@@ -98,5 +98,7 @@
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.BookingId">Edit</a> |
+    <a asp-controller="Invoices" asp-action="Details" asp-route-id="@Model?.Invoice?.InvoiceNumber">Invoice</a> |
+    <a asp-controller="Receipts" asp-action="Details" asp-route-id="@Model?.Receipt?.ReceiptNumber">Receipt</a> |
     <a asp-action="Index">Back to List</a>
 </div>
