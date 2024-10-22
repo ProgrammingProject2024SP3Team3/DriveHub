@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<DriveHubModel.Booking>
-
 @{
     ViewData["Title"] = "Index";
 }
@@ -9,14 +8,15 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.StartTime)
+                @Html.ActionLink("Start Time", "Index", new { sortOrder = ViewData["StartTimeSortParm"] })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EndTime)
+                @Html.ActionLink("End Time", "Index", new { sortOrder = ViewData["EndTimeSortParm"] })
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PricePerHour)

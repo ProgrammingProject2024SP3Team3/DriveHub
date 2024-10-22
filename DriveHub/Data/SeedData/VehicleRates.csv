@@ -1,5 +1,5 @@
 VehicleRateId,PriceId,TestPriceId,Description,PricePerHour,PricePerMinute,EffectiveDate
-798e5cce-92bb-493f-915c-f251c0dd674e,price_1QBynPFqWUoHjTKqR6y0JJ1Z,price_1QByteFqWUoHjTKqYO20PJfW,Standard,20,0.34,2024-09-21 15:39:51
-2452a253-031c-4de5-a6db-03691eac644b,price_1QBynOFqWUoHjTKqzsKZHNMc,price_1QBytdFqWUoHjTKq2IQektic,Electric,20.50,0.40,2024-09-21 15:39:51
-f11eec17-116c-4513-abe8-83049c0fa924,price_1QBynMFqWUoHjTKqyLHp60oP,price_1QBytbFqWUoHjTKq3JVUoDfd,Utility,25,0.41,2024-09-21 15:39:51
-4f040b3d-f4a9-4b8a-95f7-ed06ea181c34,price_1QBynNFqWUoHjTKqssVwhZLL,price_1QBytcFqWUoHjTKqxlUFAIxG,SUV,27.50,0.46,2024-09-21 15:39:51
+798e5cce-92bb-493f-915c-f251c0dd674e,Standard,20,0.34,2024-09-21 15:39:51
+2452a253-031c-4de5-a6db-03691eac644b,Electric,20.50,0.40,2024-09-21 15:39:51
+f11eec17-116c-4513-abe8-83049c0fa924,Utility,25,0.41,2024-09-21 15:39:51
+4f040b3d-f4a9-4b8a-95f7-ed06ea181c34,SUV,27.50,0.46,2024-09-21 15:39:51

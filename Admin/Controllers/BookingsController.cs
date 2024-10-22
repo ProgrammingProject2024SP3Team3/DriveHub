@@ -16,19 +16,39 @@ namespace Admin.Controllers
         }
 
         // GET: Bookings
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
-            var bookings = await _context.Bookings
-                .Include(b => b.EndPod)
-                .ThenInclude(c => c.Site)
-                .Include(b => b.StartPod)
-                .ThenInclude(c => c.Site)
-                .Include(b => b.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
-                .ToListAsync();
+            ViewData["StartTimeSortParm"] = String.IsNullOrEmpty(sortOrder) ? "start_desc" : "";
+            ViewData["EndTimeSortParm"] = sortOrder == "EndTime" ? "end_desc" : "EndTime";
 
-            return View(bookings);
+            var bookings = from b in _context.Bookings
+                           .Include(b => b.EndPod)
+                           .ThenInclude(c => c.Site)
+                           .Include(b => b.StartPod)
+                           .ThenInclude(c => c.Site)
+                           .Include(b => b.Vehicle)
+                           .ThenInclude(c => c.VehicleRate)
+                           select b;
+
+            switch (sortOrder)
+            {
+                case "start_desc":
+                    bookings = bookings.OrderByDescending(b => b.StartTime);
+                    break;
+                case "EndTime":
+                    bookings = bookings.OrderBy(b => b.EndTime);
+                    break;
+                case "end_desc":
+                    bookings = bookings.OrderByDescending(b => b.EndTime);
+                    break;
+                default:
+                    bookings = bookings.OrderBy(b => b.StartTime);
+                    break;
+            }
+
+            return View(await bookings.AsNoTracking().ToListAsync());
         }
+
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(string id)
@@ -82,6 +102,7 @@ namespace Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);

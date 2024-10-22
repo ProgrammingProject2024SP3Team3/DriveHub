@@ -400,10 +400,10 @@ namespace DriveHub.Controllers
                             Currency = "aud", // Australian dollars
                             ProductData = new SessionLineItemPriceDataProductDataOptions
                             {
-                                Name = $"DriveHub - {booking.BookingId}", // Give the transaction a name
-                                Description = "Payment for your next Drivehub ride", // transaction description
+                                Name = $"DriveHub - {booking.BookingId}",
+                                Description = "Payment for your Drivehub ride",
                             },
-                            UnitAmount = (long)booking.Invoice.Amount * 100 // total cost in cents (not dollars)
+                            UnitAmount = (long)booking.Invoice.Amount * 100,
                         },
                         Quantity = 1,
                     },

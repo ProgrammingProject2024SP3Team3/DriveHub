@@ -4,10 +4,10 @@ using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace Admin.Migrations
+namespace DriveHub.Migrations
 {
     /// <inheritdoc />
-    public partial class DriveHubDb : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -76,8 +76,6 @@ namespace Admin.Migrations
                 columns: table => new
                 {
                     VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PriceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TestPriceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
                     PricePerMinute = table.Column<decimal>(type: "Money", nullable: false),

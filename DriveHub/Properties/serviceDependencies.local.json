@@ -7,11 +7,11 @@
       "connectionId": "VaultUri"
     },
     "mssql1": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiasoutheast/connectors/ConnectionStringsDriveHubDb_B0CE4476E0",
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/australiaeast/connectors/DriveHubDb_26EFC62899",
       "secretStore": "AzureKeyVault",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehub/databases/DriveHubDb",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/drivehubaus/databases/DriveHubDb",
       "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:DriveHubDb"
+      "connectionId": "DriveHubDb"
     }
   }
 }

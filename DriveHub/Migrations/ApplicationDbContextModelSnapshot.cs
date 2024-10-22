@@ -263,19 +263,11 @@ namespace DriveHub.Migrations
                     b.Property<DateTime>("EffectiveDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PriceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("PricePerHour")
                         .HasColumnType("Money");
 
                     b.Property<decimal>("PricePerMinute")
                         .HasColumnType("Money");
-
-                    b.Property<string>("TestPriceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VehicleRateId");
 
