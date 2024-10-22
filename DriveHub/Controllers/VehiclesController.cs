@@ -123,12 +123,12 @@ namespace DriveHub.Controllers
             randPod.Vehicle = vehicle;
             booking.EndPod = randPod;
 
-            var totalMinutes = Math.Round((((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes), 0);
-            var totalAmount = Math.Max((decimal)totalMinutes, 2) * booking.PricePerMinute;
+            var totalMinutes = (int)Math.Round((((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes), 0);
+            var totalAmount = (decimal)(Math.Max(totalMinutes, 2)) * booking.PricePerMinute;
 
             var invoice = new Invoice
             {
-                Amount = Math.Round(Math.Max(((decimal)((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes) * booking.PricePerMinute, booking.PricePerMinute * 2))
+                Amount = totalAmount
             };
 
             booking.Invoice = invoice;

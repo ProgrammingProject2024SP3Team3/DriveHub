@@ -1,16 +1,18 @@
 ﻿using DriveHubModel;
+using global::QuestPDF.Helpers;
+using global::QuestPDF.Infrastructure;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
 
 namespace DriveHub.Models.DocumentModels
 {
-    public class BookingsDocument : IDocument
+    public class InvoiceDocument : IDocument
     {
         public static Image LogoImage { get; }
-        public IList<Booking> Bookings { get; }
+        public Invoice Model { get; }
 
-        static BookingsDocument()
+        public int TotalMinutes { get; set; }
+
+        static InvoiceDocument()
         {
             try
             {
@@ -24,11 +26,11 @@ namespace DriveHub.Models.DocumentModels
             }
         }
 
-        public BookingsDocument(IList<Booking> bookings)
+        public InvoiceDocument(Invoice model)
         {
-            Bookings = bookings;
+            Model = model;
+            TotalMinutes = (int)Math.Round((((DateTime)model.Booking.EndTime - (DateTime)model.Booking.StartTime).TotalMinutes), 0);
         }
-
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
         public void Compose(IDocumentContainer container)
@@ -55,12 +57,12 @@ namespace DriveHub.Models.DocumentModels
                 row.RelativeItem().Column(column =>
                 {
                     column
-                        .Item().Text("Bookings Report")
+                        .Item().Text($"Invoice #{Model.InvoiceNumber}")
                         .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
                     column.Item().Text(text =>
                     {
                         text.Span("Issue date: ").SemiBold();
-                        text.Span($"{DateTime.Now:d}");
+                        text.Span($"{Model.DateTime:d}");
                     });
                 });
                 if (LogoImage != null)
@@ -81,6 +83,7 @@ namespace DriveHub.Models.DocumentModels
                     row.ConstantItem(50);
                 });
                 column.Item().Element(ComposeTable);
+                column.Item().PaddingRight(5).AlignRight().Text($"Total paid: {Model.Amount:C}").SemiBold();
             });
         }
 
@@ -91,11 +94,10 @@ namespace DriveHub.Models.DocumentModels
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn(); // Start Time
-                    columns.RelativeColumn(); // Description
-                    columns.RelativeColumn(); // Minutes Used
-                    columns.RelativeColumn(); // Price Per Minute
-                    columns.RelativeColumn(); // Total
+                    columns.RelativeColumn();
+                    columns.RelativeColumn();
+                    columns.RelativeColumn();
+                    columns.RelativeColumn();
                 });
 
                 table.Header(header =>
@@ -103,25 +105,56 @@ namespace DriveHub.Models.DocumentModels
                     header.Cell().Text("Start Time").Style(headerStyle);
                     header.Cell().Text("Description").Style(headerStyle);
                     header.Cell().Text("Minutes Used").Style(headerStyle);
-                    header.Cell().Text("Price Per Minute").Style(headerStyle);
-                    header.Cell().AlignRight().Text("Total").Style(headerStyle);
+                    header.Cell().AlignRight().Text("Price Per Minute").Style(headerStyle);
 
-                    header.Cell().ColumnSpan(5).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
+                    header.Cell().ColumnSpan(4).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
                 });
 
-                foreach (var booking in Bookings)
-                {
-                    var totalMinutes = (int)Math.Round((((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes), 0);
-                    table.Cell().Element(CellStyle).Text($"{booking.StartTime}");
-                    table.Cell().Element(CellStyle).Text("DriveHub ride share");
-                    table.Cell().Element(CellStyle).Text($"{totalMinutes}");
-                    table.Cell().Element(CellStyle).Text($"{booking.PricePerMinute:C}");
-                    table.Cell().Element(CellStyle).AlignRight().Text($"{booking.Invoice?.Amount:C}");
+                table.Cell().Element(CellStyle).Text($"{Model.Booking.StartTime}");
+                table.Cell().Element(CellStyle).Text("DriveHub ride share");
+                table.Cell().Element(CellStyle).Text($"{TotalMinutes}");
+                table.Cell().Element(CellStyle).AlignRight().Text($"{Model.Booking.PricePerMinute * 1:C}");
 
-                    static IContainer CellStyle(IContainer container) =>
-                        container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
-                }
+                static IContainer CellStyle(IContainer container) =>
+                    container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
             });
         }
+    }
+}
+
+public class Address
+{
+    public string CompanyName { get; set; } = "DriveHub";
+    public string Street { get; set; } = "1/45 Obviously Fake St";
+    public string City { get; set; } = "Melbourne";
+    public string State { get; set; } = "VIC";
+    public string Email { get; set; } = "billing@drivehub.au";
+    public string Phone { get; set; } = "03 9845 1223";
+}
+
+public class AddressComponent : IComponent
+{
+    private string Title { get; }
+    private Address Address { get; }
+
+    public AddressComponent(string title, Address address)
+    {
+        Title = title;
+        Address = address;
+    }
+
+    public void Compose(IContainer container)
+    {
+        container.ShowEntire().Column(column =>
+        {
+            column.Spacing(2);
+            column.Item().Text(Title).SemiBold();
+            column.Item().PaddingBottom(5).LineHorizontal(1);
+            column.Item().Text(Address.CompanyName);
+            column.Item().Text(Address.Street);
+            column.Item().Text($"{Address.City}, {Address.State}");
+            column.Item().Text(Address.Email);
+            column.Item().Text(Address.Phone);
+        });
     }
 }

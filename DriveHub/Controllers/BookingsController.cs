@@ -8,6 +8,10 @@ using DriveHub.Models.Dto;
 using Microsoft.AspNetCore.Identity;
 using Stripe.Checkout;
 using Stripe;
+using DriveHub.Models.DocumentModels;
+using QuestPDF.Fluent;
+using QuestPDF;
+using QuestPDF.Infrastructure;
 
 namespace DriveHub.Controllers
 {
@@ -429,6 +433,67 @@ namespace DriveHub.Controllers
             {
                 _logger.LogError(ex, "Pay: Unexpected error.");
                 return View(nameof(Error));
+            }
+        }
+
+        public async Task<IActionResult> PrintInvoice(int id)
+        {
+            Settings.License = LicenseType.Community;
+
+            var invoice = await _context.Invoices
+                .Where(c => c.InvoiceNumber == id)
+                .Include(c => c.Booking)
+                .ThenInclude(s => s.Vehicle)
+                .FirstOrDefaultAsync();
+
+            if (invoice == null)
+            {
+                _logger.LogWarning($"Invoice not found: {id}");
+                return NotFound();
+            }
+
+            _logger.LogInformation($"Generated invoice: {id}");
+
+            try
+            {
+                var doc = new InvoiceDocument(invoice);
+                var pdf = doc.GeneratePdf();
+                return File(pdf, "application/pdf", $"invoice_{id}.pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error generating invoice: {id}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> PrintReport(int id)
+        {
+            Settings.License = LicenseType.Community;
+
+            var bookings = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.BookingStatus != BookingStatus.Reserved)
+                .Where(c => c.BookingStatus != BookingStatus.Collected)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
+                .Include(c => c.Receipt)
+                .ToListAsync();
+
+            try
+            {
+                var doc = new BookingsDocument(bookings);
+                var pdf = doc.GeneratePdf();
+                return File(pdf, "application/pdf", $"DriveHub Booking Report.pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error generating booking report");
+                return StatusCode(500, "Internal server error");
             }
         }
 

@@ -31,6 +31,9 @@
 }
 else
 {
+    <a asp-controller="Bookings" asp-action="PrintReport" class="btn btn-success mb-4 fw-bold text-white fs-4">
+        Print report
+    </a>
     foreach (var booking in Model)
     {
         string colour = "";
@@ -59,7 +62,6 @@ else
                 colour = "white";
                 break;
         }
-
         <div class="row">
             <a asp-action="Details" asp-route-id="@booking.BookingId" class="booking-link text-decoration-none car-item">
                 <div class="row border my-3 container-fluid">

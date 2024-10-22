@@ -145,6 +145,11 @@
                             <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
                         </form>
                     }
+                    else if (Model.BookingStatus == BookingStatus.Complete)
+                    {
+                        <a asp-action="PrintInvoice" asp-route-id="@Model.Invoice?.InvoiceNumber" class="btn btn-success mb-4 fw-bold text-white fs-4">Print invoice</a>
+                        <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
+                    }
                 </div>
             </div>
         </div>
