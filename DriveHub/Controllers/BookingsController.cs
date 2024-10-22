@@ -446,7 +446,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(s => s.Vehicle)
                 .FirstOrDefaultAsync();
 
-            if (invoice == null)
+            if (invoice == null || invoice.Booking.Id != _userManager.GetUserId(User))
             {
                 _logger.LogWarning($"Invoice not found: {id}");
                 return NotFound();
@@ -458,7 +458,7 @@ namespace DriveHub.Controllers
             {
                 var doc = new InvoiceDocument(invoice);
                 var pdf = doc.GeneratePdf();
-                return File(pdf, "application/pdf", $"invoice_{id}.pdf");
+                return File(pdf, "application/pdf", $"DriveHub Inv{id}.pdf");
             }
             catch (Exception ex)
             {

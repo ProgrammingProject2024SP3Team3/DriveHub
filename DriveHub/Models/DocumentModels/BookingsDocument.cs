@@ -10,6 +10,8 @@ namespace DriveHub.Models.DocumentModels
         public static Image LogoImage { get; }
         public IList<Booking> Bookings { get; }
 
+        public decimal TotalAmount { get; } = 0;
+
         static BookingsDocument()
         {
             try
@@ -27,6 +29,11 @@ namespace DriveHub.Models.DocumentModels
         public BookingsDocument(IList<Booking> bookings)
         {
             Bookings = bookings;
+
+            foreach (Booking booking in Bookings)
+            {
+                TotalAmount += booking.Invoice.Amount;
+            }
         }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
@@ -81,6 +88,8 @@ namespace DriveHub.Models.DocumentModels
                     row.ConstantItem(50);
                 });
                 column.Item().Element(ComposeTable);
+
+                column.Item().PaddingRight(5).AlignRight().Text($"Total: {TotalAmount:C}").SemiBold();
             });
         }
 
@@ -102,7 +111,7 @@ namespace DriveHub.Models.DocumentModels
                 {
                     header.Cell().Text("Start Time").Style(headerStyle);
                     header.Cell().Text("Description").Style(headerStyle);
-                    header.Cell().Text("Minutes Used").Style(headerStyle);
+                    header.Cell().Text("Minutes").Style(headerStyle);
                     header.Cell().Text("Price Per Minute").Style(headerStyle);
                     header.Cell().AlignRight().Text("Total").Style(headerStyle);
 
