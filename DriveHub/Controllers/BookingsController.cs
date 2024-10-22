@@ -443,6 +443,7 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.Invoice.InvoiceNumber == id)
+                .Where(c => c.BookingStatus == BookingStatus.Complete)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
