@@ -8,24 +8,11 @@
 }
 
 <style>
-    a.car-item {
-        color:black;
-    }
-
-    a.car-item :hover {
-        background-color: #eeeeee;
-        color: orange;
-    }
-
-    .img-fluid, img-fluid {
-        border-radius: 15px;
-        vertical-align: middle;
-    }
 </style>
 
 <h1 class="mb-6">Booking Search</h1>
-<div class="mb-3 p-2 fw-bold fs-4" style="background-color: #FFBA17;">Select a location or number of seats to show available cars</div>
 <div class="row">
+    <div class="mb-3 p-2 fw-bold fs-4" style="background-color: #FFBA17;">Select a location or number of seats to show available cars</div>
     <div class="col-xs-12 col-md-4">
         <div class="mb-3">
             <label for="pac-input" class="form-label">Location</label>
@@ -37,12 +24,12 @@
                 <option value="any" selected>Any</option>
             </select>
         </div>
-        <!--<div class="mb-3">
+        <div class="mb-3">
             <label for="vehicleRatesSelect" asp-for="VehicleRates" class="form-label">Vehicle category</label>
             <select class="form-select" id="vehicleRatesSelect" asp-items="ViewBag.VehicleRates">
                 <option value="any" selected>Any</option>
             </select>
-        </div>-->
+        </div>
     </div>
     <div class="col mb-4" id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;"></div>
     <div class="mb-3 p-2 fw-bold fs-4" style="background-color: #FFBA17;">Select a car</div>
@@ -58,9 +45,8 @@
             // The raw search data converted to JSON (there is no customer entered data in this)
             // TODO: There is an assumption here that those who can enter Admin data are not trying to hack users, which may be unacceptable. We can manually create nodes and use textContent if admin XSS is a concern.
             let siteData
-        @* let siteData = @Html.Raw(JsonSerializer.Serialize(ViewData["siteData"])) *@
-                // The google map object
-                let map;
+            // The google map object
+            let map;
             // All markers currently placed on the map
             let markers = []
             // The geolocation of the user
@@ -137,8 +123,9 @@
                 let carListHTML = ''
                 let totalCarsDisplayed = 0
 
-                // Get the number of seats selected by the user
+                // Get the vehicle options selected by the user in drop downs
                 let numberOfSeats = document.getElementById('seatCountSelect').value
+                let vehicleCategory = document.getElementById('vehicleRatesSelect').selectedOptions[0].text
 
                 // Render a big horrible Raw HTML block for ever nearby car
                 // TODO: this is so ugly and it's a prime cleanup candidate once we're feature complete
@@ -149,6 +136,8 @@
                         let car = pod.Vehicle
                         // Skip cars with the wrong number of seats
                         if (numberOfSeats !== 'any' && numberOfSeats != car.Seats) continue
+                        // Skip cars that are the wrong vehicle category
+                        if (vehicleCategory !== 'Any' && vehicleCategory != car.Category) continue
 
                         let locationText = `${site.SiteName}, ${site.City}`.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' ') // format location from db
                         let timeText = ''
@@ -163,14 +152,24 @@
                             }
                         }
                         carListHTML +=
-                            `<a class="text-decoration-none car-item" href="/Bookings/Create/${car.VehicleId}">
-                                <div class="row border my-3 container-fluid">
-                                    <div class="col-xs-12 col-sm-3 col-lg-4">
-                                        <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px;">
-                                    </div>
-                                    <div class="col-xs-12 col-sm-9 col-lg-8">
-                                        <div class="mb-0 text-decoration-none"><strong>${timeText}${locationText}</strong></div>
-                                        <div class="mb-0 text-decoration-none">${car.Name} the ${car.Make} ${car.Model}</div>
+                            `<a class="text-decoration-none" href="/Bookings/Create/${car.VehicleId}">
+                                <div class="border-0 shadow-sm mb-3 hover-card">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-12 col-sm-4 col-lg-3 p-3">
+                                            <img class="img-fluid rounded w-100 object-fit-cover shadow-sm" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px; height:100px;">
+                                        </div>
+                                        <div class="col-12 col-sm-8 col-lg-9">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center gap-2 mb-3">
+                                                    <i class="bi bi-geo-alt fs-5 text-primary"></i>
+                                                    <h5 class="fw-bold text-dark mb-0 pt-1">
+                                                        ${timeText}${locationText}
+                                                    </h6>
+                                                </div>
+
+                                                <h5 class="card-title text-primary mb-3 text-dark">${car.Name} the ${car.Make} ${car.Model}</h5>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </a>`
@@ -281,8 +280,9 @@
                 // Init a click listener on the map that let's the user choose their search
                 initMapClickListener(map)
 
-                // Update the map whenever the user picks another seat count
+                // Update the map whenever the user picks another car option in the drop downs (eg. seat count / vehicle category)
                 document.getElementById('seatCountSelect').addEventListener('change', updateMap)
+                document.getElementById('vehicleRatesSelect').addEventListener('change', updateMap)
 
                 updateMap()
             }
@@ -326,6 +326,7 @@
                 // Turn map into a simple list as map expects
                 let siteTree = []
                 for (let siteName in siteMap) siteTree.push(siteMap[siteName])
+                console.log(siteTree)
                 return siteTree
             }
 
