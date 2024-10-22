@@ -1,11 +1,13 @@
 ﻿using Admin.Data;
 using DriveHubModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Controllers
 {
+    [Authorize]
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
