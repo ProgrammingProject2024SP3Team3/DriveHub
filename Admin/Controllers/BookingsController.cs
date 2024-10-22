@@ -16,10 +16,13 @@ namespace Admin.Controllers
         }
 
         // GET: Bookings
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchUser, string startPodFilter, string endPodFilter)
         {
             ViewData["StartTimeSortParm"] = String.IsNullOrEmpty(sortOrder) ? "start_desc" : "";
             ViewData["EndTimeSortParm"] = sortOrder == "EndTime" ? "end_desc" : "EndTime";
+            ViewData["CurrentFilter"] = searchUser;
+            ViewData["StartPodFilter"] = startPodFilter;
+            ViewData["EndPodFilter"] = endPodFilter;
 
             var bookings = from b in _context.Bookings
                            .Include(b => b.EndPod)
@@ -30,6 +33,25 @@ namespace Admin.Controllers
                            .ThenInclude(c => c.VehicleRate)
                            select b;
 
+            // Filter by user
+            if (!String.IsNullOrEmpty(searchUser))
+            {
+                bookings = bookings.Where(b => b.Id.Contains(searchUser));
+            }
+
+            // Filter by start pod
+            if (!String.IsNullOrEmpty(startPodFilter))
+            {
+                bookings = bookings.Where(b => b.StartPod.PodName.Contains(startPodFilter));
+            }
+
+            // Filter by end pod
+            if (!String.IsNullOrEmpty(endPodFilter))
+            {
+                bookings = bookings.Where(b => b.EndPod.PodName.Contains(endPodFilter));
+            }
+
+            // Sort the results
             switch (sortOrder)
             {
                 case "start_desc":
@@ -48,6 +70,7 @@ namespace Admin.Controllers
 
             return View(await bookings.AsNoTracking().ToListAsync());
         }
+
 
 
         // GET: Bookings/Details/5

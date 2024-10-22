@@ -9,6 +9,15 @@
     <a asp-action="Create">Create New</a>
 </p>
 
+<form asp-action="Index" method="get">
+    <p>
+        User ID: <input type="text" name="searchUser" value="@ViewData["CurrentFilter"]" />
+        Start Pod: <input type="text" name="startPodFilter" value="@ViewData["StartPodFilter"]" />
+        End Pod: <input type="text" name="endPodFilter" value="@ViewData["EndPodFilter"]" />
+        <input type="submit" value="Filter" class="btn btn-default" />
+    </p>
+</form>
+
 <table class="table">
     <thead>
         <tr>
