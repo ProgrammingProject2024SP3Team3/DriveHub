@@ -122,7 +122,7 @@ namespace DriveHub.Controllers
                 return View(nameof(Error));
             }
 
-            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
+            ViewBag.Vehicle = vehicle;
             ViewBag.VehicleId = vehicle.VehicleId;
             ViewBag.StartPod = $"{vehicle.Pod.Site.SiteName} Pod #{vehicle.Pod.PodName}";
             ViewBag.StartPodId = vehicle.Pod.PodId;
@@ -414,7 +414,7 @@ namespace DriveHub.Controllers
                 },
                 Mode = "payment",
                 SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
-                CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
+                CancelUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
             };
             try
             {
