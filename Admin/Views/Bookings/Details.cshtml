@@ -8,8 +8,9 @@
     {
         string balance = String.Empty;
         if (invoiceAmount == null) { balance = "$0.00"; }
-        if (invoiceAmount != null && receiptAmount == null) { balance = ((decimal)invoiceAmount).ToString("c"); }
-        if (invoiceAmount != null && receiptAmount != null && invoiceAmount == receiptAmount) { balance = "$0.00"; }
+        else if (invoiceAmount != null && receiptAmount == null) { balance = ((decimal)invoiceAmount).ToString("c"); }
+        else if (invoiceAmount != null && receiptAmount != null && invoiceAmount == receiptAmount) { balance = "$0.00"; }
+        else if (invoiceAmount != null && receiptAmount != null) balance = ((decimal)invoiceAmount - (decimal)receiptAmount).ToString("c");
         return balance;
     }
 }
@@ -27,16 +28,16 @@
             @Html.DisplayFor(model => model.Expires)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.StartTime)
+            Start time
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.StartTime)
+            @Model.StartTime
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EndTime)
+            End time
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.EndTime)
+            @Model.EndTime
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.PricePerHour)
@@ -57,16 +58,16 @@
             @ViewBag.User
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.StartPod)
+            Start location
         </dt>
         <dd class="col-sm-10">
-            Pod @Model.StartPod.PodName at @Model.StartPod.Site.SiteName
+            Pod @Model.StartPod?.PodName at @Model.StartPod?.Site.SiteName
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EndPod)
+            End location
         </dt>
         <dd class="col-sm-10">
-            Pod @Model.EndPod.PodName at @Model.EndPod.Site.SiteName
+            Pod @Model.EndPod?.PodName at @Model.EndPod?.Site.SiteName
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Vehicle)
