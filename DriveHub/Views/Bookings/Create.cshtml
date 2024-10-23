@@ -53,13 +53,13 @@
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg" style="width: 100%;">
+                    <img class="img-fluid rounded w-100" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg">
                 </div>
             </div>
         </div>
         <div class="mb-3">
-            <div class="p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Cost</div>
-            <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
+            <div class="p-2 fw-bold fs-4 text-center" style="background-color: #FFBA17;">Booking Cost</div>
+            <div class="text-center bg-white p-3 pb-0" style="border: 1px solid #dee2e6;">
                 <p class="mb-0">Per Hour (pro-rata):</p>
                 <p class="fw-bold fs-1">$<span id="price-per-hour">@ViewBag.PricePerHour.ToString("F2")/hr</span></p>
             </div>
@@ -70,7 +70,7 @@
             <input type="hidden" asp-for="StartPodId" value="@ViewBag.StartPodId" />
             <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
             <input type="submit" value="Create Reservation" id="create-button" class="btn confirm-btn mb-4 col-12 fw-bold text-white fs-4"
-        style="background-color: #00A8E8;" />
+        style="background-color: #00A8E8; max-width: 500px;" />
         </div>
 
     </form>
