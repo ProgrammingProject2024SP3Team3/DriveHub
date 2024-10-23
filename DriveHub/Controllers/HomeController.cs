@@ -57,6 +57,11 @@ namespace DriveHub.Controllers
             return View(contact);
         }
 
+        public IActionResult Subscribe()
+        {
+            return View();
+        }
+
         private IActionResult MessageReceived()
         {
             return View();
