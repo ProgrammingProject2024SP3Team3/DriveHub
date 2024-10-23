@@ -407,7 +407,7 @@ namespace DriveHub.Controllers
                                 Name = $"DriveHub - {booking.BookingId}",
                                 Description = "Payment for your Drivehub ride",
                             },
-                            UnitAmount = (long)booking.Invoice.Amount * 100,
+                            UnitAmount = (long)(booking.Invoice.Amount * 100),
                         },
                         Quantity = 1,
                     },
