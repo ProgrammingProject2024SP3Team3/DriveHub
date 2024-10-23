@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<DriveHubModel.Booking>
-
 @{
     ViewData["Title"] = "Index";
 }
@@ -9,14 +8,24 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-action="Index" method="get">
+    <p>
+        User ID: <input type="text" name="searchUser" value="@ViewData["CurrentFilter"]" />
+        Start Pod: <input type="text" name="startPodFilter" value="@ViewData["StartPodFilter"]" />
+        End Pod: <input type="text" name="endPodFilter" value="@ViewData["EndPodFilter"]" />
+        <input type="submit" value="Filter" class="btn btn-default" />
+    </p>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.StartTime)
+                @Html.ActionLink("Start Time", "Index", new { sortOrder = ViewData["StartTimeSortParm"] })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EndTime)
+                @Html.ActionLink("End Time", "Index", new { sortOrder = ViewData["EndTimeSortParm"] })
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PricePerHour)
@@ -62,7 +71,7 @@
                     @item.StartPod.Site.SiteName #@item.StartPod.PodName
                 </td>
                 <td>
-                    @item.EndPod.Site.SiteName #@item.EndPod.PodName
+                    @item.EndPod?.Site.SiteName #@item.EndPod?.PodName
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Vehicle.Name)

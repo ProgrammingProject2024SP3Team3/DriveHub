@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Admin.Data;
 using DriveHubModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Admin.Controllers
 {
+    [Authorize]
     public class ApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;

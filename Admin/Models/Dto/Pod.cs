@@ -8,6 +8,8 @@ namespace Admin.Models.Dto
     {
         public Pod() { }
 
+        public string PodId { get; set; } = Guid.NewGuid().ToString();
+
         [Required]
         [DisplayName("Site name")]
         public int SiteId { get; set; }

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Admin.Data;
 using DriveHubModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Admin.Controllers
 {
+    [Authorize]
     public class PodsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -114,18 +116,26 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("PodId,SiteId,VehicleId,PodName")] Pod pod)
+        public async Task<IActionResult> Edit(Admin.Models.Dto.Pod pod)
         {
-            if (id != pod.PodId)
-            {
-                return NotFound();
-            }
+            var podDb = await _context.Pods.FindAsync(pod.PodId);
+            if (podDb == null) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(pod);
+                    podDb = await _context.Pods
+                        .Include(c => c.Site)
+                        .Include(c => c.Vehicle)
+                        .FirstOrDefaultAsync(c => c.PodId == pod.PodId);
+
+                    if (podDb == null) { return NotFound(); }
+
+                    podDb.SiteId = pod.SiteId;
+                    podDb.VehicleId = pod.VehicleId;
+                    podDb.PodName = pod.PodName;
+                    _context.Update(podDb);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -139,13 +149,13 @@ namespace Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return View("Details", podDb);
             }
 
             var vehicles = new List<Vehicle>();
             if (pod.VehicleId != null)
             {
-                _logger.LogWarning($"Pod {id} has a vehicle");
+                _logger.LogWarning($"Pod {pod.PodName} has a vehicle");
                 var vehicle = await _context.Vehicles.FindAsync(pod.VehicleId);
                 vehicles.Add(vehicle);
             }

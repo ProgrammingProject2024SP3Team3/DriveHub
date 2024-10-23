@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DriveHub.Data;
 using DriveHub.Controllers;
+using Microsoft.Extensions.Configuration;
 
 namespace DriveHubTests
 {
@@ -17,6 +18,8 @@ namespace DriveHubTests
         public BookingsController Controller { get; private set; }
         public Mock<ILogger<BookingsController>> MockLogger { get; private set; }
         public UserManager<IdentityUser> UserManager { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
 
         public BookingTestFixtures()
         {
@@ -33,7 +36,7 @@ namespace DriveHubTests
 
             // Mock the UserManager and set up the controller
             UserManager = MockUserManager();
-            Controller = new BookingsController(Context, MockLogger.Object, UserManager);
+            Controller = new BookingsController(Context, MockLogger.Object, UserManager, Configuration);
 
             // Set up a default mock authenticated user for tests
             SetMockAuthenticatedUser();
