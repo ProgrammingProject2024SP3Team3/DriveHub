@@ -14,8 +14,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin", "Admin\Admin.csproj
 		{9E08015D-E896-4221-B36A-EE3B879D2931} = {9E08015D-E896-4221-B36A-EE3B879D2931}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SeedProducts", "SeedProducts\SeedProducts.csproj", "{1FAB35F8-62C8-4F00-BE70-16A45BBD221D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,10 +36,6 @@ Global
 		{C9FB96BC-8728-4A0B-9799-955AE5F30F83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9FB96BC-8728-4A0B-9799-955AE5F30F83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9FB96BC-8728-4A0B-9799-955AE5F30F83}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1FAB35F8-62C8-4F00-BE70-16A45BBD221D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1FAB35F8-62C8-4F00-BE70-16A45BBD221D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1FAB35F8-62C8-4F00-BE70-16A45BBD221D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1FAB35F8-62C8-4F00-BE70-16A45BBD221D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

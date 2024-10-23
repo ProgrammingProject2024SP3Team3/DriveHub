@@ -28,8 +28,6 @@ namespace DriveHubModel
         [SetsRequiredMembers]
         public VehicleRate(
             string vehicleRateId,
-            string priceId,
-            string testPriceId,
             string description,
             decimal pricePerHour,
             decimal pricePerMinute,
@@ -37,8 +35,6 @@ namespace DriveHubModel
             )
         {
             VehicleRateId = vehicleRateId;
-            PriceId = priceId;
-            TestPriceId = testPriceId;
             Description = description;
             PricePerHour = pricePerHour;
             PricePerMinute = pricePerMinute;
@@ -48,12 +44,6 @@ namespace DriveHubModel
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VehicleRateId { get; set; } = Guid.NewGuid().ToString();
-
-        [Required]
-        public string PriceId { get; set; }
-
-        [Required]
-        public string TestPriceId { get; set; }
 
         [Required]
         public string Description { get; set; }

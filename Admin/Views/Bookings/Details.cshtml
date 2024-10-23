@@ -2,6 +2,17 @@
 
 @{
     ViewData["Title"] = "Details";
+
+
+    string GetBalance(decimal? invoiceAmount, decimal? receiptAmount)
+    {
+        string balance = String.Empty;
+        if (invoiceAmount == null) { balance = "$0.00"; }
+        else if (invoiceAmount != null && receiptAmount == null) { balance = ((decimal)invoiceAmount).ToString("c"); }
+        else if (invoiceAmount != null && receiptAmount != null && invoiceAmount == receiptAmount) { balance = "$0.00"; }
+        else if (invoiceAmount != null && receiptAmount != null) balance = ((decimal)invoiceAmount - (decimal)receiptAmount).ToString("c");
+        return balance;
+    }
 }
 
 <h1>Details</h1>
@@ -10,57 +21,95 @@
     <h4>Booking</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StartTime)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Expires)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StartTime)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Expires)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EndTime)
+        <dt class="col-sm-2">
+            Start time
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EndTime)
+        <dd class="col-sm-10">
+            @Model.StartTime
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            End time
+        </dt>
+        <dd class="col-sm-10">
+            @Model.EndTime
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.PricePerHour)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.PricePerHour)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.BookingStatus)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.BookingStatus)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ApplicationUser)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApplicationUser.Id)
+        <dd class="col-sm-10">
+            @ViewBag.User
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StartPod)
+        <dt class="col-sm-2">
+            Start location
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StartPod.PodId)
+        <dd class="col-sm-10">
+            Pod @Model.StartPod?.PodName at @Model.StartPod?.Site.SiteName
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EndPod)
+        <dt class="col-sm-2">
+            End location
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EndPod.PodId)
+        <dd class="col-sm-10">
+            Pod @Model.EndPod?.PodName at @Model.EndPod?.Site.SiteName
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Vehicle)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Vehicle.VehicleId)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Vehicle.Name)
+        </dd>
+        <dt class="col-sm-2">
+            Invoice number
+        </dt>
+        <dd class="col-sm-10">
+            #@Model.Invoice?.InvoiceNumber
+        </dd>
+        <dt class="col-sm-2">
+            Receipt number
+        </dt>
+        <dd class="col-sm-10">
+            #@Model.Receipt?.ReceiptNumber
+        </dd>
+        <dt class="col-sm-2">
+            Total due
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Invoice?.Amount.ToString("c")
+        </dd>
+        <dt class="col-sm-2">
+            Total paid
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Receipt?.Amount.ToString("c")
+        </dd>
+        <dt class="col-sm-2">
+            Balance
+        </dt>
+        <dd class="col-sm-10">
+            @GetBalance(@Model?.Invoice?.Amount, @Model?.Receipt?.Amount)
         </dd>
     </dl>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.BookingId">Edit</a> |
+    <a asp-controller="Invoices" asp-action="Details" asp-route-id="@Model?.Invoice?.InvoiceNumber">Invoice</a> |
+    <a asp-controller="Receipts" asp-action="Details" asp-route-id="@Model?.Receipt?.ReceiptNumber">Receipt</a> |
     <a asp-action="Index">Back to List</a>
 </div>

@@ -82,6 +82,36 @@ namespace DriveHub.Migrations
                     b.ToTable("Bookings");
                 });
 
+            modelBuilder.Entity("DriveHubModel.Contact", b =>
+                {
+                    b.Property<int>("ContactId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ContactId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ContactId");
+
+                    b.ToTable("Contacts");
+                });
+
             modelBuilder.Entity("DriveHubModel.Invoice", b =>
                 {
                     b.Property<int>("InvoiceNumber")
@@ -263,19 +293,11 @@ namespace DriveHub.Migrations
                     b.Property<DateTime>("EffectiveDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PriceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("PricePerHour")
                         .HasColumnType("Money");
 
                     b.Property<decimal>("PricePerMinute")
                         .HasColumnType("Money");
-
-                    b.Property<string>("TestPriceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VehicleRateId");
 

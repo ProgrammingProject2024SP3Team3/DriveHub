@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using DriveHub.Data;
 using Microsoft.AspNetCore.Identity;
 using DriveHubModel;
-using static QuestPDF.Helpers.Colors;
 
 namespace DriveHub.Controllers
 {
@@ -75,9 +74,9 @@ namespace DriveHub.Controllers
         {
             _logger.LogInformation($"Dropping off {id}");
 
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(id))
             {
-                _logger.LogWarning($"Bad vehicle id {id}");
+                _logger.LogWarning("Bad vehicle id provided.");
                 return View(nameof(Error));
             }
 
@@ -85,7 +84,7 @@ namespace DriveHub.Controllers
 
             if (vehicle == null)
             {
-                _logger.LogWarning($"Vehicle not found {id}");
+                _logger.LogWarning($"Vehicle not found for id: {id}");
                 return View(nameof(Error));
             }
 
@@ -103,35 +102,48 @@ namespace DriveHub.Controllers
 
             if (booking?.BookingId == null || booking.StartTime == null)
             {
-                _logger.LogWarning($"Couldn't find booking for {id}");
+                _logger.LogWarning($"Couldn't find collected booking for vehicle id: {id}");
                 return RedirectToAction("Search", "Bookings");
             }
 
-            var emptyPods = await _context.Pods.Where(c => c.VehicleId != null).Include(c => c.Site).ToListAsync();
+            var emptyPods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
+
+            if (!emptyPods.Any())
+            {
+                _logger.LogWarning("No empty pods available for drop-off.");
+                return View(nameof(Error));
+            }
+
             Random rnd = new Random();
-            var randPod = emptyPods[rnd.Next(emptyPods.Count())];
+            var randPod = emptyPods[rnd.Next(emptyPods.Count)];
 
             booking.EndTime = DateTime.Now;
             booking.BookingStatus = BookingStatus.Unpaid;
-            booking.Vehicle.IsReserved = false;
-            vehicle.Pod = randPod;
+            vehicle.IsReserved = false;
+            randPod.Vehicle = vehicle;
             booking.EndPod = randPod;
 
-            var invoice = new Invoice();
-            var diff = (decimal)((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes;
-            invoice.Amount = diff * booking.PricePerMinute;
-            if (invoice.Amount < 0.5m) { invoice.Amount = booking.PricePerMinute * 2; }
+            var totalMinutes = (int)Math.Round((((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes), 0);
+            var totalAmount = (decimal)(Math.Max(totalMinutes, 2)) * booking.PricePerMinute;
+
+            var invoice = new Invoice
+            {
+                Amount = totalAmount
+            };
+
             booking.Invoice = invoice;
 
             _context.Add(invoice);
             _context.Update(booking);
             _context.Update(vehicle);
+            _context.Update(randPod);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation($"Drop off OK - {booking.BookingId}");
+            _logger.LogInformation($"Drop-off completed for booking id: {booking.BookingId}");
 
             return View(booking);
         }
+
 
         /// <summary>
         /// Return the error page when a pickup/dropoff action is not sane. Not publicly accessible.

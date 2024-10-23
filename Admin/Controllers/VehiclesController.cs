@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Admin.Data;
 using DriveHubModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Admin.Controllers
 {
+    [Authorize]
     public class VehiclesController : Controller
     {
         private readonly ApplicationDbContext _context;

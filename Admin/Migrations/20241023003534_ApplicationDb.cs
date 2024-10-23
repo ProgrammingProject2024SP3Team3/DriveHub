@@ -4,10 +4,10 @@ using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace DriveHub.Migrations
+namespace Admin.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class ApplicationDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,6 +53,22 @@ namespace DriveHub.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Contacts",
+                columns: table => new
+                {
+                    ContactId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Contacts", x => x.ContactId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sites",
                 columns: table => new
                 {
@@ -76,8 +92,6 @@ namespace DriveHub.Migrations
                 columns: table => new
                 {
                     VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PriceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TestPriceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
                     PricePerMinute = table.Column<decimal>(type: "Money", nullable: false),
@@ -438,6 +452,9 @@ namespace DriveHub.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Contacts");
 
             migrationBuilder.DropTable(
                 name: "Invoices");

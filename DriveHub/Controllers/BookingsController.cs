@@ -8,6 +8,10 @@ using DriveHub.Models.Dto;
 using Microsoft.AspNetCore.Identity;
 using Stripe.Checkout;
 using Stripe;
+using DriveHub.Models.DocumentModels;
+using QuestPDF.Fluent;
+using QuestPDF;
+using QuestPDF.Infrastructure;
 
 namespace DriveHub.Controllers
 {
@@ -379,27 +383,15 @@ namespace DriveHub.Controllers
                 .Include(c => c.Invoice)
                 .FirstOrDefaultAsync();
 
-            if (booking == null)
+            if (booking == null || booking.Invoice == null)
             {
                 _logger.LogWarning($"Pay: Booking not found for BookingId: {BookingId}");
                 return View(nameof(Error));
             }
 
-            // Use TestPriceId for development, and PriceId for production
-            var priceId = booking.Vehicle.VehicleRate.TestPriceId;
-            var quantity = Convert.ToInt32(((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes);
-
-            // Min stripe charge = $0.50
-            if (quantity * booking.Vehicle.VehicleRate.PricePerMinute < 0.5m)
-            {
-                quantity = 2;
-            }
-
             var apiKey = _configuration.GetValue<string>("StripeKey");
-            var client = new Stripe.StripeClient(apiKey);
+            var client = new StripeClient(apiKey);
             var domain = _configuration.GetValue<string>("Domain");
-
-            _logger.LogInformation($"Using price ID: {priceId}");
 
             var options = new SessionCreateOptions
             {
@@ -407,15 +399,23 @@ namespace DriveHub.Controllers
                 {
                     new SessionLineItemOptions
                     {
-                        Price = priceId,
-                        Quantity = quantity,
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            Currency = "aud", // Australian dollars
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = $"DriveHub - {booking.BookingId}",
+                                Description = "Payment for your Drivehub ride",
+                            },
+                            UnitAmount = (long)booking.Invoice.Amount * 100,
+                        },
+                        Quantity = 1,
                     },
                 },
                 Mode = "payment",
                 SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
                 CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
             };
-
             try
             {
                 var service = new SessionService(client);
@@ -433,6 +433,73 @@ namespace DriveHub.Controllers
             {
                 _logger.LogError(ex, "Pay: Unexpected error.");
                 return View(nameof(Error));
+            }
+        }
+
+        public async Task<IActionResult> PrintInvoice(int id)
+        {
+            Settings.License = LicenseType.Community;
+
+            var booking = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.Invoice.InvoiceNumber == id)
+                .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
+                .Include(c => c.Receipt)
+                .FirstOrDefaultAsync();
+
+            if (booking == null || booking.Receipt == null)
+            {
+                _logger.LogWarning($"Invoice not found: {id}");
+                return NotFound();
+            }
+
+            _logger.LogInformation($"Generated invoice: {id}");
+
+            try
+            {
+                var doc = new InvoiceDocument(booking);
+                var pdf = doc.GeneratePdf();
+                return File(pdf, "application/pdf", $"DriveHub Inv{id}.pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error generating invoice: {id}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> PrintReport(int id)
+        {
+            Settings.License = LicenseType.Community;
+
+            var bookings = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
+                .Include(c => c.Receipt)
+                .ToListAsync();
+
+            try
+            {
+                var doc = new BookingsDocument(bookings);
+                var pdf = doc.GeneratePdf();
+                return File(pdf, "application/pdf", $"DriveHub Booking Report.pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error generating booking report");
+                return StatusCode(500, "Internal server error");
             }
         }
 
