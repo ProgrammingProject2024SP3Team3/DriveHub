@@ -24,28 +24,44 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-body-tertiary" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="ApplicationUsers" asp-action="Index">Users</a>
+                            <a class="nav-link text-body-tertiary" asp-area="" asp-controller="ApplicationUsers" asp-action="Index">Users</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-body-tertiary" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Vehicles
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="nav-link text-body-tertiary" asp-area="" asp-controller="Vehicles" asp-action="Index">Vehicles</a></li>
+                                <li><a class="nav-link text-body-tertiary" asp-area="" asp-controller="VehicleRates" asp-action="Index">Vehicle Rates</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-body-tertiary" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Locations
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="nav-link" asp-area="" asp-controller="Sites" asp-action="Index">Sites</a></li>
+                                <li><a class="nav-link" asp-area="" asp-controller="Pods" asp-action="Index">Pods</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-body-tertiary" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Bookings
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="nav-link" asp-area="" asp-controller="Bookings" asp-action="Index">Bookings</a></li>
+                                <li><a class="nav-link" asp-area="" asp-controller="Invoices" asp-action="Index">Invoices</a></li>
+                                <li><a class="nav-link" asp-area="" asp-controller="Receipts" asp-action="Index">Receipts</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Vehicles" asp-action="Index">Vehicles</a>
+                            <a class="nav-link text-body-tertiary" asp-area="" asp-controller="Contacts" asp-action="Index">Messages</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="VehicleRates" asp-action="Index">Vehicle Rates</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Sites" asp-action="Index">Sites</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Pods" asp-action="Index">Pods</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Bookings" asp-action="Index">Bookings</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">About</a>
+                            <a class="nav-link text-body-tertiary" asp-area="" asp-controller="Home" asp-action="About">About</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
