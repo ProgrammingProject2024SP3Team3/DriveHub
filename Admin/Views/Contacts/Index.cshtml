@@ -35,7 +35,11 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Email)
+                    <a href="mailto:@{
+                        @item.Email
+                    }?subject=@{
+                        @item.Subject.Replace(" ", "%20")
+                    }">@item.Email</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Subject)
