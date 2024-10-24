@@ -5,24 +5,8 @@
     var Vehicle = ViewBag.Vehicle;
 }
 
-<style>
-    .booking-info h1 {
-        color: black;
-        font-weight: 400;
-    }
-    .btn-blue {
-        background-color: #00A8E8;
-        color: #ffffff;
-    }
-
-    .btn-blue:hover {
-        background-color: #0a76a1;
-        color: #ffffff;
-    }
-</style>
-
 <div class="booking-info">
-    <h1 class="text-center">Reserve a Vehicle</h1>
+    <h1 class="text-center fw-normal text-dark">Reserve a Vehicle</h1>
     <p  class="text-center">Reserve @Vehicle.Name the @Vehicle.Make @Vehicle.Model for the next hour</p>
 
     <form asp-action="Create">

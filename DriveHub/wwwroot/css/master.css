@@ -96,3 +96,15 @@ h4 {
     color: orange;
     font-weight: bold;
 }
+
+
+
+/* Booking Details page specific CSS */
+.btn-blue {
+    background-color: #00A8E8;
+    color: #ffffff;
+}
+.btn-blue:hover {
+    background-color: #0a76a1;
+    color: #ffffff;
+}
