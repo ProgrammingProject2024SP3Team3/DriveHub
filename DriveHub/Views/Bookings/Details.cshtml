@@ -5,14 +5,22 @@
     ViewData["Title"] = isCurrentBooking ? "Current Booking" : "Booking Details";
 
     var Vehicle = Model.Vehicle;
-
-    Console.WriteLine(Model.BookingId);
 }
 
 <style>
     .booking-info h1 {
         color: black;
         font-weight: 400;
+    }
+
+    .btn-blue {
+        background-color: #00A8E8;
+        color: #ffffff;
+    }
+
+    .btn-blue:hover {
+        background-color: #0a76a1;
+        color: #ffffff;
     }
 </style>
 
@@ -33,7 +41,7 @@
             <div class="col-lg-6 mb-2">
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between">
-                        <strong>Booking Status:</strong> <span>@Model.BookingStatus</span>
+                        <strong>Booking Status:</strong> <span class="">@Model.BookingStatus</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <strong>Vehicle:</strong> <span>@Vehicle.Name the @Vehicle.Make @Vehicle.Model</span>
@@ -61,7 +69,7 @@
                         @* only show the extend reservation button if the booking has not yet been extended *@
                         @if (!Model.IsExtended) {
                             <div class="text-center mt-0">
-                                <a asp-action="Extend" asp-route-id="@Model.BookingId" class="my-2 btn text-white mt-0" style="background-color: #00A8E8;">
+                                <a asp-action="Extend" asp-route-id="@Model.BookingId" class="my-2 btn btn-blue mt-0">
                                     Extend reservation by 30 minutes
                                 </a>
                             </div>

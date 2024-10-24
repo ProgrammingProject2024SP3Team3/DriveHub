@@ -281,6 +281,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(d => d.Site)
                 .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
+                .OrderByDescending(c => c.Expires)
                 .ToListAsync();
 
             return View(bookings);
@@ -356,7 +357,7 @@ namespace DriveHub.Controllers
             _context.Update(vehicle);
             await _context.SaveChangesAsync();
 
-            return View(nameof(Index));
+            return RedirectToAction("Details", "Bookings", new { id = booking.BookingId });
         }
 
         /// <summary>
