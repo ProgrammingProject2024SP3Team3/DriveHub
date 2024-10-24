@@ -14,7 +14,7 @@
                     <h1 class="hero-heading mb-5">Find, Book, and Drive – Anytime, Anywhere!</h1>
                 </div>
                 <div class="hero-search-bar">
-                    <a asp-action="Search" asp-controller="Bookings" class="btn btn-primary btn-lg">Find a car near you!</a>
+                    <a id="hero-search-button" asp-action="Search" asp-controller="Bookings" class="btn btn-primary btn-lg">Find a car near you!</a>
                 </div>
             </div>
         </div>
@@ -113,6 +113,7 @@
 
 <script>
     window.addEventListener('DOMContentLoaded', function () {
+        // Hero fade in code
         const heroHeading = document.querySelector('.hero-heading');
 
         // A check if heroHeading exists so it doesn't error on other pages
@@ -132,7 +133,41 @@
                 heroHeading.style.transition = 'opacity 0.5s ease-out';
             }
         };
-
-        window.addEventListener('scroll', fadeInOnScroll)
     });
+
+    // How can VSCode's syntax highlighting be this bad?
+    // Geolocation code to get user's GPS coordinates before they click the "Find a car near you" button
+    function initSearchButtonListener() {
+        let buttonClicked = false
+
+        document.getElementById('hero-search-button').addEventListener('click', function(event) {
+            buttonClicked = true
+            if (navigator.geolocation) {
+                event.preventDefault(); // don't follow the default button link if we have a GPS
+                // Try to get the user's position
+                navigator.geolocation.getCurrentPosition(
+                    geolocationSuccess,
+                    handleError,
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000, // Timeout in 5 seconds if geolocation doesn't work
+                        maximumAge: 1000 * 60 * 5 // cached results up to 5 minutes old is fine
+                    }
+                )
+            } else {
+                console.log("Error: No geolocation API enabled in browser")
+                // It will also take the user to the default button link (Booking Search) if no geolocation is enabled
+            }
+        });
+
+        // on successfully getting user's geolocation
+        function geolocationSuccess(position) {
+            console.log(position.coords)
+            window.location.href = `/somefuturepage?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}`
+        }
+        function handleError(error) {
+            console.log("Geolocation error: ", error)
+        }
+    }
+    initSearchButtonListener()
 </script>
