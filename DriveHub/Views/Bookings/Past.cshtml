@@ -9,10 +9,10 @@
         color: black;
     }
 
-        a.booking-link :hover {
-            background-color: #eeeeee;
-            color: orange;
-        }
+    a.booking-link :hover {
+        background-color: #eeeeee;
+        color: orange;
+    }
 
     .img-fluid, img-fluid {
         border-radius: 15px;
@@ -20,13 +20,13 @@
     }
 </style>
 
-<h1>@ViewData["Title"]</h1>
-<p>Here are your past bookings.</p>
+<h1 class="text-center text-dark fw-normal">@ViewData["Title"]</h1>
+<p class="text-center">Here are your past bookings.</p>
 
 @if (Model.Count() == 0)
 {
     <div class="row ms-1">
-        You have no past bookings
+        <p>You have no past bookings</p>
     </div>
 }
 else
@@ -63,20 +63,19 @@ else
                 break;
         }
         <div class="row">
-            <a asp-action="Details" asp-route-id="@booking.BookingId" class="booking-link text-decoration-none car-item">
-                <div class="row border my-3 container-fluid">
-                    <div class="col-xs-12 col-sm-3 col-lg-4">
-                        <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                                    @booking.VehicleId
-}.jpg" style="max-width:150px;">
-                    </div>
-                    <div class="col-xs-12 col-sm-8 col-lg-7">
-                        <b>@booking.Vehicle.Name the @booking.Vehicle.Make @booking.Vehicle.Model</b><br />
-                        Pickup at @booking.StartTime @booking.StartPod.Site.SiteName Pod #@booking.StartPod.PodName<br />
-                        Drop off at @booking.EndTime @booking.EndPod?.Site.SiteName Pod #@booking.EndPod?.PodName
-                    </div>
-                    <div class="col-xs-12 col-sm-1 col-lg-1 d-flex align-items-center">
-                        <b style="color:@colour">@booking.BookingStatus</b>
+            <a asp-action="Details" asp-route-id="@booking.BookingId" class="booking-link text-decoration-none">
+                <div class="border-0 shadow-sm mb-3 hover-card">
+                    <div class="row g-0 align-items-center">
+                        <div class="col-12 col-sm-4 col-lg-3 p-3">
+                            <img class="img-fluid rounded w-100 object-fit-cover shadow-sm" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@booking.VehicleId}.jpg" style="max-width:150px; height:100px;">
+                        </div>
+                        <div class="col-xs-12 col-sm-8 col-lg-7 card-body">
+                            <b>@booking.Vehicle.Name the @booking.Vehicle.Make @booking.Vehicle.Model</b><br />
+                            Pickup at @booking.StartTime @booking.StartPod.Site.SiteName Pod #@booking.StartPod.PodName
+                        </div>
+                        <div class="col-xs-12 col-sm-1 col-lg-1 d-flex align-items-center">
+                            <b style="color:@colour">@booking.BookingStatus</b>
+                        </div>
                     </div>
                 </div>
             </a>
