@@ -115,26 +115,33 @@
     else if (Model.BookingStatus == BookingStatus.Collected)
     {
         <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" class="btn btn-success mb-4 fw-bold text-white fs-4">
-            Return vehicle
+            Drop off vehicle
         </a>
     }
     else if (Model.BookingStatus == BookingStatus.Unpaid)
     {
         <form asp-action="Pay">
             <input type="hidden" asp-for="BookingId" />
-            <input type="submit" value="Pay" class="btn btn-success mb-4 fw-bold text-white fs-4" />
+            <input type="submit" value="Pay for Booking" class="btn btn-success mb-4 fw-bold text-white fs-4" />
         </form>
     } else if (Model.BookingStatus == BookingStatus.Complete) {
         <a asp-action="PrintInvoice" asp-route-id="@Model.Invoice?.InvoiceNumber" class="btn btn-success mb-4 fw-bold text-white fs-4">Print invoice</a>
     }
 </div>
 
-@* Only show a map for cars that have yet to be picked up *@
+@* Reserved car specific scripting (Pickup QR code and map) *@
 @if (Model.BookingStatus == BookingStatus.Reserved) {
+    <h3 class="text-center">Pick up QR Code</h3>
+    <div class="d-flex justify-content-center" id="qrcode"></div>
     <hr>
     <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 
     @section Scripts {
+        <script type="text/javascript" src="/js/qrcode.min.js"></script>
+        <script type="text/javascript">
+            // Note: the changes to make this work with your phone for a local development environmment would be massive. I have hardcoded the site domain instead.
+            new QRCode(document.getElementById("qrcode"), location.origin + "/Vehicles/Pickup/@Model.VehicleId");
+        </script>
         <script>
             function initMap() {
                 // Init Google Map
@@ -153,6 +160,19 @@
         </script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
                 defer>
+        </script>
+    }
+}
+
+@* Collected Car specific scripting (Dropoff QR code and live updated price) *@
+@if (Model.BookingStatus == BookingStatus.Collected) {
+    <h3 class="text-center">Drop off QR Code</h3>
+    <div class="d-flex justify-content-center" id="qrcode"></div>
+
+    @section Scripts {
+        <script type="text/javascript" src="/js/qrcode.min.js"></script>
+        <script defer type="text/javascript">
+            new QRCode(document.getElementById("qrcode"), location.origin + "/Vehicles/Dropoff/@Model.VehicleId");
         </script>
     }
 }
