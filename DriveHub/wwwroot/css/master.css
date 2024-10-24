@@ -20,11 +20,11 @@ body {
     color: #343a40; /* Text color for readability */
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
 }
 
 main {
-    padding: 20px;
+    padding-top: 20px;
     flex-grow: 1;
 }
 
