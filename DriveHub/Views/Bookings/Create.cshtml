@@ -60,9 +60,10 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="StartPodId" value="@Vehicle.Pod.PodId" />
             <input type="hidden" asp-for="QuotedPricePerHour" value="@Vehicle.VehicleRate.PricePerHour" />
-            <input type="submit" value="Create Reservation" id="create-button" class="btn btn-blue mb-4 fw-bold fs-4"/>
+            <input type="submit" value="Create Reservation" id="create-button" class="btn btn-success mb-4 fw-bold fs-4"/>
         </form>
     </div>
+    <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17;">Pickup Location</div>
     <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 </div>
 

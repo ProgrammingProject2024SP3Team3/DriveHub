@@ -113,7 +113,6 @@
 
                     // repeatedly update the live cost
                     setInterval(updateLiveCost, 1000)
-
                 </script>
             }
             @* If the booking has an invoice show the total cost to the user *@
@@ -157,8 +156,8 @@
 @* Reserved car specific scripting (Pickup QR code and map) *@
 @if (Model.BookingStatus == BookingStatus.Reserved) {
     <h3 class="text-center">Pick up QR Code</h3>
-    <div class="d-flex justify-content-center" id="qrcode"></div>
-    <hr>
+    <div class="d-flex justify-content-center mb-3" id="qrcode"></div>
+    <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17;">Pickup Location</div>
     <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 
     @section Scripts {
