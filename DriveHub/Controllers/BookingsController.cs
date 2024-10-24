@@ -239,7 +239,7 @@ namespace DriveHub.Controllers
                 return RedirectToAction(nameof(Search));
             }
 
-            return View(booking);
+            return View("Details", booking);
         }
 
         /// <summary>
