@@ -8,14 +8,13 @@
 }
 
 <style>
-    .booking-search h1 {
-        color: black;
-        font-weight: 400;
+    .search-link:hover .card {
+        background-color: #eeeeee;
     }
 </style>
 
 <div class="booking-search">
-    <h1 class="mb-6 text-center">Booking Search</h1>
+    <h1 class="mb-6 text-center fw-normal text-dark">Booking Search</h1>
     <div class="row">
         <div class="mb-3 p-2 fw-bold fs-4 text-center" style="background-color: #FFBA17;">Select a location or vehicle options to show available cars</div>
         <div class="col-xs-12 col-md-4">
@@ -83,7 +82,7 @@
                     markers.push(marker)
 
                     let infowindow = new google.maps.InfoWindow({
-                        content: `<strong>${site.SiteName} TODO: Big list of cars to book at this site</strong>`
+                        content: `<p class="fw-bold">${site.SiteName}</p>`
                     })
 
                     marker.addListener("click", () => {
@@ -151,8 +150,8 @@
                             timeText += `${(site.distanceInKMs && site.distanceInKMs.toFixed()) || '0'} kms away from `
                         }
                         carListHTML +=
-                            `<a class="text-decoration-none" href="/Bookings/Create/${car.VehicleId}">
-                                <div class="border-0 shadow-sm mb-3 hover-card">
+                            `<a class="search-link text-decoration-none" href="/Bookings/Create/${car.VehicleId}">
+                                <div class="border-0 shadow-sm mb-3 card">
                                     <div class="row g-0 align-items-center">
                                         <div class="col-12 col-sm-4 col-lg-3 p-3">
                                             <img class="img-fluid rounded w-100 object-fit-cover shadow-sm" src="https://drivehubstorage.blob.core.windows.net/vehicles/${car.VehicleId}.jpg" style="max-width:150px; height:100px;">
@@ -160,8 +159,8 @@
                                         <div class="col-12 col-sm-8 col-lg-9">
                                             <div class="card-body">
                                                 <div class="d-flex align-items-center gap-2 mb-3">
-                                                    <i class="bi bi-geo-alt fs-5 text-primary"></i>
-                                                    <h5 class="fw-bold text-dark mb-0 pt-1">
+                                                    <i class="bi bi-geo-alt fs-5"></i>
+                                                    <h5 class="fw-bold mb-0 pt-1">
                                                         ${timeText}${locationText}
                                                     </h5>
                                                 </div>
