@@ -100,8 +100,7 @@
                     let startDate = new Date(@(((DateTimeOffset)Model.StartTime).ToUnixTimeMilliseconds()))
                     let pricePerMinute = @Model.Vehicle.VehicleRate.PricePerMinute
 
-                    // repeatedly update the live cost
-                    setInterval(() => {
+                    function updateLiveCost() {
                         let currDate = new Date()
                         let diffInMillis = currDate - startDate
                         let diffInMins = diffInMillis / (1000 * 60)
@@ -109,7 +108,11 @@
 
                         document.getElementById("live-cost").innerHTML = currCost.toFixed(2)
                         document.getElementById("live-minutes").innerHTML = diffInMins.toFixed(0)
-                    }, 1000)
+                    }
+                    updateLiveCost()
+
+                    // repeatedly update the live cost
+                    setInterval(updateLiveCost, 1000)
 
                 </script>
             }
