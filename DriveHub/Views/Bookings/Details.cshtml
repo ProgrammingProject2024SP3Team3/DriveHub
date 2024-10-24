@@ -90,8 +90,31 @@
         <div class="text-center bg-white p-3 pb-0" style="border: 1px solid #dee2e6;">
             <p class="mb-0">Per Hour (pro-rata):</p>
             <p class="fw-bold fs-1">$<span id="price-per-hour">@Model.Vehicle.VehicleRate.PricePerHour.ToString("F2")/hr</span></p>
+            @* If the car is currently being driven show a live cost tracker to the user *@
+            @if (Model.BookingStatus == BookingStatus.Collected && Model.StartTime != null) {
+                <hr>
+                <p class="mb-0">Current Total (for <span id="live-minutes">0</span> minutes):</p>
+                <p class="fw-bold fs-1">$<span id="live-cost">0</span></p>
+                <script>
+                    // Make a UTC javascript date from the bookings start time (needs to be UTC so different time zones don't kill us)
+                    let startDate = new Date(@(((DateTimeOffset)Model.StartTime).ToUnixTimeMilliseconds()))
+                    let pricePerMinute = @Model.Vehicle.VehicleRate.PricePerMinute
+
+                    // repeatedly update the live cost
+                    setInterval(() => {
+                        let currDate = new Date()
+                        let diffInMillis = currDate - startDate
+                        let diffInMins = diffInMillis / (1000 * 60)
+                        let currCost = diffInMins * pricePerMinute
+
+                        document.getElementById("live-cost").innerHTML = currCost.toFixed(2)
+                        document.getElementById("live-minutes").innerHTML = diffInMins.toFixed(0)
+                    }, 1000)
+
+                </script>
+            }
             @* If the booking has an invoice show the total cost to the user *@
-            @if (@Model.Invoice != null) {
+            @if (Model.Invoice != null) {
                 <hr>
                 <p class="mb-0">Total@(@Model.BookingStatus == BookingStatus.Complete ? " (Paid)" : ""):</p>
                 <p class="fw-bold fs-1">$<span id="total-cost">@(Model.Invoice.Amount.ToString("F2"))</span></p>
