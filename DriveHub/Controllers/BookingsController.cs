@@ -123,13 +123,6 @@ namespace DriveHub.Controllers
             }
 
             ViewBag.Vehicle = vehicle;
-            ViewBag.VehicleId = vehicle.VehicleId;
-            ViewBag.StartPod = $"{vehicle.Pod.Site.SiteName} Pod #{vehicle.Pod.PodName}";
-            ViewBag.StartPodId = vehicle.Pod.PodId;
-            ViewBag.StartSite = $"{vehicle.Pod.Site.Address}, {vehicle.Pod.Site.City}";
-            ViewBag.StartSiteLatitude = vehicle.Pod.Site.Latitude;
-            ViewBag.StartSiteLongitude = vehicle.Pod.Site.Longitude;
-            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
 
             return View();
         }

@@ -8,64 +8,61 @@
 <div class="booking-info">
     <h1 class="text-center fw-normal text-dark">Reserve a Vehicle</h1>
     <p  class="text-center">Reserve @Vehicle.Name the @Vehicle.Make @Vehicle.Model for the next hour</p>
-
-    <form asp-action="Create">
-
-        <div class="mb-3" style="background-color: #f8f9fa;">
-            <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17;">Creating a Reservation</div>
-            <div class="d-flex align-items-center p-3">
-                <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-                <div>
-                    <p class="mb-0">Pickup at DriveHub @ViewBag.StartPod</p>
-                    <small>@ViewBag.StartSite</small>
-                </div>
-            </div>
-            <div class="row p-3">
-                <div class="col-lg-6">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Vehicle:</strong> <span>@Vehicle.Name the @Vehicle.Make @Vehicle.Model</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Registration:</strong> <span>@Vehicle.RegistrationPlate</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Year:</strong> <span>@Vehicle.Year</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Seats:</strong> <span>@Vehicle.Seats</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Category:</strong> <span>@Vehicle.VehicleRate.Description</span>
-                        </li>
-                    </ul>
-                    <input type="hidden" asp-for="VehicleId" value="@ViewBag.VehicleId" />
-                    <span asp-validation-for="VehicleId" class="text-danger"></span>
-                    <div class="text-end">
-                        <a asp-action="Search" class="my-2 btn btn-blue fw-bold">Find another car close by?</a>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <img class="img-fluid rounded w-100" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@ViewBag.VehicleId}.jpg">
-                </div>
+    <div class="mb-3" style="background-color: #f8f9fa;">
+        <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17;">Creating a Reservation</div>
+        <div class="d-flex align-items-center p-3">
+            <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
+            <div>
+                <p class="mb-0">Pickup at DriveHub @Vehicle.Pod.Site.SiteName Pod #@Vehicle.Pod.PodName</p>
+                <small>@Vehicle.Pod.Site.Address, @Vehicle.Pod.Site.City</small>
             </div>
         </div>
-        <div class="mb-3">
-            <div class="p-2 fw-bold fs-4 text-center" style="background-color: #FFBA17;">Booking Cost</div>
-            <div class="text-center bg-white p-3 pb-0" style="border: 1px solid #dee2e6;">
-                <p class="mb-0">Per Hour (pro-rata):</p>
-                <p class="fw-bold fs-1">$<span id="price-per-hour">@ViewBag.PricePerHour.ToString("F2")/hr</span></p>
+        <div class="row p-3">
+            <div class="col-lg-6">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Vehicle:</strong> <span>@Vehicle.Name the @Vehicle.Make @Vehicle.Model</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Registration:</strong> <span>@Vehicle.RegistrationPlate</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Year:</strong> <span>@Vehicle.Year</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Seats:</strong> <span>@Vehicle.Seats</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Category:</strong> <span>@Vehicle.VehicleRate.Description</span>
+                    </li>
+                </ul>
+                <div class="text-end">
+                    <a asp-action="Search" class="my-2 btn btn-blue fw-bold">Find another car close by?</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img class="img-fluid rounded w-100" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Vehicle.VehicleId}.jpg">
             </div>
         </div>
+    </div>
+    <div class="mb-3">
+        <div class="p-2 fw-bold fs-4 text-center" style="background-color: #FFBA17;">Booking Cost</div>
+        <div class="text-center bg-white p-3 pb-0" style="border: 1px solid #dee2e6;">
+            <p class="mb-0">Per Hour (pro-rata):</p>
+            <p class="fw-bold fs-1">$<span id="price-per-hour">@Vehicle.VehicleRate.PricePerHour.ToString("F2")/hr</span></p>
+        </div>
+    </div>
 
-        <div class="text-center">
+    <div class="text-center">
+        <form asp-action="Create">
+            <input type="hidden" asp-for="VehicleId" value="@Vehicle.VehicleId" />
+            <span asp-validation-for="VehicleId" class="text-danger"></span>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="StartPodId" value="@ViewBag.StartPodId" />
-            <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
+            <input type="hidden" asp-for="StartPodId" value="@Vehicle.Pod.PodId" />
+            <input type="hidden" asp-for="QuotedPricePerHour" value="@Vehicle.VehicleRate.PricePerHour" />
             <input type="submit" value="Create Reservation" id="create-button" class="btn btn-blue mb-4 fw-bold fs-4"/>
-        </div>
-
-    </form>
+        </form>
+    </div>
     <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 </div>
 
@@ -75,7 +72,7 @@
             function initMap() {
                 // Init Google Map
                 let map = new google.maps.Map(document.getElementById("map"), {
-                    center: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude },
+                    center: { lat: @Vehicle.Pod.Site.Latitude, lng: @Vehicle.Pod.Site.Longitude },
                     zoom: 19,
                     mapTypeId: "roadmap",
                     mapId: "DRIVEHUB_CREATE"
@@ -83,7 +80,7 @@
                 new google.maps.marker.AdvancedMarkerElement({
                     map,
                     title: "Vehicle",
-                    position: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude }
+                    position: { lat: @Vehicle.Pod.Site.Latitude, lng: @Vehicle.Pod.Site.Longitude }
                 })
             }
         </script>
