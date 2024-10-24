@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@{
     ViewData["Title"] = "DriveHub";
     Layout = "_HeroLayout";
 }
@@ -23,17 +25,31 @@
 <section class="services-section-wrapper" style="padding-top: 8rem;">
     <div class="custom-container text-center">
         <div class="row g-4">
-            <!-- Register & Verify Card -->
-            <a class="col-lg-4 text-decoration-none text-dark service-link" 
-               href="@(User.Identity.IsAuthenticated ? Url.Content("~/Identity/Account/Manage") : Url.Content("~/Identity/Account/Register"))">
-                <div class="card shadow-sm h-100 service-card bg-light">
-                    <div class="card-body">
-                        <i class="bi bi-person-check display-3"></i>
-                        <h3 class="service-heading mt-3">Register & Verify</h3>
-                        <p class="service-description lead">Create an account and verify your identity.</p>
+            @if (SignInManager.IsSignedIn(User)) {
+                <a class="col-lg-4 text-decoration-none text-dark service-link"
+                href="@(User.Identity.IsAuthenticated ? Url.Content("~/Identity/Account/Manage") : Url.Content("~/Identity/Account/Register"))">
+                    <div class="card shadow-sm h-100 service-card bg-light">
+                        <div class="card-body">
+                            <i class="bi bi-person-check display-3"></i>
+                            <h3 class="service-heading mt-3">TODO</h3>
+                            <p class="service-description lead">Add details and links for the user being logged in</p>
+                        </div>
                     </div>
-                </div>
-            </a>
+                </a>
+            } else {
+               <!-- Register & Verify Card -->
+                <a class="col-lg-4 text-decoration-none text-dark service-link"
+                href="@(User.Identity.IsAuthenticated ? Url.Content("~/Identity/Account/Manage") : Url.Content("~/Identity/Account/Register"))">
+                    <div class="card shadow-sm h-100 service-card bg-light">
+                        <div class="card-body">
+                            <i class="bi bi-person-check display-3"></i>
+                            <h3 class="service-heading mt-3">Register & Verify</h3>
+                            <p class="service-description lead">Create an account and verify your identity.</p>
+                        </div>
+                    </div>
+                </a>
+            }
+
 
             <!-- Book a Car Card -->
             <a asp-controller="Bookings" asp-action="Index" class="col-lg-4 text-decoration-none text-dark service-link">
