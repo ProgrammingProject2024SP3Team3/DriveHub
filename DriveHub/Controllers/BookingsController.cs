@@ -122,14 +122,7 @@ namespace DriveHub.Controllers
                 return View(nameof(Error));
             }
 
-            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
-            ViewBag.VehicleId = vehicle.VehicleId;
-            ViewBag.StartPod = $"{vehicle.Pod.Site.SiteName} Pod #{vehicle.Pod.PodName}";
-            ViewBag.StartPodId = vehicle.Pod.PodId;
-            ViewBag.StartSite = $"{vehicle.Pod.Site.Address}, {vehicle.Pod.Site.City}";
-            ViewBag.StartSiteLatitude = vehicle.Pod.Site.Latitude;
-            ViewBag.StartSiteLongitude = vehicle.Pod.Site.Longitude;
-            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
+            ViewBag.Vehicle = vehicle;
 
             return View();
         }
@@ -239,7 +232,7 @@ namespace DriveHub.Controllers
                 return RedirectToAction(nameof(Search));
             }
 
-            return View(booking);
+            return View("Details", booking);
         }
 
         /// <summary>
@@ -281,6 +274,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(d => d.Site)
                 .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
+                .OrderByDescending(c => c.Expires)
                 .ToListAsync();
 
             return View(bookings);
@@ -356,7 +350,7 @@ namespace DriveHub.Controllers
             _context.Update(vehicle);
             await _context.SaveChangesAsync();
 
-            return View(nameof(Index));
+            return RedirectToAction("Details", "Bookings", new { id = booking.BookingId });
         }
 
         /// <summary>
