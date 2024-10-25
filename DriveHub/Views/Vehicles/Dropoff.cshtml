@@ -8,23 +8,103 @@
 
 </style>
 
-<div class="pickup-section">
-    <h1 class="text-center text-dark fw-normal">@ViewData["Title"]</h1>
-    <p class="text-center">You have dropped off @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
-    <p class="text-center">TODO: rah rah rah something about leaving the car.</p>
+<div class="dropoff-page">
+    <h1 class="text-center fw-normal text-dark">@ViewData["Title"]</h1>
+    <p class="text-center">You have successfully dropped off @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model. Ensure you have all your personal belongings and exit the car.</p>
 
-    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Model.Vehicle.VehicleId}.jpg">
+    @* Pick up details *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="text-center mb-3">
+                <h3 class="h2">Journey Details</h3>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 mb-2 p-2">
+                    <img class="img-fluid rounded" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Model.Vehicle.VehicleId}.jpg">
+                </div>
+                <div class="col-sm-8 px-3 pt-1">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Start Time:</span>
+                        <span class="text-muted">@Model.StartTime</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>End Time:</span>
+                        <span class="text-muted">@Model.EndTime</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Pick up location:</span>
+                        <span class="text-muted">@Model.StartPod.Site.SiteName Pod #@Model.StartPod.PodName</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Vehicle:</span>
+                        <span class="text-muted">@Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>License:</span>
+                        <span class="text-muted">@Model.Vehicle.RegistrationPlate</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Colour:</span>
+                        <span class="text-muted">@Model.Vehicle.Colour</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Year:</span>
+                        <span class="text-muted">@Model.Vehicle.Year</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="text-center p-4">
-        <a asp-controller="Bookings" asp-action="Current" class="btn btn-success mb-4 fw-bold text-white fs-4">
-            Booking Details
-        </a>
+    @* Instructions *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="text-center mb-3">
+                <h3 class="h2">Drop off Instructions</h3>
+            </div>
+            <div class="row">
+                <div class="col-sm-8 px-3">
+                    <p class="lead">
+                        <strong>Check for Personal Belongings:</strong> Before concluding your journey, please take a moment to ensure that you have removed all personal belongings from the vehicle. This helps to keep the car clean and ready for the next user.
+                    </p>
+                    <p class="lead">
+                        <strong>Secure the Vehicle:</strong> Once you exit the car, it will automatically lock to ensure its security. Please verify that the doors are closed securely before leaving.
+                    </p>
+                    <p class="lead">
+                        <strong>Complete Your Payment:</strong> To finalize your trip, please complete the payment for your booking. Simply click the "Pay for Booking" button below, which will direct you to our secure payment portal where you can settle any outstanding charges.
+                    </p>
+                </div>
+                <div class="col-sm-4 mb-2 p-2">
+                    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking4.jpg" alt="booking4" style="max-width:contain">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Buttons *@
+    <div class="text-center">
         <form asp-controller="Bookings" asp-action="Pay">
             <input type="hidden" asp-for="BookingId" />
             <input type="submit" value="Pay for Booking" class="btn btn-success mb-4 fw-bold text-white fs-4" />
+            <a asp-controller="Bookings" asp-action="Details" asp-route-id="@Model.BookingId" class="btn btn-blue mb-4 fw-bold text-white fs-4">
+                Booking Details
+            </a>
         </form>
     </div>
+
+    @* Help *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-body text-center">
+            <h3 class="h5 mb-3">Need Help?</h3>
+            <div class="d-grid gap-2">
+                <a asp-controller="Home" asp-action="ContactUs" class="btn btn-outline-danger">
+                    24/7 Support
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+
 @section Scripts {
 
 }
