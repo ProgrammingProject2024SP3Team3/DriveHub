@@ -5,18 +5,9 @@
 }
 
 <style>
-    a.booking-link {
-        color: black;
-    }
-
-    a.booking-link :hover {
-        background-color: #eeeeee;
-        color: rgb(21, 140, 219);
-    }
-
-    .img-fluid, img-fluid {
-        border-radius: 15px;
-        vertical-align: middle;
+    .card:hover {
+        transform: translateY(-2px);
+        background-color: #eee;
     }
 </style>
 
@@ -36,45 +27,63 @@ else
     </a>
     foreach (var booking in Model)
     {
-        string colour = "";
-
-        switch (booking.BookingStatus)
-        {
-            case BookingStatus.Reserved:
-                colour = "green";
-                break;
-            case BookingStatus.Collected:
-                colour = "blue";
-                break;
-            case BookingStatus.Unpaid:
-                colour = "orange";
-                break;
-            case BookingStatus.Complete:
-                colour = "black";
-                break;
-            case BookingStatus.Expired:
-                colour = "red";
-                break;
-            case BookingStatus.Cancelled:
-                colour = "red";
-                break;
-            default:
-                colour = "white";
-                break;
-        }
+        string color = booking.BookingStatus switch {
+            BookingStatus.Reserved => "green",
+            BookingStatus.Collected => "blue",
+            BookingStatus.Unpaid => "orange",
+            BookingStatus.Complete => "black",
+            _ => "red"
+        };
         <div class="row">
             <a asp-action="Details" asp-route-id="@booking.BookingId" class="booking-link text-decoration-none">
-                <div class="border-0 shadow-sm mb-3 hover-card">
-                    <div class="row g-0 align-items-center">
-                        <div class="col-lg-3 col-sm-4 p-3">
-                            <img class="img-fluid rounded w-100 object-fit-cover shadow-sm" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@booking.VehicleId}.jpg" style="max-width:150px; height:100px;">
+                <div class="card border-0 shadow-sm mb-3 transition-all hover:shadow-lg">
+                    <div class="row g-0 align-items-center p-2">
+                        @* Image *@
+                        <div class="col-lg-3 col-sm-4">
+                            <div class="position-relative rounded overflow-hidden">
+                                <img
+                                class="img-fluid w-100 object-fit-cover rounded"
+                                src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@booking.VehicleId}.jpg"
+                                style="height: 120px;"
+                                alt="@booking.Vehicle.Make @booking.Vehicle.Model"
+                                >
+                                @* Only show a Cost for bookings that have an invoice *@
+                                @if (booking.Invoice != null) {
+                                    <div class="position-absolute bottom-0 start-0 m-2">
+                                        <span class="badge bg-dark bg-opacity-75 px-2 py-1">
+                                        <i class="bi bi-tag-fill me-1"></i>
+                                        $@booking.Invoice.Amount.ToString("F2")
+                                        </span>
+                                    </div>
+                                }
+                            </div>
                         </div>
-                        <div class="col-lg-7 col-sm-6 card-body">
-                            <b>@booking.Vehicle.Name the @booking.Vehicle.Make @booking.Vehicle.Model</b><br />
-                            Pickup at @booking.StartTime @booking.StartPod.Site.SiteName Pod #@booking.StartPod.PodName
+
+                        @* Booking details *@
+                        <div class="col-lg-7 col-sm-6 px-4">
+                            <h5 class="mb-2 text-dark">
+                                @booking.Vehicle.Name the @booking.Vehicle.Make @booking.Vehicle.Model
+                            </h5>
+
+                            @* Only show a booking start time for bookings that have started *@
+                            @if (booking.StartTime != null) {
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-clock me-2"></i>
+                                    <span>@booking.StartTime</span>
+                                </div>
+                            }
+
+                            <div class="d-flex align-items-center text-muted mt-1">
+                                <i class="bi bi-geo-alt me-2"></i>
+                                <span>Pickup @booking.StartPod.Site.SiteName - Pod #@booking.StartPod.PodName</span>
+                            </div>
                         </div>
-                        <div class="col-lg-2 col-sm-2">
-                            <b style="color:@colour">@booking.BookingStatus</b>
+
+                        @* Booking Status *@
+                        <div class="col-lg-2 col-sm-2 text-end pe-4">
+                            <span class="badge rounded-pill px-3 py-2" style="background-color: @color">
+                                @booking.BookingStatus
+                            </span>
                         </div>
                     </div>
                 </div>
