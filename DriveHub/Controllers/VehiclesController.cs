@@ -100,6 +100,8 @@ namespace DriveHub.Controllers
                 .ThenInclude(c => c.Site)
                 .FirstOrDefaultAsync();
 
+            var earlyExit = booking.BookingStatus == BookingStatus.Unpaid;
+
             if (booking?.BookingId == null || booking.StartTime == null)
             {
                 _logger.LogWarning($"Couldn't find collected booking for vehicle id: {id}");
@@ -132,7 +134,7 @@ namespace DriveHub.Controllers
             };
 
             booking.Invoice = invoice;
-            if (booking.BookingStatus == BookingStatus.Unpaid) {
+            if (earlyExit) {
                 return View(booking);
             }
 
