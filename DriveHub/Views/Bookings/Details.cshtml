@@ -161,7 +161,7 @@
     <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 
     @section Scripts {
-        <script type="text/javascript" src="/js/qrcode.min.js"></script>
+        <script type="text/javascript" src="/lib/qrcode/qrcode.min.js"></script>
         <script type="text/javascript">
             // Note: the changes to make this work with your phone for a local development environmment would be massive. I have hardcoded the site domain instead.
             new QRCode(document.getElementById("qrcode"), location.origin + "/Vehicles/Pickup/@Model.VehicleId");
@@ -194,7 +194,7 @@
     <div class="d-flex justify-content-center" id="qrcode"></div>
 
     @section Scripts {
-        <script type="text/javascript" src="/js/qrcode.min.js"></script>
+        <script type="text/javascript" src="/lib/qrcode/qrcode.min.js"></script>
         <script defer type="text/javascript">
             new QRCode(document.getElementById("qrcode"), location.origin + "/Vehicles/Dropoff/@Model.VehicleId");
         </script>
