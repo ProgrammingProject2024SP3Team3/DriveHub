@@ -408,7 +408,7 @@ namespace DriveHub.Controllers
                 },
                 Mode = "payment",
                 SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
-                CancelUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
+                CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
             };
             try
             {

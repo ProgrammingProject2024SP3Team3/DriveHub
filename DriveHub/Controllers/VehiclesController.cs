@@ -47,7 +47,7 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Reserved || c.BookingStatus == BookingStatus.Collected)
+                .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Include(c => c.StartPod)
                 .ThenInclude(c => c.Site)
                 .FirstOrDefaultAsync();
@@ -93,14 +93,12 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Collected || c.BookingStatus == BookingStatus.Unpaid)
+                .Where(c => c.BookingStatus == BookingStatus.Collected)
                 .Include(c => c.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(c => c.Site)
                 .FirstOrDefaultAsync();
-
-            var earlyExit = booking.BookingStatus == BookingStatus.Unpaid;
 
             if (booking?.BookingId == null || booking.StartTime == null)
             {
@@ -134,9 +132,6 @@ namespace DriveHub.Controllers
             };
 
             booking.Invoice = invoice;
-            if (earlyExit) {
-                return View(booking);
-            }
 
             _context.Add(invoice);
             _context.Update(booking);
