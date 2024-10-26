@@ -9,7 +9,7 @@
             box-shadow: 0 4px 15px rgba(0, 168, 232, 0.3);
             border-radius: 25px;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 168, 232, 0.6), 0 0 30px rgba(0, 168, 232, 0.5);
@@ -32,42 +32,39 @@
 </style>
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
-<div class="container py-5">
-    <div class="row justify-content-center g-4">
-        
+
+<div class="container pb-5 pt-3">
+    <div class="row g-4">
         <div class="col-lg-4 col-md-6">
-            <a class="text-decoration-none h-100 d-flex align-items-stretch" asp-action="Search">
-                <div class="card text-center p-4">
+            <a class="" asp-action="Search">
+                <div class="card text-center p-4 h-100">
                     <i class="bi bi-calendar-plus mb-3"></i>
                     <h5 class="card-title">Book a Car</h5>
                     <p class="card-text">Choose your preferred car and time for booking.</p>
                 </div>
             </a>
         </div>
-
         <div class="col-lg-4 col-md-6">
-            <a class="text-decoration-none h-100 d-flex align-items-stretch" asp-action="Current">
-                <div class="card text-center p-4">
+            <a class="" asp-action="Current">
+                <div class="card text-center p-4 h-100">
                     <i class="bi bi-calendar-check mb-3"></i>
                     <h5 class="card-title">Your Current Booking</h5>
                     <p class="card-text">View details of your current car booking.</p>
                 </div>
             </a>
         </div>
-
-        <div class="col-lg-4 col-md-6">
-            <a class="text-decoration-none h-100 d-flex align-items-stretch" asp-action="Past">
-                <div class="card text-center p-4">
+        <div class="col-lg-4 col-md-6 mx-auto">
+            <a class="" asp-action="Past">
+                <div class="card text-center p-4 h-100">
                     <i class="bi bi-calendar-week mb-3"></i>
                     <h5 class="card-title">Your Previous Bookings</h5>
                     <p class="card-text">See your past bookings and details.</p>
                 </div>
             </a>
         </div>
-        
+
     </div>
 </div>
-<hr />
 
 <h2 class="text-center py-3">How does DriveHub work?</h2>
 <div class="container-fluid mb-3">
