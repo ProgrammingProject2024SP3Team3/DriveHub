@@ -7,13 +7,13 @@
 <div class="container-fluid px-4 py-5">
     <!-- Success Checkmark and Title -->
     <div class="text-center mb-5">
-        <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-lg" 
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-lg"
              style="width: 90px; height: 90px; font-size: 3.5rem; background-color: #28a745; color: white;">
             <i class="bi bi-check2"></i>
         </div>
         <h1 class="fw-bold text-dark mt-4">Vehicle Dropped Off!</h1>
         <p class="text-muted fs-5 fs-md-4">
-            You have successfully dropped off <span class="fw-bold" style="color: #00A8E8;">@Model.Vehicle.Name</span>, the 
+            You have successfully dropped off <span class="fw-bold" style="color: #00A8E8;">@Model.Vehicle.Name</span>, the
             <span class="fw-bold">@Model.Vehicle.Make</span> <span class="fw-bold">@Model.Vehicle.Model</span>.
             <br>Ensure you have all your personal belongings and exit the car.
         </p>
@@ -22,11 +22,11 @@
     <!-- Drop-off Details Card -->
     <div class="card border-0 shadow-sm mb-5" style="border-radius: 12px; background-color: #f1f5f9;">
         <div class="card-body p-4">
-            <h3 class="text-center h4 mb-4" style="color: #28a745;">Pick-up Details</h3>
+            <h3 class="text-center h4 mb-4" style="color: #28a745;">Drop-off Details</h3>
             <div class="row g-4 align-items-stretch">
                 <div class="col-md-4">
-                    <img src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Model.Vehicle.VehicleId}.jpg" 
-                         alt="Vehicle Image" class="img-fluid rounded-3 shadow-sm" 
+                    <img src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Model.Vehicle.VehicleId}.jpg"
+                         alt="Vehicle Image" class="img-fluid rounded-3 shadow-sm"
                          style="object-fit: cover; max-height: 200px; width: 100%;">
                 </div>
                 <div class="col-md-8">
@@ -83,7 +83,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <img src="https://drivehubstorage.blob.core.windows.net/website/dropoff.jpg" 
+                    <img src="https://drivehubstorage.blob.core.windows.net/website/dropoff.jpg"
                          alt="Drop-off Instructions" class="img-fluid rounded-3 shadow-sm"
                          style="object-fit: cover; max-height: 200px; width: 100%;">
                 </div>
@@ -93,30 +93,30 @@
 
     <!-- Payment Required -->
     <div class="text-center my-5">
-        <div class="d-inline-flex align-items-center justify-content-center px-4 py-2 shadow-sm"
+        <div class="d-inline-flex align-items-center justify-content-center px-4 py-2 shadow-sm mb-2"
              style="border-radius: 8px; background-color: #d1ecf1; color: #007b8f; font-size: 1.25rem; font-weight: bold;">
-            <span>Payment Required:</span> 
+            <span>Payment Required:</span>
             <span class="ms-2">$@Model.Invoice?.Amount.ToString("F2")</span>
         </div>
         <p class="text-muted">Please complete the payment to finalise your booking.</p>
     </div>
 
-<!-- Action Buttons -->
-        <div class="container text-center mb-4">
-            <div class="row justify-content-center g-2">
-                <!-- Button 1: Pay for Booking -->
-                <div class="col-12 col-md-4 d-grid">
-                    <form asp-controller="Bookings" asp-action="Pay">
-                        <input type="hidden" asp-for="BookingId" />
-                        <input type="submit" value="Pay for Booking" 
-                            class="btn btn-lg btn-success fw-bold text-white shadow-sm w-100" 
-                            style="padding: 12px; border-radius: 8px; font-size: 1rem;">
-                    </form>
-                </div>
-        
+    <!-- Action Buttons -->
+    <div class="container text-center mb-4">
+        <div class="row justify-content-center g-2">
+            <!-- Button 1: Pay for Booking -->
+            <div class="col-12 col-md-4 d-grid">
+                <form asp-controller="Bookings" asp-action="Pay">
+                    <input type="hidden" asp-for="BookingId" />
+                    <input type="submit" value="Pay for Booking"
+                        class="btn btn-lg btn-success fw-bold text-white shadow-sm w-100"
+                        style="padding: 12px; border-radius: 8px; font-size: 1rem;">
+                </form>
+            </div>
+
         <div class="col-12 col-md-4 d-grid">
-            <a asp-controller="Bookings" asp-action="Details" asp-route-id="@Model.BookingId" 
-               class="btn btn-lg btn-info fw-bold text-white shadow-sm w-100" 
+            <a asp-controller="Bookings" asp-action="Details" asp-route-id="@Model.BookingId"
+               class="btn btn-lg btn-info fw-bold text-white shadow-sm w-100"
                style="padding: 12px; border-radius: 8px; font-size: 1rem;">
                 Booking Details
             </a>
@@ -130,8 +130,8 @@
         <div class="card-body p-4">
             <h3 class="text-center h5 mb-4" style="color: #28a745;">Need Help?</h3>
             <div class="d-grid gap-3 col-md-8 mx-auto">
-                <a asp-controller="Home" asp-action="ContactUs" 
-                   class="btn btn-outline-primary fw-semibold" 
+                <a asp-controller="Home" asp-action="ContactUs"
+                   class="btn btn-outline-primary fw-semibold"
                    style="padding: 12px; border: 2px solid #00A8E8; border-radius: 8px; background: rgba(0, 168, 232, 0.2); color: #00A8E8;"
                    onmouseover="this.style.backgroundColor='#00A8E8'; this.style.color='white';"
                    onmouseout="this.style.backgroundColor='rgba(0, 168, 232, 0.2)'; this.style.color='#00A8E8';">

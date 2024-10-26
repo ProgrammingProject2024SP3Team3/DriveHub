@@ -11,7 +11,7 @@
         <div class="row justify-content-center">
             <div class="col-xl-8">
                 <div class="text-center text-white">
-                    <h1 class="hero-heading mb-5">Find, Book, and Drive – Anytime, Anywhere!</h1>
+                    <h1 class="hero-heading mb-5">Find, Book, and Drive - Anytime, Anywhere!</h1>
                 </div>
                 <div class="hero-search-bar">
                     <a id="hero-search-button" asp-action="Search" asp-controller="Bookings" class="btn btn-primary btn-lg">Find a car near you!</a>
@@ -26,8 +26,7 @@
     <div class="custom-container text-center">
         <div class="row g-4">
             @if (SignInManager.IsSignedIn(User)) {
-                <a class="col-lg-4 text-decoration-none text-dark service-link"
-                href="@(User.Identity.IsAuthenticated ? Url.Content("~/Identity/Account/Manage") : Url.Content("~/Identity/Account/Register"))">
+                <a class="col-lg-4 text-decoration-none text-dark service-link" href="@(Url.Content("~/Identity/Account/Manage"))">
                     <div class="card shadow-sm h-100 service-card bg-light">
                         <div class="card-body">
                             <i class="bi bi-person-check display-3"></i>
@@ -38,8 +37,7 @@
                 </a>
             } else {
                <!-- Register & Verify Card -->
-                <a class="col-lg-4 text-decoration-none text-dark service-link"
-                href="@(User.Identity.IsAuthenticated ? Url.Content("~/Identity/Account/Manage") : Url.Content("~/Identity/Account/Register"))">
+               <a class="col-lg-4 text-decoration-none text-dark service-link" href="@(Url.Content("~/Identity/Account/Register"))">
                     <div class="card shadow-sm h-100 service-card bg-light">
                         <div class="card-body">
                             <i class="bi bi-person-check display-3"></i>
@@ -112,30 +110,15 @@
 </section>
 
 <script>
+    // Hero fade in code
     window.addEventListener('DOMContentLoaded', function () {
-        // Hero fade in code
         const heroHeading = document.querySelector('.hero-heading');
 
-        // A check if heroHeading exists so it doesn't error on other pages
-        if (heroHeading) {
-            setTimeout(() => {
-                heroHeading.classList.add('scrolled');
-            }, 500);
-        }
-
-        const fadeInOnScroll = () => {
-            const scrollPosition = window.scrollY;
-            const opacity = Math.min(1, scrollPosition / (windowHeight / 2));
-
-            heroHeading.style.opacity = opacity;
-
-            if (scrollPosition <= windowHeight) {
-                heroHeading.style.transition = 'opacity 0.5s ease-out';
-            }
-        };
+        setTimeout(() => {
+            heroHeading.classList.add('scrolled');
+        }, 500);
     });
 
-    // How can VSCode's syntax highlighting be this bad?
     // Geolocation code to get user's GPS coordinates before they click the "Find a car near you" button
     function initSearchButtonListener() {
         let buttonClicked = false
