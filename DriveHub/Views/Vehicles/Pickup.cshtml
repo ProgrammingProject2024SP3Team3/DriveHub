@@ -8,9 +8,7 @@
     <!-- Success Checkmark and Title -->
     <div class="text-center mb-5">
         <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-lg" 
-             style="width: 90px; height: 90px; font-size: 3.5rem; background-color: #28a745; color: white; transition: transform 0.3s ease;"
-             onmouseover="this.style.transform='scale(1.15)'" 
-             onmouseout="this.style.transform='scale(1)'">
+             style="width: 90px; height: 90px; font-size: 3.5rem; background-color: #28a745; color: white;">
             <i class="bi bi-check2"></i>
         </div>
         <h1 class="fw-bold text-dark mt-4">Vehicle Picked Up!</h1>
@@ -25,15 +23,13 @@
     <div class="card border-0 shadow-sm mb-5" style="border-radius: 12px; background-color: #f1f5f9;">
         <div class="card-body p-4">
             <h3 class="text-center h4 mb-4" style="color: #28a745;">Pick-up Details</h3>
-            <div class="row g-4 align-items-stretch">
+            <div class="row g-4 align-items-center">
                 <div class="col-md-6 d-flex align-items-stretch">
                     <img src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Model.Vehicle.VehicleId}.jpg" 
                          alt="Vehicle Image" class="img-fluid rounded-3 shadow-sm" 
-                         style="border: 3px solid #00A8E8; transition: transform 0.3s ease, box-shadow 0.3s ease; width: 100%; height: 100%; object-fit: cover;"
-                         onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)'" 
-                         onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)'">
+                         style="border: 3px solid #00A8E8; object-fit: cover; min-height: 200px;">
                 </div>
-                <div class="col-md-6 d-flex flex-column justify-content-around">
+                <div class="col-md-6">
                     <div class="d-flex justify-content-between py-2 border-bottom">
                         <span class="fw-semibold text-secondary">Start Time</span>
                         <span class="text-dark">@Model.StartTime</span>
@@ -86,11 +82,9 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <img src="https://drivehubstorage.blob.core.windows.net/website/Booking4.jpg" 
+                    <img src="https://drivehubstorage.blob.core.windows.net/website/pickup.jpg" 
                          alt="Booking Instructions" class="img-fluid rounded-3 shadow-sm"
-                         style="border: 3px solid #00A8E8; transition: transform 0.3s ease, box-shadow 0.3s ease; width: 100%; height: 100%; object-fit: cover;"
-                         onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)'" 
-                         onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)'">
+                         style="border: 3px solid #00A8E8; object-fit: cover; min-height: 200px;">
                 </div>
             </div>
         </div>
@@ -100,41 +94,40 @@
     <div class="text-center mb-4">
         <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" 
            class="btn btn-lg fw-bold text-white shadow-sm mx-2" 
-           style="background: linear-gradient(135deg, #28a745, #218838); padding: 10px 40px; border-radius: 8px; transition: transform 0.3s ease;"
-           onmouseover="this.style.transform='scale(1.05)'" 
-           onmouseout="this.style.transform='scale(1)'">
+           style="background: linear-gradient(135deg, #28a745, #218838); padding: 10px 40px; border-radius: 8px;"
+           onmouseover="this.style.backgroundColor='#218838'; this.style.color='white';"
+           onmouseout="this.style.background='linear-gradient(135deg, #28a745, #218838)';">
             Drop off vehicle
         </a>
         <a asp-controller="Bookings" asp-action="Details" asp-route-id="@Model.BookingId" 
            class="btn btn-lg fw-bold text-white shadow-sm mx-2" 
-           style="background: linear-gradient(135deg, #17a2b8, #117a8b); padding: 10px 40px; border-radius: 8px; transition: transform 0.3s ease;"
-           onmouseover="this.style.transform='scale(1.05)'" 
-           onmouseout="this.style.transform='scale(1)'">
+           style="background: linear-gradient(135deg, #17a2b8, #117a8b); padding: 10px 40px; border-radius: 8px;"
+           onmouseover="this.style.backgroundColor='#117a8b'; this.style.color='white';"
+           onmouseout="this.style.background='linear-gradient(135deg, #17a2b8, #117a8b)';">
             Booking Details
         </a>
     </div>
 
-<div class="card border-0 shadow-sm" style="border-radius: 12px; background-color: #eaf5fb;">
-    <div class="card-body p-4">
-        <h3 class="text-center h5 mb-4" style="color: #28a745;">Need Help?</h3>
-        <div class="d-grid gap-3 col-md-8 mx-auto">
-            <!-- First Button with Hover Color Change -->
-            <a asp-controller="Bookings" asp-action="Index" 
-               class="btn fw-semibold shadow-sm text-primary" 
-               style="padding: 12px; border: 2px solid #00A8E8; border-radius: 8px; background: rgba(0, 168, 232, 0.2); transition: background-color 0.3s, color 0.3s;"
-               onmouseover="this.style.backgroundColor='#00A8E8'; this.style.color='white';"
-               onmouseout="this.style.backgroundColor='rgba(0, 168, 232, 0.2)'; this.style.color='#00A8E8';">
-                How does DriveHub work?
-            </a>
-
-            <!-- Second Button with Hover Color Change -->
-            <a asp-controller="Home" asp-action="ContactUs" 
-               class="btn fw-semibold shadow-sm" 
-               style="padding: 12px; border: 2px solid #00A8E8; border-radius: 8px; color: #00A8E8; transition: background-color 0.3s, color 0.3s;"
-               onmouseover="this.style.backgroundColor='#00A8E8'; this.style.color='white';"
-               onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00A8E8';">
-                24/7 Support
-            </a>
+    <!-- Help Section -->
+    <div class="card border-0 shadow-sm" style="border-radius: 12px; background-color: #eaf5fb;">
+        <div class="card-body p-4">
+            <h3 class="text-center h5 mb-4" style="color: #28a745;">Need Help?</h3>
+            <div class="d-grid gap-3 col-md-8 mx-auto">
+                <a asp-controller="Bookings" asp-action="Index" 
+                   class="btn fw-semibold shadow-sm" 
+                   style="padding: 12px; border: 2px solid #00A8E8; border-radius: 8px; background: rgba(0, 168, 232, 0.2); color: #00A8E8;"
+                   onmouseover="this.style.backgroundColor='#00A8E8'; this.style.color='white';"
+                   onmouseout="this.style.background='rgba(0, 168, 232, 0.2)'; this.style.color='#00A8E8';">
+                    How does DriveHub work?
+                </a>
+                <a asp-controller="Home" asp-action="ContactUs" 
+                   class="btn fw-semibold shadow-sm" 
+                   style="padding: 12px; border: 2px solid #00A8E8; border-radius: 8px; color: #00A8E8;"
+                   onmouseover="this.style.backgroundColor='#00A8E8'; this.style.color='white';"
+                   onmouseout="this.style.background='transparent'; this.style.color='#00A8E8';">
+                    24/7 Support
+                </a>
+            </div>
         </div>
     </div>
 </div>
