@@ -20,7 +20,7 @@
     <p class="text-center">Your @Model.BookingStatus Booking for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
 
     <div class="mb-3" style="background-color: #f8f9fa;">
-        <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Details</div>
+        <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17; border-radius: 8px 8px 0 0;">Booking Details</div>
         <div class="d-flex align-items-center p-3">
             <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
             <div>
@@ -32,7 +32,7 @@
             <div class="col-lg-6 mb-2">
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Booking Status:</strong> <span class="badge text-white p-2 fw-bold fs-3" style="background-color: @color;">@Model.BookingStatus</span>
+                        <strong>Booking Status:</strong> <span class="badge text-white p-2 fw-bold fs-5" style="background-color: @color; border-radius: 5px; padding: 0.5rem 1rem; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">@Model.BookingStatus</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <strong>Vehicle:</strong> <span>@Vehicle.Name the @Vehicle.Make @Vehicle.Model</span>
@@ -86,7 +86,7 @@
         </div>
     </div>
     <div class="mb-3">
-        <div class="p-2 fw-bold fs-4 text-center" style="background-color: #FFBA17;">Booking Cost</div>
+        <div class="p-2 fw-bold fs-4 text-center" style="background-color: #FFBA17; border-radius: 8px 8px 0 0;">Booking Cost</div>
         <div class="text-center bg-white p-3 pb-0" style="border: 1px solid #dee2e6;">
             <p class="mb-0">Per Hour (pro-rata):</p>
             <p class="fw-bold fs-1">$<span id="price-per-hour">@Model.Vehicle.VehicleRate.PricePerHour.ToString("F2")/hr</span></p>
@@ -157,7 +157,7 @@
 @if (Model.BookingStatus == BookingStatus.Reserved) {
     <h3 class="text-center">Pick up QR Code</h3>
     <div class="d-flex justify-content-center mb-3" id="qrcode"></div>
-    <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17;">Pickup Location</div>
+    <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17; border-radius: 8px 8px 0 0;">Pickup Location</div>
     <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 
     @section Scripts {
