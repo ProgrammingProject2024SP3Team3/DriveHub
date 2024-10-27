@@ -8,6 +8,8 @@
     align-items: center;
     justify-content: center;
     text-align: center;
+    height:500px;
+    margin: -20px;
 }
 
 .hero-section::before{
@@ -22,7 +24,7 @@
 }
 
 .hero-section .container {
-    position: relative;
+    max-width: 100%;
     z-index: 1; /* Ensure content is above the overlay */
 }
 
@@ -39,106 +41,115 @@
     opacity: 1;
   }
 
-.hero-search-bar {
-    max-width: 600px;
-    margin: 20px auto;
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    padding-bottom: 12%;
-}
 
-.hero-search-bar input {
-    flex-grow: 1;
-    padding: 10px;
-    font-size: 1.1rem;
-    border-radius: 5px 0 0 5px;
-    border: 1px solid #00A8E8
-}
-
-.hero-search-bar button {
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    border-radius: 0 5px 5px 0;
-    border: 1px solid #00A8E8;
-    background-color: #00A8E8;
-    color: white;
-}
-
-.hero-search-bar input:focus{
-    outline: none;
-}
 
 @media (min-width: 768px) {
     .hero-heading{
         padding-top: 8rem;
     }
     .hero-heading h1{
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
-
-    /* Adjust the padding of the search bar */
-    .hero-search-bar input {
-        width: 75%; /* Wider input field for larger screens */
-        padding: 15px; /* More padding for a more comfortable UI */
-    }
-
-    .hero-search-bar button {
-        width: 25%; /* Slightly smaller button compared to the input field */
-        padding: 15px; /* Match padding with input */
-    }
-
     /* Ensure the hero section maintains a good layout */
     .hero-section {
         justify-content: center; /* Ensure the content stays centered */
     }
 }
 
-/* Services Section */
-.services-section {
-    padding: 60px 0;
-    background-color:rgba(242, 240, 240, 0.66) ;
-    margin-top: 90px;
+
+.custom-container {
+    max-width: 1200px; 
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.service-item i {
-    font-size: 3rem;
-    margin-bottom: 60px;
-    color:#00A8E8 !important;
+
+/* Services Section Content */
+.service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    border-color:#bbc8d5; 
+    border-radius: 10px;
 }
 
-.service-heading {
-    font-size: 1.5rem;
-    margin-top: 15px;
+.service-card:hover {
+    transform: translateY(-10px); /* Lifts the card up */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: #e9ecef;
+    border-color:orange; 
 }
 
-.service-description {
-    font-size: 1rem;
+/* Hover effect for the whole link */
+.service-link:hover .service-card {
+    background-color: #e9ecef; 
+}
+
+.service-link:hover .service-heading,
+.service-link:hover .service-description {
+/* color: orange !important;  */
+text-decoration: underline;
+}
+
+/* Changing the default icon color */
+.bi {
+    color: #00A8E8 !important; 
 }
 
 /* QR Code Section */
 .qr-section {
-    padding: 40px 0;
+    padding-top: 8rem;
+    padding-bottom: 8rem;
 }
 
+/* Initial state before animation starts */
 .qr-image {
-    min-height: 30rem;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    opacity: 0;
+    animation: fadeInOut 8s infinite;
 }
 
+/* Keyframes for fade-in and fade-out */
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* QR Text Styling */
 .qr-text {
-    padding: 40px;
+    text-align: center;
 }
 
 .qr-text h2 {
-    font-size: 2rem;
     margin-bottom: 20px;
+    font-size: 2rem;
 }
 
 .qr-text p {
-    font-size: 1rem;
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .qr-text h2 {
+        font-size: 1.5rem;
+    }
+
+    .qr-text p {
+        font-size: 1.1rem;
+    }
+
+    .qr-section {
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+    }
 }
 
 /* Call to Action Section */

@@ -1,179 +1,202 @@
 ﻿@model DriveHubModel.Booking
 @using DriveHubModel
 @{
-    ViewData["Title"] = "Booking Details";
+    var isCurrentBooking = Model.BookingStatus == BookingStatus.Reserved || Model.BookingStatus == BookingStatus.Collected || Model.BookingStatus == BookingStatus.Unpaid;
+    ViewData["Title"] = isCurrentBooking ? "Current Booking" : "Booking Details";
 
-    string colour = "";
+    var Vehicle = Model.Vehicle;
 
-    switch (Model.BookingStatus)
+    string color = Model.BookingStatus switch {
+        BookingStatus.Reserved => "green",
+        BookingStatus.Collected => "blue",
+        BookingStatus.Unpaid => "orange",
+        BookingStatus.Complete => "black",
+        _ => "red"
+    };
+}
+
+<div class="booking-info">
+    <h1 class="text-center fw-normal text-dark">@ViewData["Title"]</h1>
+    <p class="text-center">Your @Model.BookingStatus Booking for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
+
+    <div class="mb-3" style="background-color: #f8f9fa;">
+        <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17; border-radius: 8px 8px 0 0;">Booking Details</div>
+        <div class="d-flex align-items-center p-3">
+            <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
+            <div>
+                <p class="mb-0">Pickup DriveHub @Model.StartPod.Site.SiteName Pod #@Model.StartPod.PodName</p>
+                <small>@Model.StartPod.Site.Address, @Model.StartPod.Site.City</small>
+            </div>
+        </div>
+        <div class="row p-3">
+            <div class="col-lg-6 mb-2">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Booking Status:</strong> <span class="badge text-white p-2 fw-bold fs-5" style="background-color: @color; border-radius: 5px; padding: 0.5rem 1rem; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">@Model.BookingStatus</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Vehicle:</strong> <span>@Vehicle.Name the @Vehicle.Make @Vehicle.Model</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Registration:</strong> <span>@Vehicle.RegistrationPlate</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Year:</strong> <span>@Vehicle.Year</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Seats:</strong> <span>@Vehicle.Seats</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Category:</strong> <span>@Vehicle.VehicleRate.Description</span>
+                    </li>
+                    @* If Booking is currently in reservation state, show how long it's reserved for and a button to extend the reservation *@
+                    @if (Model.BookingStatus == BookingStatus.Reserved) {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong>Reserved Until:</strong> <span>@Model.Expires</span>
+                        </li>
+                        <div class="alert alert-danger text-center mx-5 my-2" role="alert">
+                            You have @((Model.Expires - DateTime.Now).TotalMinutes.ToString("F0")) minutes to pickup your vehicle.
+                        </div>
+                        @* only show the extend reservation button if the booking has not yet been extended *@
+                        @if (!Model.IsExtended) {
+                            <div class="text-center mt-0">
+                                <a asp-action="Extend" asp-route-id="@Model.BookingId" class="my-2 btn btn-blue mt-0">
+                                    Extend reservation by 30 minutes
+                                </a>
+                            </div>
+                        }
+                    }
+                    @* Show a booking's start date if it has one *@
+                    @if (@Model.StartTime != null) {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong>Pick up time:</strong> <span>@Model.StartTime</span>
+                        </li>
+                    }
+                    @* Show a booking's end date if it has one *@
+                    @if (@Model.EndTime != null) {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong>Drop off time:</strong> <span>@Model.EndTime</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <img class="img-fluid rounded w-100" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Vehicle.VehicleId}.jpg">
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="p-2 fw-bold fs-4 text-center" style="background-color: #FFBA17; border-radius: 8px 8px 0 0;">Booking Cost</div>
+        <div class="text-center bg-white p-3 pb-0" style="border: 1px solid #dee2e6;">
+            <p class="mb-0">Per Hour (pro-rata):</p>
+            <p class="fw-bold fs-1">$<span id="price-per-hour">@Model.Vehicle.VehicleRate.PricePerHour.ToString("F2")/hr</span></p>
+            @* If the car is currently being driven show a live cost tracker to the user *@
+            @if (Model.BookingStatus == BookingStatus.Collected && Model.StartTime != null) {
+                <hr>
+                <p class="mb-0">Current Total (for <span id="live-minutes">0</span> minutes):</p>
+                <p class="fw-bold fs-1">$<span id="live-cost">0</span></p>
+                <script>
+                    // Make a UTC javascript date from the bookings start time (needs to be UTC so different time zones don't kill us)
+                    let startDate = new Date(@(((DateTimeOffset)Model.StartTime).ToUnixTimeMilliseconds()))
+                    let pricePerMinute = @Model.Vehicle.VehicleRate.PricePerMinute
+
+                    function updateLiveCost() {
+                        let currDate = new Date()
+                        let diffInMillis = currDate - startDate
+                        let diffInMins = diffInMillis / (1000 * 60)
+                        let currCost = diffInMins * pricePerMinute
+
+                        document.getElementById("live-cost").innerHTML = currCost.toFixed(2)
+                        document.getElementById("live-minutes").innerHTML = diffInMins.toFixed(0)
+                    }
+                    updateLiveCost()
+
+                    // repeatedly update the live cost
+                    setInterval(updateLiveCost, 1000)
+                </script>
+            }
+            @* If the booking has an invoice show the total cost to the user *@
+            @if (Model.Invoice != null) {
+                <hr>
+                <p class="mb-0">Total@(@Model.BookingStatus == BookingStatus.Complete ? " (Paid)" : ""):</p>
+                <p class="fw-bold fs-1">$<span id="total-cost">@(Model.Invoice.Amount.ToString("F2"))</span></p>
+            }
+        </div>
+    </div>
+</div>
+
+@* Conditional Buttons Section (Buttons displayed to the user depend on the booking status) *@
+<div class="booking-buttons text-center">
+    @if (Model.BookingStatus == BookingStatus.Reserved)
     {
-        case BookingStatus.Reserved:
-            colour = "green";
-            break;
-        case BookingStatus.Collected:
-            colour = "blue";
-            break;
-        case BookingStatus.Unpaid:
-            colour = "orange";
-            break;
-        case BookingStatus.Complete:
-            colour = "black";
-            break;
-        case BookingStatus.Expired:
-            colour = "red";
-            break;
-        case BookingStatus.Cancelled:
-            colour = "red";
-            break;
-        default:
-            colour = "white";
-            break;
+        <form asp-controller="Bookings" asp-action="Cancel" asp-route-id="@Model.BookingId" method="post">
+            <a asp-controller="Vehicles" asp-action="Pickup" asp-route-id="@Model.VehicleId" class="btn btn-success mb-4 fw-bold text-white fs-4">
+                Pickup vehicle
+            </a>
+            <input type="submit" value="Cancel Booking" class="btn btn-danger mb-4 fw-bold text-white fs-4" />
+        </form>
     }
-
-    string GetCurrentPrice(DateTime startTime, decimal pricePerMinute)
+    else if (Model.BookingStatus == BookingStatus.Collected)
     {
-        var diff = (decimal)(DateTime.Now - startTime).TotalMinutes;
-        return (pricePerMinute * diff).ToString();
+        <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" class="btn btn-success mb-4 fw-bold text-white fs-4">
+            Drop off vehicle
+        </a>
+    }
+    else if (Model.BookingStatus == BookingStatus.Unpaid)
+    {
+        <form asp-action="Pay">
+            <input type="hidden" asp-for="BookingId" />
+            <input type="submit" value="Pay for Booking" class="btn btn-success mb-4 fw-bold text-white fs-4" />
+        </form>
+    } else if (Model.BookingStatus == BookingStatus.Complete) {
+        <a asp-action="PrintInvoice" asp-route-id="@Model.Invoice?.InvoiceNumber" class="btn btn-success mb-4 fw-bold text-white fs-4">Print invoice</a>
+    }
+</div>
+
+@* Reserved car specific scripting (Pickup QR code and map) *@
+@if (Model.BookingStatus == BookingStatus.Reserved) {
+    <h3 class="text-center">Pick up QR Code</h3>
+    <div class="d-flex justify-content-center mb-3" id="qrcode"></div>
+    <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17; border-radius: 8px 8px 0 0;">Pickup Location</div>
+    <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
+
+    @section Scripts {
+        <script type="text/javascript" src="/lib/qrcode/qrcode.min.js"></script>
+        <script type="text/javascript">
+            // Note: the changes to make this work with your phone for a local development environmment would be massive. I have hardcoded the site domain instead.
+            new QRCode(document.getElementById("qrcode"), location.origin + "/Vehicles/Pickup/@Model.VehicleId");
+        </script>
+        <script>
+            function initMap() {
+                // Init Google Map
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: @Model.StartPod.Site.Latitude, lng: @Model.StartPod.Site.Longitude },
+                    zoom: 19,
+                    mapTypeId: "roadmap",
+                    mapId: "DRIVEHUB_DETAILS"
+                });
+                new google.maps.marker.AdvancedMarkerElement({
+                    map,
+                    title: "Vehicle",
+                    position: { lat: @Model.StartPod.Site.Latitude, lng: @Model.StartPod.Site.Longitude }
+                })
+            }
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
+                defer>
+        </script>
     }
 }
 
-<style>
-    .booking-section {
-        background-color: #f8f9fa;
-    }
-</style>
+@* Collected Car specific scripting (Dropoff QR code and live updated price) *@
+@if (Model.BookingStatus == BookingStatus.Collected) {
+    <h3 class="text-center">Drop off QR Code</h3>
+    <div class="d-flex justify-content-center" id="qrcode"></div>
 
-<h1>@ViewData["Title"]</h1>
-<p>Your booking details for @Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model.</p>
-<div class="booking-section mb-3">
-    <div class="text-center p-2 fw-bold mb-3 fs-4 text-white" style="background-color:@colour;">
-        @Model.BookingStatus
-    </div>
-    <div class="d-flex align-items-center mb-3">
-        <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-        <p class="mb-0">Pickup DriveHub @Model.StartPod.Site.SiteName Pod #@Model.StartPod.PodName</p>
-    </div>
-    <hr />
-    <div class="row">
-        <div class="col-xs-12 col-md-8 mb-3">
-            <label class="form-label">Car</label>
-            <div class="form-control">@Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model @Model.Vehicle.RegistrationPlate</div>
-        </div>
-        <div class="col-xs-12 col-md-4 container-fluid mb-3">
-            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                            @Model.Vehicle.VehicleId
-}.jpg" style="max-width:250px;">
-        </div>
-        <hr />
-    </div>
-    <div class="p-3">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label for="ReservationExpires" class="form-label">Reserved till</label>
-                <input class="form-control" name="ReservationExpires"
-                       value="@Model.Expires" disabled />
-            </div>
-            </<div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="StartTime" class="form-label">Booking Start</label>
-                        <input class="form-control" id="StartTime" name="StartTime"
-                               value="@Model.StartTime" disabled />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="EndTime" class="form-label">Booking End</label>
-                        <input class="form-control" id="EndTime" name="EndTime"
-                               value="@Model.EndTime" disabled />
-                    </div>
-                </div>
-                <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
-                    <p class="mb-0">Per Hour (pro-rata):</p>
-                    <p class="fw-bold fs-1">$@Model.PricePerHour.ToString("F2")</p>
-                    @if (Model.Invoice?.Amount != null)
-                    {
-                        <p class="mb-0">Total:</p>
-                        <p class="fw-bold fs-1">$@Model.Invoice?.Amount.ToString("F2")</p>
-                    }
-                    else if (Model.StartTime != null)
-                    {
-                        <p class="mb-0">Current price:</p>
-                        <p class="fw-bold fs-1">$@GetCurrentPrice((DateTime)Model.StartTime, Model.PricePerMinute)</p>
-                    }
-                    @if (Model.Receipt?.Amount != null)
-                    {
-                        <p class="mb-0">Total paid:</p>
-                        <p class="fw-bold fs-1">$@Model.Receipt?.Amount.ToString("F2")</p>
-                    }
-                    <hr />
-                </div>
-                <div class="text-center">
-                    @if (!Model.IsExtended && Model.BookingStatus == BookingStatus.Reserved)
-                    {
-                        <a asp-controller="Vehicles" asp-action="Pickup" asp-route-id="@Model.VehicleId" class="btn btn-success mb-4 fw-bold text-white fs-4">
-                            Pickup vehicle
-                        </a>
-                        <a asp-action="Extend" asp-route-id="@Model.BookingId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
-                            Extend booking for 30mins
-                        </a>
-                        <a asp-action="Cancel" asp-route-id="@Model.BookingId" class="btn btn-danger mb-4 fw-bold text-white fs-4">
-                            Cancel booking
-                        </a>
-                        <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
-                    }
-                    else if (Model.IsExtended && Model.BookingStatus == BookingStatus.Reserved)
-                    {
-                        <a asp-controller="Vehicles" asp-action="Pickup" asp-route-id="@Model.VehicleId" class="btn btn-success mb-4 fw-bold text-white fs-4">
-                            Pickup vehicle
-                        </a>
-                        <a asp-action="Cancel" asp-route-id="@Model.BookingId" class="btn btn-danger mb-4 fw-bold text-white fs-4">
-                            Cancel booking
-                        </a>
-                        <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
-                    }
-                    else if (Model.BookingStatus == BookingStatus.Collected)
-                    {
-                        <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" class="btn btn-primary mb-4 fw-bold text-white fs-4">
-                            Return vehicle
-                        </a>
-                        <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
-                    }
-                    else if (Model.BookingStatus == BookingStatus.Unpaid)
-                    {
-                        <form asp-action="Pay">
-                            <input type="hidden" asp-for="BookingId" />
-                            <input type="submit" value="Pay" class="btn btn-success mb-4 fw-bold text-white fs-4" />
-                            <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
-                        </form>
-                    }
-                    else if (Model.BookingStatus == BookingStatus.Complete)
-                    {
-                        <a asp-action="PrintInvoice" asp-route-id="@Model.Invoice?.InvoiceNumber" class="btn btn-success mb-4 fw-bold text-white fs-4">Print invoice</a>
-                        <a asp-action="Index" class="btn btn-primary mb-4 fw-bold text-white fs-4">Back to bookings</a>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
-</div>
-@section Scripts {
-    <script>
-        function initMap() {
-            // Init Google Map
-            const map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: @Model.StartPod.Site.Latitude, lng: @Model.StartPod.Site.Longitude },
-                zoom: 19,
-                mapTypeId: "roadmap",
-                mapId: "DRIVEHUB_DETAILS"
-            });
-            new google.maps.marker.AdvancedMarkerElement({
-                map,
-                title: "Vehicle",
-                position: { lat: @Model.StartPod.Site.Latitude, lng: @Model.StartPod.Site.Longitude }
-            })
-        }
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
-            defer>
-    </script>
+    @section Scripts {
+        <script type="text/javascript" src="/lib/qrcode/qrcode.min.js"></script>
+        <script defer type="text/javascript">
+            new QRCode(document.getElementById("qrcode"), location.origin + "/Vehicles/Dropoff/@Model.VehicleId");
+        </script>
+    }
 }

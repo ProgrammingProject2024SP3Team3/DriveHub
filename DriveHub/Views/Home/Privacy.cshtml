@@ -2,7 +2,12 @@
     ViewData["Title"] = "Privacy Policy";
 }
 
-<img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/privacy-hero-edit-123.jpg" alt="privacy-hero" />
+<!-- Hero Image Section with Parallax Effect and Fade-In -->
+<div class="container-fluid p-0 parallax-container">
+    <img class="img-fluid w-100 fade-in" src="https://drivehubstorage.blob.core.windows.net/website/privacy-hero-edit-123.jpg" alt="privacy-hero">
+</div>
+
+<div class="container mt-5">
 <p class="lead">
     DriveHub Australia is committed to protecting your personal information and complying with privacy laws applicable to its buisness, including the Australian Privacy Principles.
     This privacy policy sets out our policy with respect to the way we manage (collect, use, and disclose) personal information about you.
@@ -17,7 +22,7 @@
 <p class="lead">
     We may use and disclose your Personal Information in the following ways:
 </p>
-<ul>
+<ul class="lead">
     <li> to deliver services you have requested and do all things required to manage those services; </li>
     <li> to contact you about any incidents involving your vehicle, our contract or dealings with you, and other matters, including investigating any accidents, claims, breaches to our terms, unlawful activities, or fraud;</li>
     <li> verify the information you provide us, including confirming your identity;</li>
@@ -36,7 +41,7 @@
 <p class="lead">
     We may disclose your Personal Information to third parties including:
 </p>
-<ul>
+<ul class="lead">
     <li>our service providers who assist us to provide the services including (without limitation), mailing houses, call center operators, data processing, market research firms, consultants, insurance providers, accident management, roadside assistance providers, or for personal information verification;</li>
     <li>finance providers, including banks, debit, and credit card providers;</li>
     <li>credit reporting, fraud checking agencies, and debt collection agencies </li>
@@ -68,3 +73,91 @@
 <p class="lead">
     If you wish to exercise any of your rights under this Privacy Policy, have any questions, comments, or complaints regarding our practices, or if you are of the view that we have not adhered to this Privacy Policy, you may write to our Privacy Officer by emailing us at privacy@DriveHub.com.au or contacting us through our Contact Us page.
 </p>
+</div>
+
+<!-- Custom CSS for Parallax, Fade-In, and Hover Effects -->
+<style>
+    /* Parallax effect */
+    .parallax-container {
+        position: relative;
+        overflow: hidden;
+        height: 500px; 
+    }
+
+    .parallax-container img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: translateZ(0);
+        will-change: transform;
+        transition: transform 0.5s ease-out;
+    }
+
+    /* Fade-in animation */
+    .fade-in {
+        opacity: 0;
+        animation: fadeInAnimation 2s forwards;
+    }
+
+    @@keyframes fadeInAnimation {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Hover effect: Slight zoom on hover */
+    .parallax-container img:hover {
+        transform: scale(1.05); 
+    }
+
+    /* Parallax scrolling effect */
+    @@media (min-width: 768px) {
+        .parallax-container {
+            perspective: 1px;
+            perspective-origin: 50% 50%;
+            height: 500px;
+        }
+
+        .parallax-container img {
+            transform: translateZ(-1px) scale(2);
+        }
+    }
+/* Responsive adjustment for smaller screens */
+    @@media (max-width: 767px) {
+        .parallax-container {
+            height: 300px;
+        }
+
+        .parallax-container img {
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .parallax-container {
+            height: 200px;
+        }
+
+        .parallax-container img {
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+    
+</style>
+
+<script>
+    // Simple JS to adjust parallax scroll behavior
+    window.addEventListener('scroll', function() {
+        const parallax = document.querySelector('.parallax-container img');
+        let scrollPosition = window.pageYOffset;
+        parallax.style.transform = 'translateY(' + scrollPosition * 0.5 + 'px)';
+    });
+</script>

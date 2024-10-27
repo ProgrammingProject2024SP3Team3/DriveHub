@@ -1,55 +1,71 @@
 ﻿@{
     ViewData["Title"] = "Bookings";
 }
-
-<style>
-
-    a.booking-link {
-        color: #00A8E8;
-    }
-
-        a.booking-link :hover {
-            color: orange;
+    <style>
+        .card {
+            background: linear-gradient(135deg, #0f4c75, #000, #0f4c75);
+            color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 168, 232, 0.3);
+            border-radius: 25px;
         }
 
-    h3.service-heading {
-        color: #00A8E8
-    }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 168, 232, 0.6), 0 0 30px rgba(0, 168, 232, 0.5);
+        }
 
-    .img-fluid, img-fluid {
+        .card .bi {
+            font-size: 3rem;
+            color: #00a8e8;
+            transition: color 0.3s ease;
+        }
+
+        .card:hover .bi {
+            color: #ffa500;
+        }
+        .img-fluid{
         border-radius: 15px;
         vertical-align: middle;
-    }
+        }
 
 </style>
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
-<a class="booking-link text-decoration-none" asp-action="Search">
-    <div class="row d-flex align-items-center mb-3" style="background-image:url('https://drivehubstorage.blob.core.windows.net/website/bg-car.jpg')">
-        <div class="col-4"><i class="bi bi-calendar-plus" style="font-size:100px"></i></div>
-        <div class="col-8">
-            <h3 class="service-heading">Book a Car</h3>
+<div class="container pb-5 pt-3">
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+            <a class="" asp-action="Search">
+                <div class="card text-center p-4 h-100">
+                    <i class="bi bi-calendar-plus mb-3"></i>
+                    <h5 class="card-title">Book a Car</h5>
+                    <p class="card-text">Choose your preferred car and time for booking.</p>
+                </div>
+            </a>
         </div>
-    </div>
-</a>
-<a class="booking-link text-decoration-none" asp-action="Current">
-    <div class="row d-flex align-items-center mb-3" style="background-image:url('https://drivehubstorage.blob.core.windows.net/website/Booking-banner.jpg')">
-        <div class="col-4"><i class="bi bi-calendar-check" style="font-size:100px"></i></div>
-        <div class="col-8">
-            <h3 class="service-heading">Your current booking</h3>
+        <div class="col-lg-4 col-md-6">
+            <a class="" asp-action="Current">
+                <div class="card text-center p-4 h-100">
+                    <i class="bi bi-calendar-check mb-3"></i>
+                    <h5 class="card-title">Your Current Booking</h5>
+                    <p class="card-text">View details of your current car booking.</p>
+                </div>
+            </a>
         </div>
-    </div>
-</a>
-<a class="booking-link text-decoration-none" asp-action="Past">
-    <div class="row d-flex align-items-center mb-5" style="background-image:url('https://drivehubstorage.blob.core.windows.net/website/Booking4.jpg')">
-        <div class="col-4"><i class="bi bi-calendar-week" style="font-size:100px"></i></div>
-        <div class="col-8">
-            <h3 class="service-heading">Your previous bookings</h3>
+        <div class="col-lg-4 col-md-6 mx-auto">
+            <a class="" asp-action="Past">
+                <div class="card text-center p-4 h-100">
+                    <i class="bi bi-calendar-week mb-3"></i>
+                    <h5 class="card-title">Your Previous Bookings</h5>
+                    <p class="card-text">See your past bookings and details.</p>
+                </div>
+            </a>
         </div>
+
     </div>
-</a>
-<hr />
+</div>
+
 <h2 class="text-center py-3">How does DriveHub work?</h2>
 <div class="container-fluid mb-3">
     <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/Booking-banner.jpg" alt="booking-banner" style="max-width:contain" />
