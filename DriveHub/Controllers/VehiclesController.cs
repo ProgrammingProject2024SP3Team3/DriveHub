@@ -62,8 +62,14 @@ namespace DriveHub.Controllers
 
             booking.StartTime = DateTime.Now;
             booking.BookingStatus = BookingStatus.Collected;
+            var startPod = booking.StartPod;
+            startPod.Vehicle = null;
+            vehicle.IsReserved = false;
 
             _context.Update(booking);
+            _context.Update(startPod);
+            _context.Update(vehicle);
+
             await _context.SaveChangesAsync();
 
             return View(booking);
