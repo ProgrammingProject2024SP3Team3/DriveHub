@@ -63,8 +63,8 @@ namespace DriveHubTests
         {
             var userStore = new Mock<IUserStore<IdentityUser>>().Object;
             return new UserManager<IdentityUser>(userStore, new Mock<IOptions<IdentityOptions>>().Object,
-                new Mock<IPasswordHasher<IdentityUser>>().Object, new IUserValidator<IdentityUser>[0],
-                new IPasswordValidator<IdentityUser>[0], new Mock<ILookupNormalizer>().Object,
+                new Mock<IPasswordHasher<IdentityUser>>().Object, Array.Empty<IUserValidator<IdentityUser>>(),
+                Array.Empty<IPasswordValidator<IdentityUser>>(), new Mock<ILookupNormalizer>().Object,
                 new Mock<IdentityErrorDescriber>().Object, null,
                 new Mock<ILogger<UserManager<IdentityUser>>>().Object);
         }
@@ -89,16 +89,6 @@ namespace DriveHubTests
                 HttpContext = new DefaultHttpContext { User = mockUser }
             };
         }
-
-        //// Public method to create mock users for specific cases
-        //public ClaimsPrincipal CreateMockUser(string userId = "dac0b461-0e19-4879-a43c-53be7460f819", string userName = "test-user")
-        //{
-        //    return new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-        //    {
-        //        new Claim(ClaimTypes.NameIdentifier, userId),
-        //        new Claim(ClaimTypes.Name, userName)
-        //    }, "mock"));
-        //}
 
         // Public method to set a mock user in the controller for a specific test case
         public void SetMockUserToContext(Controller controller, ClaimsPrincipal mockUser)

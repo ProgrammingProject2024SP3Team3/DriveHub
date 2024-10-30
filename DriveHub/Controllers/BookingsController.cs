@@ -70,7 +70,7 @@ namespace DriveHub.Controllers
             if (hasReservation)
             {
                 ViewBag.Message = "You have a current booking";
-                return RedirectToAction(nameof(Current));
+                return View(nameof(Current));
             }
 
             var vehicles = await _context.Vehicles.Where(c => c.IsReserved == false).Include(c => c.VehicleRate).ToListAsync();
@@ -83,7 +83,7 @@ namespace DriveHub.Controllers
                 vehicleRates,
                 pods
                 );
-            return View(bookingSearchVM);
+            return View("Search", bookingSearchVM);
         }
 
         // GET: Bookings/Create
@@ -101,7 +101,7 @@ namespace DriveHub.Controllers
             if (hasReservation)
             {
                 ViewBag.Message = "User has a current booking";
-                return RedirectToAction(nameof(Current));
+                return View(nameof(Current));
             }
 
             // Fetch vehicle data including related entities
@@ -140,7 +140,7 @@ namespace DriveHub.Controllers
                 if (hasReservation)
                 {
                     ViewBag.Message = "You have a current booking.";
-                    return RedirectToAction(nameof(Current));
+                    return View(nameof(Current));
                 }
 
                 // Start transaction to ensure atomic operations
@@ -207,8 +207,6 @@ namespace DriveHub.Controllers
             }
         }
 
-
-
         /// <summary>
         /// Displays current (in-progress) bookings for the logged-in user.
         /// </summary>
@@ -262,7 +260,7 @@ namespace DriveHub.Controllers
             _context.Update(booking);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Current));
+            return View(nameof(Current));
         }
 
         public async Task<IActionResult> Past()
@@ -281,7 +279,7 @@ namespace DriveHub.Controllers
                 .OrderByDescending(c => c.Expires)
                 .ToListAsync();
 
-            return View(bookings);
+            return View("Past", bookings);
         }
 
         public async Task<IActionResult> Details(string id)
@@ -302,7 +300,7 @@ namespace DriveHub.Controllers
                 return NotFound();
             }
 
-            return View(booking);
+            return View("Details", booking);
         }
 
         public async Task<IActionResult> Cancel(string id)
@@ -314,7 +312,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(d => d.VehicleRate)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
 
-            return View(booking);
+            return View("Cancel", booking);
         }
 
         [HttpPost, ActionName("Cancel")]
