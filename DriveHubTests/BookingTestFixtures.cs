@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace DriveHubTests
 {
-    public class BookingTestFixtures
+    public class BookingTestFixtures : IDisposable
     {
         public ApplicationDbContext Context { get; private set; }
         public BookingsController BookingsController { get; private set; }
@@ -85,6 +85,11 @@ namespace DriveHubTests
             {
                 HttpContext = new DefaultHttpContext { User = mockUser }
             };
+        }
+
+        public void Dispose()
+        {
+            Context.Dispose();
         }
     }
 }

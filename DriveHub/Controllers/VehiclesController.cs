@@ -44,17 +44,22 @@ namespace DriveHub.Controllers
 
             _logger.LogInformation($"Found vehicle {id}");
 
-            var booking = await _context.Bookings
+            Booking? booking = null;
+            try
+            {
+                await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Reserved)
+                .Where(c => c.BookingStatus == BookingStatus.Collected)
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(c => c.Site)
-                .FirstOrDefaultAsync();
-
-            if (booking?.BookingId == null)
+                .SingleAsync();
+            }
+            catch (InvalidOperationException ex)
             {
-                _logger.LogWarning($"Couldn't find booking for {id}");
+                _logger.LogWarning($"Booking not found for id: {id}");
                 return RedirectToAction("Search", "Bookings");
             }
 

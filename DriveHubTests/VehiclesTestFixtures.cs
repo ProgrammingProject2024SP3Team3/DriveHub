@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace DriveHubTests
 {
-    public class VehiclesTestFixtures
+    public class VehiclesTestFixtures : IDisposable
     {
         public ApplicationDbContext Context { get; private set; }
         public VehiclesController VehiclesController { get; private set; }
@@ -83,6 +83,11 @@ namespace DriveHubTests
             {
                 HttpContext = new DefaultHttpContext { User = mockUser }
             };
+        }
+
+        public void Dispose()
+        {
+            Context.Dispose();
         }
     }
 }

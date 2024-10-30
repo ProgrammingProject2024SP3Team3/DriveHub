@@ -8,16 +8,9 @@ using System.Reflection;
 
 namespace DriveHubTests
 {
-    public class BookingTests : BeforeAfterTestAttribute
+    public class BookingTests
     {
-        BookingTestFixtures? Fixture = null;
-
-        public override void Before(MethodInfo methodUnderTest) { }
-
-        public override void After(MethodInfo methodUnderTest)
-        {
-            Fixture = null;
-        }
+        BookingTestFixtures Fixture;
 
         [Fact]
         public async Task Set1_UserA_Search_ShouldRedirectToCurrent()
@@ -30,6 +23,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Current", viewResult.ViewName);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -43,6 +37,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Current", viewResult.ViewName);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -63,6 +58,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Current", viewResult.ViewName);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -78,6 +74,7 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<Booking>(viewResult.Model);
             Assert.Equal("cac6a77c-59fd-4d0e-b557-9a3230a79e9a", model.VehicleId);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -98,6 +95,7 @@ namespace DriveHubTests
             var booking = await Fixture.Context.Bookings.FindAsync("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
             Assert.NotNull(booking);
             Assert.Equal(BookingStatus.Cancelled, booking.BookingStatus);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -112,6 +110,7 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
             Assert.Equal(9, model.Pods.Count);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -126,6 +125,7 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
             Assert.False(model.Pods.Where(c => c.VehicleId == "cac6a77c-59fd-4d0e-b557-9a3230a79e9a").Any());
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -139,6 +139,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Create", viewResult.ViewName);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -152,6 +153,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -165,6 +167,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Current", viewResult.ViewName);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -179,6 +182,7 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
             Assert.Equal(9, model.Pods.Count);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -192,6 +196,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Current", viewResult.ViewName);
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -206,6 +211,7 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
             Assert.False(model.Pods.Where(c => c.VehicleId == "cac6a77c-59fd-4d0e-b557-9a3230a79e9a").Any());
+            Fixture.Dispose();
         }
 
         [Fact]
@@ -219,8 +225,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
+            Fixture.Dispose();
         }
-
-
     }
 }
