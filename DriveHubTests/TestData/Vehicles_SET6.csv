@@ -1,0 +1,11 @@
+VehicleId,VehicleRateId,IsReserved,Make,Model,RegistrationPlate,State,Year,Seats,Colour,Name
+0e1769a3-c277-462f-a448-830b76328285,f11eec17-116c-4513-abe8-83049c0fa924,0,Toyota,HiLux,VRM001,VIC,2019,2,White,Vroominator
+0fbbd18e-bd5b-4f99-a00b-29533d26c3ad,4f040b3d-f4a9-4b8a-95f7-ed06ea181c34,0,Toyota,RAV4,THU001,VIC,2019,5,Blue,Thunderbolt
+236d7fac-7e6f-4856-9203-de65bc9e7545,2452a253-031c-4de5-a6db-03691eac644b,0,Tesla,Model Y,SLV001,VIC,2022,5,Silver,The Silver Bullet
+3685eb7e-7cdc-4c5e-8980-a85ecaf62023,4f040b3d-f4a9-4b8a-95f7-ed06ea181c34,0,Mazda,CX-5,BRN001,VIC,2019,5,Blue,Blaze Runner
+36d4bc1e-6159-46df-ad98-da93a38bcc82,f11eec17-116c-4513-abe8-83049c0fa924,0,Toyota,HiLux,CRS001,VIC,2024,2,White,Shadow Cruiser
+417b7216-6148-4a40-9458-99db17987790,798e5cce-92bb-493f-915c-f251c0dd674e,0,Hyundai,i30,STH001,VIC,2022,5,Black,Stealth Rocket
+4e0f6bb8-4835-4960-87ab-b89e21c78ab4,2452a253-031c-4de5-a6db-03691eac644b,0,Tesla,Model Y,WAR001,VIC,2023,5,Red,Road Warrior
+5780bc06-a5e2-4598-9eea-7cb90b55e169,4f040b3d-f4a9-4b8a-95f7-ed06ea181c34,0,Toyota,RAV4,RDR001,VIC,2021,5,White,Night Rider
+cac6a77c-59fd-4d0e-b557-9a3230a79e9a,798e5cce-92bb-493f-915c-f251c0dd674e,0,Hyundai,i30,STA001,VIC,2023,5,Silver,Iron Stallion
+eeb7b72c-b362-4513-b84b-baa954c83ce0,4f040b3d-f4a9-4b8a-95f7-ed06ea181c34,0,Mazda,CX-5,MCS001,VIC,2023,5,Red,Lightning McSpeed
