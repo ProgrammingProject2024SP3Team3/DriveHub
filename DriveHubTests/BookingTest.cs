@@ -3,18 +3,29 @@ using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using DriveHub.Models.Dto;
+using Xunit.Sdk;
+using System.Reflection;
 
 namespace DriveHubTests
 {
-    public class BookingTests
+    public class BookingTests : BeforeAfterTestAttribute
     {
+        BookingTestFixtures? Fixture = null;
+
+        public override void Before(MethodInfo methodUnderTest) { }
+
+        public override void After(MethodInfo methodUnderTest)
+        {
+            Fixture = null;
+        }
+
         [Fact]
         public async Task Set1_UserA_Search_ShouldRedirectToCurrent()
         {
-            var bookingTestFixtures = new BookingTestFixtures(1, "usera");
+            Fixture = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Search();
+            var result = await Fixture.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -24,10 +35,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set1_UserA_Create_ShouldRedirectToCurrent()
         {
-            var bookingTestFixtures = new BookingTestFixtures(1, "usera");
+            Fixture = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -38,7 +49,7 @@ namespace DriveHubTests
         public async Task Set1_UserA_CreateConfirmed_ShouldReturnCurrent()
         {
             // Arrange
-            var bookingTestFixtures = new BookingTestFixtures(1, "usera");
+            Fixture = new BookingTestFixtures(1, "usera");
 
             var reservationDto = new ReservationDto();
             reservationDto.BookingId = "b8075e83-6e70-4dee-b76a-22e8c7ee7ec1";
@@ -47,7 +58,7 @@ namespace DriveHubTests
             reservationDto.QuotedPricePerHour = 20m;
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Create(reservationDto.BookingId);
+            var result = await Fixture.BookingsController.Create(reservationDto.BookingId);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -58,10 +69,10 @@ namespace DriveHubTests
         public async Task Set1_UserA_Cancel_ShouldReturnCancelViewForIronStallion()
         {
             // Arrange
-            var bookingTestFixtures = new BookingTestFixtures(1, "usera");
+            Fixture = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Cancel("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
+            var result = await Fixture.BookingsController.Cancel("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -73,10 +84,10 @@ namespace DriveHubTests
         public async Task Set1_UserA_CancelConfirmed_ShouldCancelBooking()
         {
             // Arrange
-            var bookingTestFixtures = new BookingTestFixtures(1, "usera");
+            Fixture = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.CancelConfirmed("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
+            var result = await Fixture.BookingsController.CancelConfirmed("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
@@ -84,7 +95,7 @@ namespace DriveHubTests
             Assert.Equal("Bookings", redirectToActionResult.ControllerName);
 
             // Verify that the booking is indeed cancelled
-            var booking = await bookingTestFixtures.Context.Bookings.FindAsync("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
+            var booking = await Fixture.Context.Bookings.FindAsync("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
             Assert.NotNull(booking);
             Assert.Equal(BookingStatus.Cancelled, booking.BookingStatus);
         }
@@ -92,10 +103,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set1_UserB_Search_ShouldReturn9Vehicles()
         {
-            var bookingTestFixtures = new BookingTestFixtures(1, "userb");
+            Fixture = new BookingTestFixtures(1, "userb");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Search();
+            var result = await Fixture.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -106,10 +117,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set1_UserB_Search_CannotFindIronStallion()
         {
-            var bookingTestFixtures = new BookingTestFixtures(1, "userb");
+            Fixture = new BookingTestFixtures(1, "userb");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Search();
+            var result = await Fixture.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -120,10 +131,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set1_UserB_Create_ShouldReturnCreateView()
         {
-            var bookingTestFixtures = new BookingTestFixtures(1, "userb");
+            Fixture = new BookingTestFixtures(1, "userb");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Create("eeb7b72c-b362-4513-b84b-baa954c83ce0");
+            var result = await Fixture.BookingsController.Create("eeb7b72c-b362-4513-b84b-baa954c83ce0");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -133,10 +144,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set1_UserB_Create_IronStallionReturnsErrorView()
         {
-            var bookingTestFixtures = new BookingTestFixtures(1, "userb");
+            Fixture = new BookingTestFixtures(1, "userb");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -146,10 +157,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set2_UserA_Create_ShouldRedirectToCurrent()
         {
-            var bookingTestFixtures = new BookingTestFixtures(2, "usera");
+            Fixture = new BookingTestFixtures(2, "usera");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -159,10 +170,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set2_UserB_Search_ShouldReturn9Vehicles()
         {
-            var bookingTestFixtures = new BookingTestFixtures(2, "userb");
+            Fixture = new BookingTestFixtures(2, "userb");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Search();
+            var result = await Fixture.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -173,10 +184,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set2_UserA_Search_ShouldRedirectToCurrent()
         {
-            var bookingTestFixtures = new BookingTestFixtures(2, "usera");
+            Fixture = new BookingTestFixtures(2, "usera");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Search();
+            var result = await Fixture.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -186,10 +197,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set2_UserB_Search_CannotFindIronStallion()
         {
-            var bookingTestFixtures = new BookingTestFixtures(2, "userb");
+            Fixture = new BookingTestFixtures(2, "userb");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Search();
+            var result = await Fixture.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -200,10 +211,10 @@ namespace DriveHubTests
         [Fact]
         public async Task Set2_UserB_Create_IronStallionRedirectsToError()
         {
-            var bookingTestFixtures = new BookingTestFixtures(2, "userb");
+            Fixture = new BookingTestFixtures(2, "userb");
 
             // Act
-            var result = await bookingTestFixtures.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);

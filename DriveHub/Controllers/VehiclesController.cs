@@ -72,7 +72,7 @@ namespace DriveHub.Controllers
 
             await _context.SaveChangesAsync();
 
-            return View(booking);
+            return View("Pickup", booking);
         }
 
         // GET: Vehicles/Dropoff/5
@@ -96,7 +96,10 @@ namespace DriveHub.Controllers
 
             _logger.LogInformation($"Found vehicle {id}");
 
-            var booking = await _context.Bookings
+            Booking? booking = null;
+            try
+            {
+                await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Collected)
@@ -104,12 +107,18 @@ namespace DriveHub.Controllers
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(c => c.Site)
-                .FirstOrDefaultAsync();
+                .SingleAsync();
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning($"Booking not found for id: {id}");
+                return View(nameof(Error));
+            }
 
-            if (booking?.BookingId == null || booking.StartTime == null)
+            if (booking == null || booking?.BookingId == null || booking.StartTime == null)
             {
                 _logger.LogWarning($"Couldn't find collected booking for vehicle id: {id}");
-                return RedirectToAction("Search", "Bookings");
+                return View(nameof(Error));
             }
 
             var emptyPods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
@@ -145,7 +154,7 @@ namespace DriveHub.Controllers
 
             _logger.LogInformation($"Drop-off completed for booking id: {booking.BookingId}");
 
-            return View(booking);
+            return View("Dropoff", booking);
         }
 
 
