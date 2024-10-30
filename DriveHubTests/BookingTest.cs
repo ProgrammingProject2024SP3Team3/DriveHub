@@ -14,7 +14,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Search();
+            var result = await bookingTestFixtures.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -27,7 +27,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await bookingTestFixtures.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -47,7 +47,7 @@ namespace DriveHubTests
             reservationDto.QuotedPricePerHour = 20m;
 
             // Act
-            var result = await bookingTestFixtures.Controller.Create(reservationDto.BookingId);
+            var result = await bookingTestFixtures.BookingsController.Create(reservationDto.BookingId);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -61,7 +61,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Cancel("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
+            var result = await bookingTestFixtures.BookingsController.Cancel("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -76,7 +76,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.Controller.CancelConfirmed("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
+            var result = await bookingTestFixtures.BookingsController.CancelConfirmed("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
@@ -95,7 +95,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(1, "userb");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Search();
+            var result = await bookingTestFixtures.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -109,7 +109,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(1, "userb");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Search();
+            var result = await bookingTestFixtures.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -123,7 +123,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(1, "userb");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Create("eeb7b72c-b362-4513-b84b-baa954c83ce0");
+            var result = await bookingTestFixtures.BookingsController.Create("eeb7b72c-b362-4513-b84b-baa954c83ce0");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -136,7 +136,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(1, "userb");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await bookingTestFixtures.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -149,7 +149,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(2, "usera");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await bookingTestFixtures.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -162,7 +162,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(2, "userb");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Search();
+            var result = await bookingTestFixtures.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -176,7 +176,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(2, "usera");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Search();
+            var result = await bookingTestFixtures.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -189,7 +189,7 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(2, "userb");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Search();
+            var result = await bookingTestFixtures.BookingsController.Search();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -203,11 +203,13 @@ namespace DriveHubTests
             var bookingTestFixtures = new BookingTestFixtures(2, "userb");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await bookingTestFixtures.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
         }
+
+
     }
 }

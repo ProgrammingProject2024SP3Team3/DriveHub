@@ -27,8 +27,11 @@ namespace DriveHubTests
     public class BookingTestFixtures
     {
         public ApplicationDbContext Context { get; private set; }
-        public BookingsController Controller { get; private set; }
-        public Mock<ILogger<BookingsController>> MockLogger { get; private set; }
+        public BookingsController BookingsController { get; private set; }
+
+        public VehiclesController VehiclesController { get; private set; }
+        public Mock<ILogger<BookingsController>> BookingsLogger { get; private set; }
+        public Mock<ILogger<VehiclesController>> VehiclesLogger { get; private set; }
         public UserManager<IdentityUser> UserManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -45,14 +48,16 @@ namespace DriveHubTests
                 .Options;
 
             Context = new ApplicationDbContext(options);
-            MockLogger = new Mock<ILogger<BookingsController>>();
+            BookingsLogger = new Mock<ILogger<BookingsController>>();
+            VehiclesLogger = new Mock<ILogger<VehiclesController>>();
 
             // Seed the database with test data using TestDataBuilder
             TestDataBuilder.SeedData(Context, set);
 
             // Mock the UserManager and set up the controller
             UserManager = MockUserManager();
-            Controller = new BookingsController(Context, MockLogger.Object, UserManager, Configuration);
+            BookingsController = new BookingsController(Context, BookingsLogger.Object, UserManager, Configuration);
+            VehiclesController = new VehiclesController(Context, VehiclesLogger.Object, UserManager);
 
             // Set up a default mock authenticated user for tests
             SetMockAuthenticatedUser(userName);
@@ -84,7 +89,7 @@ namespace DriveHubTests
                 new Claim(ClaimTypes.Name, user.UserName)
             }, "mock"));
 
-            Controller.ControllerContext = new ControllerContext
+            BookingsController.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = mockUser }
             };
