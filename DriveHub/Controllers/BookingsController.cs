@@ -76,9 +76,9 @@ namespace DriveHub.Controllers
             var vehicles = await _context.Vehicles.Where(c => c.IsReserved == false).Include(c => c.VehicleRate).ToListAsync();
             var seats = vehicles.Select(c => c.Seats).Distinct().ToList();
             var vehicleRates = await _context.VehicleRates.ToListAsync();
-            var pods = await _context.Pods.Where(c => c.VehicleId != null).Include(c => c.Site).Include(c => c.Vehicle).OrderBy(c => c.SiteId).ToListAsync();
+            var pods = await _context.Pods.Where(c => c.VehicleId != null).Where(c => c.Vehicle.IsReserved == false).Include(c => c.Site).Include(c => c.Vehicle).OrderBy(c => c.SiteId).ToListAsync();
+
             var bookingSearchVM = new BookingSearchVM(
-                vehicles,
                 seats,
                 vehicleRates,
                 pods
@@ -118,7 +118,7 @@ namespace DriveHub.Controllers
             }
 
             ViewBag.Vehicle = vehicle;
-            return View();
+            return View(nameof(Create));
         }
 
         // POST: Bookings/Create

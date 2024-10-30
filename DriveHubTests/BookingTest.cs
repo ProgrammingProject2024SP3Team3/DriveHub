@@ -1,13 +1,6 @@
-using DriveHub.Models.Dto;
 using DriveHub.Models.ViewModels;
-using DriveHubModel;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
-using Microsoft.EntityFrameworkCore;
-using Xunit.Sdk;
-using System.Diagnostics;
-using System.Reflection;
 
 namespace DriveHubTests
 {
@@ -26,6 +19,18 @@ namespace DriveHubTests
         }
 
         [Fact]
+        public async Task Set1_UserA_Create_ShouldRedirectToError()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(1, "usera");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
         public async Task Set1_UserB_Search_ShouldReturn9Vehicles()
         {
             var bookingTestFixtures = new BookingTestFixtures(1, "userb");
@@ -36,26 +41,115 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
-            Assert.True(model.Vehicles.Count() == 9);
+            Assert.Equal(9, model.Pods.Count);
         }
 
-        //[Fact]
-        //public async Task Search_ShouldReturnEmptyList_WhenNoVehiclesAreAvailable()
-        //{
-        //    // Arrange: Make a vehicle reserved
-        //    var vehicle = await bookingTestFixtures.Context.Vehicles.FirstOrDefaultAsync();
-        //    vehicle.IsReserved = true;
-        //    bookingTestFixtures.Context.Update(vehicle);
-        //    await bookingTestFixtures.Context.SaveChangesAsync();
+        [Fact]
+        public async Task Set1_UserB_Search_CannotFindIronStallion()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(1, "userb");
 
-        //    // Act
-        //    var result = await bookingTestFixtures.Controller.Search();
+            // Act
+            var result = await bookingTestFixtures.Controller.Search();
 
-        //    // Assert
-        //    var viewResult = Assert.IsType<ViewResult>(result);
-        //    var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.ViewData.Model);
-        //    Assert.True(model.Vehicles.Count() == 9);
-        //}
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
+            Assert.False(model.Pods.Where(c => c.VehicleId == "cac6a77c-59fd-4d0e-b557-9a3230a79e9a").Any());
+        }
+
+        [Fact]
+        public async Task Set1_UserB_Create_ShoudReturnCreateView()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(1, "userb");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create("eeb7b72c-b362-4513-b84b-baa954c83ce0");
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Create", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task Set1_UserB_Create_IronStallionRedirectsToError()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(1, "userb");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Error", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task Set2_UserA_Create_ShouldRedirectToError()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(2, "usera");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public async Task Set2_UserB_Search_ShouldReturn9Vehicles()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(2, "userb");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Search();
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
+            Assert.Equal(9, model.Pods.Count);
+        }
+
+        [Fact]
+        public async Task Set2_UserA_Search_ShouldRedirectToCurrent()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(2, "usera");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Search();
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public async Task Set2_UserB_Search_CannotFindIronStallion()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(2, "userb");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Search();
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
+            Assert.False(model.Pods.Where(c => c.VehicleId == "cac6a77c-59fd-4d0e-b557-9a3230a79e9a").Any());
+        }
+
+        [Fact]
+        public async Task Set2_UserB_Create_IronStallionRedirectsToError()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(2, "userb");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Error", viewResult.ViewName);
+        }
+
+
 
 
         //[Fact]
