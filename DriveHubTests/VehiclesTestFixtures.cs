@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DriveHub.Data;
 using DriveHub.Controllers;
-using Microsoft.Extensions.Configuration;
 
 namespace DriveHubTests
 {
