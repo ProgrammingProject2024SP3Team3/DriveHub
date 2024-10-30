@@ -91,15 +91,12 @@ namespace DriveHub.Controllers
         {
             _logger.LogInformation($"Received a request to book vehicle {id}");
 
-            // Redirect if user has a current reserveration
-            var hasReservation = _context.Bookings
+            // Check if user already has an active reservation
+            var hasReservation = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(
-                    c => c.BookingStatus == BookingStatus.Reserved ||
-                    c.BookingStatus == BookingStatus.Unpaid ||
-                    c.BookingStatus == BookingStatus.Collected
-                    )
-                .Any();
+                .AnyAsync(c => c.BookingStatus == BookingStatus.Reserved || 
+                            c.BookingStatus == BookingStatus.Unpaid || 
+                            c.BookingStatus == BookingStatus.Collected);
 
             if (hasReservation)
             {
@@ -107,23 +104,20 @@ namespace DriveHub.Controllers
                 return RedirectToAction(nameof(Current));
             }
 
-            // Get a vehicle with its rate, pod and site
+            // Fetch vehicle data including related entities
             var vehicle = await _context.Vehicles
-                .Where(c => c.VehicleId == id)
-                .Include(c => c.Pod)
-                .ThenInclude(c => c.Site)
-                .Include(c => c.VehicleRate)
-                .FirstOrDefaultAsync();
+                .Include(v => v.Pod)
+                .ThenInclude(p => p.Site)
+                .Include(v => v.VehicleRate)
+                .FirstOrDefaultAsync(v => v.VehicleId == id);
 
-            // If we couldn't find the vehicle or it's not currently in a pod then bail out
-            if (vehicle == null || vehicle.Pod == null || vehicle.IsReserved == true)
+            if (vehicle == null || vehicle.Pod == null || vehicle.IsReserved)
             {
-                _logger.LogWarning($"Unable to find vehicle or is reserved {id}");
+                _logger.LogWarning($"Vehicle unavailable or already reserved: {id}");
                 return View(nameof(Error));
             }
 
             ViewBag.Vehicle = vehicle;
-
             return View();
         }
 
@@ -132,78 +126,88 @@ namespace DriveHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ReservationDto reservationDto)
         {
-            _logger.LogInformation($"Received POST to make a reservation");
-            _logger.LogInformation(reservationDto.ToString());
+            _logger.LogInformation($"Received POST to make a reservation for vehicle {reservationDto.VehicleId}");
 
-            // Redirect if user has a current reserveration
-            var hasReservation = _context.Bookings
-                .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(
-                    c => c.BookingStatus == BookingStatus.Reserved ||
-                    c.BookingStatus == BookingStatus.Unpaid ||
-                    c.BookingStatus == BookingStatus.Collected
-                    )
-                .Any();
-
-            if (hasReservation)
+            try
             {
-                ViewBag.Message = "You have a current booking";
-                return RedirectToAction(nameof(Current));
-            }
+                // Verify if the user has an active reservation
+                bool hasReservation = await _context.Bookings
+                    .AnyAsync(c => c.Id == _userManager.GetUserId(User) &&
+                                (c.BookingStatus == BookingStatus.Reserved || 
+                                    c.BookingStatus == BookingStatus.Unpaid || 
+                                    c.BookingStatus == BookingStatus.Collected));
 
-            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == reservationDto.VehicleId);
-            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == reservationDto.StartPodId);
+                if (hasReservation)
+                {
+                    ViewBag.Message = "You have a current booking.";
+                    return RedirectToAction(nameof(Current));
+                }
 
-            // Prevent users from posting illegal data combinations
-            if (vehicle == null ||
-                startPod == null ||
-                vehicle?.VehicleRate.PricePerHour != reservationDto.QuotedPricePerHour ||
-                startPod.VehicleId != vehicle?.VehicleId
-                )
-            {
-                _logger.LogError($"User has posted illegal data {reservationDto}");
-                return View(nameof(Error));
-            }
+                // Start transaction to ensure atomic operations
+                using var transaction = await _context.Database.BeginTransactionAsync();
 
-            if (ModelState.IsValid)
-            {
-                _logger.LogInformation($"Booking is valid");
-                Booking booking = new Booking(
+                // Fetch vehicle and ensure it exists
+                var vehicle = await _context.Vehicles
+                    .Include(v => v.VehicleRate)
+                    .FirstOrDefaultAsync(v => v.VehicleId == reservationDto.VehicleId);
+
+                if (vehicle == null || vehicle.IsReserved)
+                {
+                    _logger.LogWarning("Vehicle is unavailable or already reserved.");
+                    ViewBag.Message = "This vehicle has already been reserved.";
+                    return View(nameof(Error));
+                }
+
+                // Fetch the start pod and validate it
+                var startPod = await _context.Pods
+                    .Include(p => p.Site)
+                    .FirstOrDefaultAsync(p => p.PodId == reservationDto.StartPodId);
+
+                if (startPod == null)
+                {
+                    _logger.LogError("Invalid start pod specified.");
+                    return View(nameof(Error));
+                }
+
+                // Prepare and validate the booking
+                var booking = new Booking(
                     _userManager.GetUserId(User),
                     reservationDto.VehicleId,
                     reservationDto.StartPodId,
                     vehicle.VehicleRate.PricePerHour,
                     vehicle.VehicleRate.PricePerMinute
-                    );
+                )
+                {
+                    Vehicle = vehicle,
+                    StartPod = startPod
+                };
 
-                booking.Vehicle = vehicle;
-                booking.StartPod = startPod;
-                _context.Add(booking);
-                _logger.LogInformation($"Added Booking OK");
-
-                // Complete the reservation
+                // Reserve the vehicle
                 vehicle.IsReserved = true;
+
+                // Save booking and vehicle updates in a transaction
                 _context.Add(booking);
                 _context.Update(vehicle);
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
+                _logger.LogInformation("Reservation successfully created.");
                 return View("Details", booking);
             }
-
-            // -- Return a page with data and errors if the model is not valid --
-            _logger.LogError($"There was an error with booking {reservationDto.ToString()}");
-
-            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
-            ViewBag.VehicleId = vehicle.VehicleId;
-            ViewBag.StartPod = $"{vehicle.Pod.Site.SiteName} Pod #{vehicle.Pod.PodName}";
-            ViewBag.StartPodId = vehicle.Pod.PodId;
-            ViewBag.StartSite = $"{vehicle.Pod.Site.Address}, {vehicle.Pod.Site.City}";
-            ViewBag.StartSiteLatitude = vehicle.Pod.Site.Latitude;
-            ViewBag.StartSiteLongitude = vehicle.Pod.Site.Longitude;
-            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
-
-            return View(reservationDto);
+            catch (DbUpdateConcurrencyException)
+            {
+                _logger.LogWarning("Concurrency issue: Vehicle was reserved by another user.");
+                ViewBag.Message = "The vehicle was just reserved by someone else.";
+                return View(nameof(Error));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating reservation.");
+                return View(nameof(Error));
+            }
         }
+
+
 
         /// <summary>
         /// Displays current (in-progress) bookings for the logged-in user.
