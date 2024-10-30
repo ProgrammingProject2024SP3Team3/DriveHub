@@ -25,9 +25,10 @@ namespace DriveHubTests
 
         public VehiclesTestFixtures(int set, string userName)
         {
-            // Set up in-memory database for testing
+            // Use a unique database name for each test to ensure isolation
+            var uniqueDbName = Guid.NewGuid().ToString();
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("TestDatabase")
+                .UseInMemoryDatabase(uniqueDbName)
                 .Options;
 
             Context = new ApplicationDbContext(options);
@@ -76,18 +77,12 @@ namespace DriveHubTests
             };
         }
 
-        // Public method to set a mock user in the controller for a specific test case
-        public void SetMockUserToContext(Controller controller, ClaimsPrincipal mockUser)
-        {
-            controller.ControllerContext = new ControllerContext()
-            {
-                HttpContext = new DefaultHttpContext { User = mockUser }
-            };
-        }
-
         public void Dispose()
         {
             Context.Dispose();
+            VehiclesController = null;
+            VehiclesLogger = null;
+            UserManager = null;
         }
     }
 }
