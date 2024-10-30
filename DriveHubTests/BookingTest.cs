@@ -2,6 +2,7 @@ using DriveHubModel;
 using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using DriveHub.Models.Dto;
 
 namespace DriveHubTests
 {
@@ -14,6 +15,39 @@ namespace DriveHubTests
 
             // Act
             var result = await bookingTestFixtures.Controller.Search();
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Current", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task Set1_UserA_Create_ShouldRedirectToCurrent()
+        {
+            var bookingTestFixtures = new BookingTestFixtures(1, "usera");
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Current", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task Set1_UserA_CreateConfirmed_ShouldReturnCurrent()
+        {
+            // Arrange
+            var bookingTestFixtures = new BookingTestFixtures(1, "usera");
+
+            var reservationDto = new ReservationDto();
+            reservationDto.BookingId = "b8075e83-6e70-4dee-b76a-22e8c7ee7ec1";
+            reservationDto.VehicleId = "cac6a77c-59fd-4d0e-b557-9a3230a79e9a";
+            reservationDto.StartPodId = "e904170e-a945-4edd-802a-72e214e89cdb";
+            reservationDto.QuotedPricePerHour = 20m;
+
+            // Act
+            var result = await bookingTestFixtures.Controller.Create(reservationDto.BookingId);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -35,18 +69,24 @@ namespace DriveHubTests
             Assert.Equal("cac6a77c-59fd-4d0e-b557-9a3230a79e9a", model.VehicleId);
         }
 
-
         [Fact]
-        public async Task Set1_UserA_Create_ShouldRedirectToCurrent()
+        public async Task Set1_UserA_CancelConfirmed_ShouldCancelBooking()
         {
+            // Arrange
             var bookingTestFixtures = new BookingTestFixtures(1, "usera");
 
             // Act
-            var result = await bookingTestFixtures.Controller.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await bookingTestFixtures.Controller.CancelConfirmed("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Current", viewResult.ViewName);
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Details", redirectToActionResult.ActionName);
+            Assert.Equal("Bookings", redirectToActionResult.ControllerName);
+
+            // Verify that the booking is indeed cancelled
+            var booking = await bookingTestFixtures.Context.Bookings.FindAsync("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
+            Assert.NotNull(booking);
+            Assert.Equal(BookingStatus.Cancelled, booking.BookingStatus);
         }
 
         [Fact]
@@ -78,7 +118,7 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set1_UserB_Create_ShoudReturnCreateView()
+        public async Task Set1_UserB_Create_ShouldReturnCreateView()
         {
             var bookingTestFixtures = new BookingTestFixtures(1, "userb");
 
@@ -91,7 +131,7 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set1_UserB_Create_IronStallionRedirectsToError()
+        public async Task Set1_UserB_Create_IronStallionReturnsErrorView()
         {
             var bookingTestFixtures = new BookingTestFixtures(1, "userb");
 
