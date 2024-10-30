@@ -70,7 +70,7 @@ namespace DriveHub.Controllers
             if (hasReservation)
             {
                 ViewBag.Message = "You have a current booking";
-                return View(nameof(Current));
+                return RedirectToAction(nameof(Current));
             }
 
             var vehicles = await _context.Vehicles.Where(c => c.IsReserved == false).Include(c => c.VehicleRate).ToListAsync();
@@ -94,14 +94,14 @@ namespace DriveHub.Controllers
             // Check if user already has an active reservation
             var hasReservation = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .AnyAsync(c => c.BookingStatus == BookingStatus.Reserved || 
-                            c.BookingStatus == BookingStatus.Unpaid || 
+                .AnyAsync(c => c.BookingStatus == BookingStatus.Reserved ||
+                            c.BookingStatus == BookingStatus.Unpaid ||
                             c.BookingStatus == BookingStatus.Collected);
 
             if (hasReservation)
             {
                 ViewBag.Message = "User has a current booking";
-                return View(nameof(Current));
+                return RedirectToAction(nameof(Current));
             }
 
             // Fetch vehicle data including related entities
@@ -133,8 +133,8 @@ namespace DriveHub.Controllers
                 // Verify if the user has an active reservation
                 bool hasReservation = await _context.Bookings
                     .AnyAsync(c => c.Id == _userManager.GetUserId(User) &&
-                                (c.BookingStatus == BookingStatus.Reserved || 
-                                    c.BookingStatus == BookingStatus.Unpaid || 
+                                (c.BookingStatus == BookingStatus.Reserved ||
+                                    c.BookingStatus == BookingStatus.Unpaid ||
                                     c.BookingStatus == BookingStatus.Collected));
 
                 if (hasReservation)
@@ -260,7 +260,7 @@ namespace DriveHub.Controllers
             _context.Update(booking);
             await _context.SaveChangesAsync();
 
-            return View(nameof(Current));
+            return RedirectToAction(nameof(Current));
         }
 
         public async Task<IActionResult> Past()
@@ -498,7 +498,6 @@ namespace DriveHub.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
 
         private bool BookingExists(string id)
         {

@@ -47,10 +47,10 @@ namespace DriveHub.Controllers
             Booking? booking = null;
             try
             {
-                await _context.Bookings
+                booking = await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.BookingStatus == BookingStatus.Collected)
+                .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .Include(c => c.Vehicle)
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
@@ -60,6 +60,12 @@ namespace DriveHub.Controllers
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning($"Booking not found for id: {id}");
+                return RedirectToAction("Search", "Bookings");
+            }
+
+            if (booking == null)
+            {
+                _logger.LogWarning($"Vehicle not found {id}");
                 return RedirectToAction("Search", "Bookings");
             }
 
@@ -104,7 +110,7 @@ namespace DriveHub.Controllers
             Booking? booking = null;
             try
             {
-                await _context.Bookings
+                booking = await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Collected)
