@@ -76,7 +76,6 @@ namespace DriveHubTests
                 HttpContext = new DefaultHttpContext { User = mockUser }
             };
         }
-
         public void Dispose()
         {
             Context.Dispose();
