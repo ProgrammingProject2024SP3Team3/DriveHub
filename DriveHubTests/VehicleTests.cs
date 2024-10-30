@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace DriveHubTests
 {
-    public class VehicleTests : BeforeAfterTestAttribute
+    public class VehicleTests : IDisposable
     {
         VehiclesTestFixtures Fixture;
 
@@ -25,7 +25,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Pickup", viewResult.ViewName);
-            Fixture.Dispose();
+            Dispose();
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
-            Fixture.Dispose();
+            Dispose();
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace DriveHubTests
 
             // Assert
             Assert.IsType<RedirectToActionResult>(result);
-            Fixture.Dispose();
+            Dispose();
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
-            Fixture.Dispose();
+            Dispose();
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
-            Fixture.Dispose();
+            Dispose();
         }
 
 
@@ -100,6 +100,11 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
+            Dispose();
+        }
+
+        public void Dispose()
+        {
             Fixture.Dispose();
         }
     }

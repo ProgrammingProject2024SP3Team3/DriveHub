@@ -21,8 +21,8 @@ namespace DriveHubTests
             var result = await Fixture.BookingsController.Search();
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Current", viewResult.ViewName);
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Current", redirectToActionResult.ActionName);
             Fixture.Dispose();
         }
 
@@ -35,8 +35,8 @@ namespace DriveHubTests
             var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Current", viewResult.ViewName);
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Current", redirectToActionResult.ActionName);
             Fixture.Dispose();
         }
 
@@ -56,8 +56,9 @@ namespace DriveHubTests
             var result = await Fixture.BookingsController.Create(reservationDto.BookingId);
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Current", viewResult.ViewName);
+            // Assert
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Current", redirectToActionResult.ActionName);
             Fixture.Dispose();
         }
 
@@ -165,8 +166,9 @@ namespace DriveHubTests
             var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Current", viewResult.ViewName);
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Current", redirectToActionResult.ActionName);
+
             Fixture.Dispose();
         }
 
@@ -194,8 +196,8 @@ namespace DriveHubTests
             var result = await Fixture.BookingsController.Search();
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Current", viewResult.ViewName);
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Current", redirectToActionResult.ActionName);
             Fixture.Dispose();
         }
 
