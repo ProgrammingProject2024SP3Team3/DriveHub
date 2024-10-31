@@ -279,6 +279,33 @@ namespace DriveHubTests
             Assert.Equal("Error", viewResult.ViewName);
         }
 
+        // Set 4 Tests
+
+        [Fact]
+        public async Task Set4_UserA_PrintInvoice_ShouldReturnFile()
+        {
+            Fixture = new BookingTestFixtures(4, "usera");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintInvoice(1);
+
+            // Assert
+            var viewResult = Assert.IsType<FileContentResult>(result);
+            //Assert.Equal("Error", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task Set4_UserB_PrintInvoice_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(4, "userb");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintInvoice(1);
+
+            // Assert
+            var viewResult = Assert.IsType<NotFoundResult>(result);
+        }
+
         // Set 7 Tests
         [Fact]
         public async Task Set7_UserA_Extend_ShouldReturnError()

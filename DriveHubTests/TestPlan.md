@@ -28,13 +28,24 @@
   - **Search Functionality**: Verify available vehicles and their details.
   - **Create Booking**: Test successful booking and various failure cases (validation errors, overlapping bookings).
   - **View Details**: Check if booking details are retrieved correctly.
-  - **Edit Booking**: Validate the editing process and ensure changes are saved.
-  - **Delete Booking**: Ensure bookings can be deleted correctly.
+  - **Extend Reservation**: Validate the editing process and ensure changes are saved.
+  - **Cancel Reservation**: Ensure reservations can be cancelled correctly.
 
 ## 5. Test Data Handling
 - Implement a test data builder to create test data efficiently without hardcoding values.
 - Utilize the **InMemoryDatabase** for unit tests, ensuring that the test data resembles production data.
 
-## 6. Write Tests
+## 6. Create data sets
+- Create 7x white data sets that represent different states for a booking
+- The sets are:
+    1. User A has reserved Iron Stallion
+    2. User A has collected Iron Stallion
+    3. User A has unpaid booking for Iron Stallion
+    4. User A has a complete booking for Iron Stallion
+    5. User A has a cancelled booking for Iron Stallion
+    6. User A has an expired reservation for Iron Stallion
+    7. User A has an extended reservation for Iron Stallion
+
+## 7. Write Tests
 - Incrementally write tests based on the scenarios identified.
 - Use **xUnit** for testing, and **Moq** for mocking any dependencies.

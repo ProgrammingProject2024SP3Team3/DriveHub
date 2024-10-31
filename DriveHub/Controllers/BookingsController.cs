@@ -458,7 +458,7 @@ namespace DriveHub.Controllers
 
             if (booking == null || booking.Receipt == null)
             {
-                _logger.LogWarning($"Invoice not found: {id}");
+                _logger.LogWarning($"Receipt not found: {id}");
                 return NotFound();
             }
 

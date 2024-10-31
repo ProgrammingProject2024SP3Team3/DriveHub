@@ -54,7 +54,7 @@ namespace DriveHubTests
             Fixture = new PaymentsTestFixtures(3, "userb");
 
             // Act
-            var result = await Fixture.PaymentsController.Success("3cab88d0-603a-4bc6-a0cb-9cff6de2d86b");
+            var result = await Fixture.PaymentsController.Cancel("3cab88d0-603a-4bc6-a0cb-9cff6de2d86b");
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);

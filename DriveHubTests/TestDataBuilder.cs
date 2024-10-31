@@ -13,6 +13,7 @@ public static class TestDataBuilder
         string ratesCsvPath = Path.Combine(testDataPath, "VehicleRates.csv");
         string vehiclesCsvPath = Path.Combine(testDataPath, $"Vehicles_SET{set}.csv");
         string invoicesCsvPath = Path.Combine(testDataPath, $"Invoices_SET{set}.csv");
+        string receiptsCsvPath = Path.Combine(testDataPath, $"Receipts_SET{set}.csv");
         string podsCsvPath = Path.Combine(testDataPath, $"Pods_SET{set}.csv");
         string sitesCsvPath = Path.Combine(testDataPath, "Sites.csv");
         string usersCsvPath = Path.Combine(testDataPath, "Users.csv"); // For seeding users
@@ -229,7 +230,7 @@ public static class TestDataBuilder
             }
         }
 
-        // Seed Sites from CSV
+        // Seed Invoices from CSV
         using (var reader = new StreamReader(invoicesCsvPath))
         {
             bool skipHeader = true;
@@ -253,6 +254,34 @@ public static class TestDataBuilder
                     invoice.DateTime = DateTime.Parse(values[2], CultureInfo.InvariantCulture);
                     invoice.Amount = decimal.Parse(values[3]);
                     context.Invoices.Add(invoice);
+                }
+            }
+        }
+
+        // Seed Receipts from CSV
+        using (var reader = new StreamReader(receiptsCsvPath))
+        {
+            bool skipHeader = true;
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                if (skipHeader)
+                {
+                    skipHeader = false;
+                    continue;
+                }
+
+                var values = line.Split(',');
+                //if (values.Length < 7) continue;
+
+                if (!context.Receipts.Any(s => s.ReceiptNumber == int.Parse(values[0])))
+                {
+                    Receipt receipt = new Receipt();
+                    receipt.ReceiptNumber = int.Parse(values[0]);
+                    receipt.BookingId = values[1];
+                    receipt.DateTime = DateTime.Parse(values[2], CultureInfo.InvariantCulture);
+                    receipt.Amount = decimal.Parse(values[3]);
+                    context.Receipts.Add(receipt);
                 }
             }
         }
