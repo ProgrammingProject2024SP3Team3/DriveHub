@@ -75,7 +75,6 @@ namespace DriveHub.Controllers
             booking.BookingStatus = BookingStatus.Collected;
             var startPod = booking.StartPod;
             startPod.Vehicle = null;
-            vehicle.IsReserved = false;
 
             _context.Update(booking);
             _context.Update(startPod);
@@ -147,6 +146,7 @@ namespace DriveHub.Controllers
             booking.BookingStatus = BookingStatus.Unpaid;
             randPod.Vehicle = vehicle;
             booking.EndPod = randPod;
+            vehicle.IsReserved = false;
 
             var totalMinutes = (int)Math.Round((((DateTime)booking.EndTime - (DateTime)booking.StartTime).TotalMinutes), 0);
             var totalAmount = (decimal)(Math.Max(totalMinutes, 2)) * booking.PricePerMinute;
@@ -161,6 +161,7 @@ namespace DriveHub.Controllers
             _context.Add(invoice);
             _context.Update(booking);
             _context.Update(randPod);
+            _context.Update(vehicle);
             await _context.SaveChangesAsync();
 
             _logger.LogInformation($"Drop-off completed for booking id: {booking.BookingId}");

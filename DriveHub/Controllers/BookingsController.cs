@@ -151,6 +151,7 @@ namespace DriveHub.Controllers
                     .Include(v => v.VehicleRate)
                     .FirstOrDefaultAsync(v => v.VehicleId == reservationDto.VehicleId);
 
+
                 if (vehicle == null || vehicle.IsReserved)
                 {
                     _logger.LogWarning("Vehicle is unavailable or already reserved.");
@@ -161,11 +162,12 @@ namespace DriveHub.Controllers
                 // Fetch the start pod and validate it
                 var startPod = await _context.Pods
                     .Include(p => p.Site)
+                    .Include(p => p.Vehicle)
                     .FirstOrDefaultAsync(p => p.PodId == reservationDto.StartPodId);
 
-                if (startPod == null)
+                if (startPod == null || startPod.Vehicle == null)
                 {
-                    _logger.LogError("Invalid start pod specified.");
+                    _logger.LogError("Invalid start pod or vehicle not in pod.");
                     return View(nameof(Error));
                 }
 

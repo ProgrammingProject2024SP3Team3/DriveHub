@@ -1,19 +1,20 @@
-using DriveHubModel;
 using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
-using DriveHub.Models.Dto;
 
 namespace DriveHubTests
 {
-    public class BookingTests_SET2
+    /// <summary>    
+    /// User A has unpaid Iron Stallion
+    /// </summary>
+    public class BookingTests_SET3
     {
         BookingTestFixtures Fixture;
 
         [Fact]
-        public async Task Set2_UserA_Extend_ShouldReturnError()
+        public async Task Set3_UserA_Extend_ShouldReturnError()
         {
-            Fixture = new BookingTestFixtures(2, "usera");
+            Fixture = new BookingTestFixtures(3, "usera");
 
             // Act
             var result = await Fixture.BookingsController.Extend("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
@@ -24,9 +25,9 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set2_UserA_Create_ShouldRedirectToCurrent()
+        public async Task Set3_UserA_Create_ShouldRedirectToCurrent()
         {
-            Fixture = new BookingTestFixtures(2, "usera");
+            Fixture = new BookingTestFixtures(3, "usera");
 
             // Act
             var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
@@ -37,9 +38,9 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set2_UserB_Search_ShouldReturn9Vehicles()
+        public async Task Set3_UserB_Search_ShouldReturn10Vehicles()
         {
-            Fixture = new BookingTestFixtures(2, "userb");
+            Fixture = new BookingTestFixtures(3, "userb");
 
             // Act
             var result = await Fixture.BookingsController.Search();
@@ -47,13 +48,13 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
-            Assert.Equal(9, model.Pods.Count);
+            Assert.Equal(10, model.Pods.Count);
         }
 
         [Fact]
-        public async Task Set2_UserA_Search_ShouldRedirectToCurrent()
+        public async Task Set3_UserA_Search_ShouldRedirectToCurrent()
         {
-            Fixture = new BookingTestFixtures(2, "usera");
+            Fixture = new BookingTestFixtures(3, "usera");
 
             // Act
             var result = await Fixture.BookingsController.Search();
@@ -64,9 +65,9 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set2_UserB_Search_CannotFindIronStallion()
+        public async Task Set3_UserB_Search_CanFindIronStallion()
         {
-            Fixture = new BookingTestFixtures(2, "userb");
+            Fixture = new BookingTestFixtures(3, "userb");
 
             // Act
             var result = await Fixture.BookingsController.Search();
@@ -74,45 +75,26 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
-            Assert.False(model.Pods.Where(c => c.VehicleId == "cac6a77c-59fd-4d0e-b557-9a3230a79e9a").Any());
+            Assert.True(model.Pods.Where(c => c.VehicleId == "cac6a77c-59fd-4d0e-b557-9a3230a79e9a").Any());
         }
 
         [Fact]
-        public async Task Set2_UserB_Create_IronStallionRedirectsToError()
+        public async Task Set3_UserB_Create_IronStallionShouldReturnCreateView()
         {
-            Fixture = new BookingTestFixtures(2, "userb");
+            Fixture = new BookingTestFixtures(3, "userb");
 
             // Act
             var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Error", viewResult.ViewName);
+            Assert.Equal("Create", viewResult.ViewName);
         }
 
         [Fact]
-        public async Task Set2_UserB_CreateConfirmed_IronStallionRedirectsToError()
+        public async Task Set3_UserA_PrintInvoice_ShouldReturnNotFound()
         {
-            // Arrange
-            Fixture = new BookingTestFixtures(2, "userb");
-
-            var reservationDto = new ReservationDto();
-            reservationDto.VehicleId = "cac6a77c-59fd-4d0e-b557-9a3230a79e9a";
-            reservationDto.StartPodId = "e904170e-a945-4edd-802a-72e214e89cdb";
-            reservationDto.QuotedPricePerHour = 20m;
-
-            // Act
-            var result = await Fixture.BookingsController.Create(reservationDto);
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Error", viewResult.ViewName);
-        }
-
-        [Fact]
-        public async Task Set2_UserA_PrintInvoice_ShouldReturnNotFound()
-        {
-            Fixture = new BookingTestFixtures(2, "usera");
+            Fixture = new BookingTestFixtures(3, "usera");
 
             // Act
             var result = await Fixture.BookingsController.PrintInvoice(1);
@@ -122,9 +104,9 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set2_UserA_PrintReport_ShouldReturnNotFound()
+        public async Task Set3_UserA_PrintReport_ShouldReturnNotFound()
         {
-            Fixture = new BookingTestFixtures(2, "usera");
+            Fixture = new BookingTestFixtures(3, "usera");
 
             // Act
             var result = await Fixture.BookingsController.PrintReport();
@@ -134,9 +116,9 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set2_UserB_PrintInvoice_ShouldReturnNotFound()
+        public async Task Set3_UserB_PrintInvoice_ShouldReturnNotFound()
         {
-            Fixture = new BookingTestFixtures(2, "userb");
+            Fixture = new BookingTestFixtures(3, "userb");
 
             // Act
             var result = await Fixture.BookingsController.PrintInvoice(1);
@@ -146,9 +128,9 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set2_UserB_PrintReport_ShouldReturnNotFound()
+        public async Task Set3_UserB_PrintReport_ShouldReturnNotFound()
         {
-            Fixture = new BookingTestFixtures(2, "userb");
+            Fixture = new BookingTestFixtures(3, "userb");
 
             // Act
             var result = await Fixture.BookingsController.PrintReport();

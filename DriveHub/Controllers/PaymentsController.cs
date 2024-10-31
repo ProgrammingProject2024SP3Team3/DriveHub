@@ -40,6 +40,7 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                   .Where(c => c.PaymentId == id)
                   .Where(c => c.Id == _userManager.GetUserId(User))
+                  .Where(c => c.BookingStatus == BookingStatus.Unpaid)
                   .Include(c => c.Invoice)
                   .FirstOrDefaultAsync();
 
@@ -81,6 +82,7 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
               .Where(c => c.PaymentId == id)
               .Where(c => c.Id == _userManager.GetUserId(User))
+              .Where(c => c.BookingStatus == BookingStatus.Unpaid)
               .FirstOrDefaultAsync();
 
             if (booking == null)

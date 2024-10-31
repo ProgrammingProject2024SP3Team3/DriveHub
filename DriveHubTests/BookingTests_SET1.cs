@@ -6,11 +6,12 @@ using DriveHub.Models.Dto;
 
 namespace DriveHubTests
 {
+    /// <summary>
+    /// User A has a reservation for Iron Stallion
+    /// </summary>
     public class BookingTests_SET1
     {
         BookingTestFixtures Fixture;
-
-        // Set 1 Tests
 
         [Fact]
         public async Task Set1_UserA_Extend_ShouldExtendReservation()
@@ -208,6 +209,54 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task Set1_UserA_PrintInvoice_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(1, "usera");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintInvoice(1);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Set1_UserA_PrintReport_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(1, "usera");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintReport();
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Set1_UserB_PrintInvoice_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(4, "userb");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintInvoice(1);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Set1_UserB_PrintReport_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(1, "userb");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintReport();
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
         }
     }
 }
