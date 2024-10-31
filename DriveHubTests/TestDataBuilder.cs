@@ -1,24 +1,23 @@
 using DriveHubModel;
 using DriveHub.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using System.Globalization;
-using System.IO;
-
 public static class TestDataBuilder
 {
-    public static void SeedData(ApplicationDbContext context)
+    public static void SeedData(ApplicationDbContext context, int set)
     {
         string basePath = AppDomain.CurrentDomain.BaseDirectory; // Base directory of the test run
         string testDataPath = Path.Combine(basePath, "TestData");
 
         string ratesCsvPath = Path.Combine(testDataPath, "VehicleRates.csv");
-        string vehiclesCsvPath = Path.Combine(testDataPath, "Vehicles.csv");
-        string podsCsvPath = Path.Combine(testDataPath, "Pods.csv");
+        string vehiclesCsvPath = Path.Combine(testDataPath, $"Vehicles_SET{set}.csv");
+        string invoicesCsvPath = Path.Combine(testDataPath, $"Invoices_SET{set}.csv");
+        string receiptsCsvPath = Path.Combine(testDataPath, $"Receipts_SET{set}.csv");
+        string podsCsvPath = Path.Combine(testDataPath, $"Pods_SET{set}.csv");
         string sitesCsvPath = Path.Combine(testDataPath, "Sites.csv");
         string usersCsvPath = Path.Combine(testDataPath, "Users.csv"); // For seeding users
-        string bookingsCsvPath = Path.Combine(testDataPath, "Bookings.csv"); // For seeding bookings
+        string bookingsCsvPath = Path.Combine(testDataPath, $"Bookings_SET{set}.csv"); // For seeding bookings
 
         // Seed Users from CSV
         using (var reader = new StreamReader(usersCsvPath))
@@ -66,7 +65,7 @@ public static class TestDataBuilder
         // Seed VehicleRates from CSV
         using (var reader = new StreamReader(ratesCsvPath))
         {
-            bool skipHeader = true;  
+            bool skipHeader = true;
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
@@ -86,7 +85,8 @@ public static class TestDataBuilder
                         VehicleRateId = values[0],
                         Description = values[1],
                         PricePerHour = decimal.Parse(values[2], CultureInfo.InvariantCulture),
-                        EffectiveDate = DateTime.Parse(values[3], CultureInfo.InvariantCulture)
+                        PricePerMinute = decimal.Parse(values[3], CultureInfo.InvariantCulture),
+                        EffectiveDate = DateTime.Parse(values[4], CultureInfo.InvariantCulture)
                     });
                 }
             }
@@ -95,7 +95,7 @@ public static class TestDataBuilder
         // Seed Vehicles from CSV
         using (var reader = new StreamReader(vehiclesCsvPath))
         {
-            bool skipHeader = true;  
+            bool skipHeader = true;
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
@@ -110,19 +110,19 @@ public static class TestDataBuilder
 
                 if (!context.Vehicles.Any(v => v.VehicleId == values[0]))
                 {
-                    context.Vehicles.Add(new Vehicle
-                    {
-                        VehicleId = values[0],
-                        VehicleRateId = values[1],
-                        Make = values[2],
-                        Model = values[3],
-                        RegistrationPlate = values[4],
-                        State = values[5],
-                        Year = values[6],
-                        Seats = int.Parse(values[7]),
-                        Colour = values[8],
-                        Name = values[9]
-                    });
+                    var vehicle = new Vehicle();
+                    vehicle.VehicleId = values[0];
+                    vehicle.VehicleRateId = values[1];
+                    vehicle.IsReserved = Convert.ToBoolean(Convert.ToInt32(values[2]));
+                    vehicle.Make = values[3];
+                    vehicle.Model = values[4];
+                    vehicle.RegistrationPlate = values[5];
+                    vehicle.State = values[6];
+                    vehicle.Year = values[7];
+                    vehicle.Seats = int.Parse(values[8]);
+                    vehicle.Colour = values[9];
+                    vehicle.Name = values[10];
+                    context.Vehicles.Add(vehicle);
                 }
             }
         }
@@ -130,7 +130,7 @@ public static class TestDataBuilder
         // Seed Pods from CSV
         using (var reader = new StreamReader(podsCsvPath))
         {
-            bool skipHeader = true;  
+            bool skipHeader = true;
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
@@ -159,7 +159,7 @@ public static class TestDataBuilder
         // Seed Sites from CSV
         using (var reader = new StreamReader(sitesCsvPath))
         {
-            bool skipHeader = true;  
+            bool skipHeader = true;
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
@@ -207,18 +207,81 @@ public static class TestDataBuilder
 
                 if (!context.Bookings.Any(b => b.BookingId == values[0]))
                 {
-                    context.Bookings.Add(new Booking
-                    {
-                        BookingId = values[0],
-                        VehicleId = values[1],
-                        Id = values[2], // User ID from AspNetUsers
-                        StartPodId = values[3],
-                        EndPodId = values[4],
-                        StartTime = DateTime.Parse(values[5], CultureInfo.InvariantCulture),
-                        EndTime = DateTime.Parse(values[6], CultureInfo.InvariantCulture),
-                        PricePerHour = decimal.Parse(values[7], CultureInfo.InvariantCulture),
-                        BookingStatus = (BookingStatus)Enum.Parse(typeof(BookingStatus), values[8])
-                    });
+                    var booking = new Booking();
+                    booking.BookingId = values[0];
+                    booking.Expires = DateTime.Parse(values[1], CultureInfo.InvariantCulture);
+                    booking.IsExtended = Convert.ToBoolean(Convert.ToInt32(values[2]));
+                    booking.PaymentId = values[3];
+                    booking.VehicleId = values[4];
+                    booking.Id = values[5]; // User ID from AspNetUsers
+                    booking.StartPodId = values[6];
+                    if ("NULL" == values[7]) booking.EndPodId = null;
+                    else booking.EndPodId = values[7];
+                    if ("NULL" == values[8]) booking.StartTime = null;
+                    else booking.StartTime = DateTime.Parse(values[8], CultureInfo.InvariantCulture);
+                    if ("NULL" == values[9]) booking.EndTime = null;
+                    else booking.EndTime = DateTime.Parse(values[9], CultureInfo.InvariantCulture);
+                    booking.PricePerHour = decimal.Parse(values[10], CultureInfo.InvariantCulture);
+                    booking.PricePerMinute = decimal.Parse(values[11], CultureInfo.InvariantCulture);
+                    booking.BookingStatus = (BookingStatus)Enum.Parse(typeof(BookingStatus), values[12]);
+
+                    context.Bookings.Add(booking);
+                }
+            }
+        }
+
+        // Seed Invoices from CSV
+        using (var reader = new StreamReader(invoicesCsvPath))
+        {
+            bool skipHeader = true;
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                if (skipHeader)
+                {
+                    skipHeader = false;
+                    continue;
+                }
+
+                var values = line.Split(',');
+                //if (values.Length < 7) continue;
+
+                if (!context.Invoices.Any(s => s.InvoiceNumber == int.Parse(values[0])))
+                {
+                    Invoice invoice = new Invoice();
+                    invoice.InvoiceNumber = int.Parse(values[0]);
+                    invoice.BookingId = values[1];
+                    invoice.DateTime = DateTime.Parse(values[2], CultureInfo.InvariantCulture);
+                    invoice.Amount = decimal.Parse(values[3]);
+                    context.Invoices.Add(invoice);
+                }
+            }
+        }
+
+        // Seed Receipts from CSV
+        using (var reader = new StreamReader(receiptsCsvPath))
+        {
+            bool skipHeader = true;
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                if (skipHeader)
+                {
+                    skipHeader = false;
+                    continue;
+                }
+
+                var values = line.Split(',');
+                //if (values.Length < 7) continue;
+
+                if (!context.Receipts.Any(s => s.ReceiptNumber == int.Parse(values[0])))
+                {
+                    Receipt receipt = new Receipt();
+                    receipt.ReceiptNumber = int.Parse(values[0]);
+                    receipt.BookingId = values[1];
+                    receipt.DateTime = DateTime.Parse(values[2], CultureInfo.InvariantCulture);
+                    receipt.Amount = decimal.Parse(values[3]);
+                    context.Receipts.Add(receipt);
                 }
             }
         }

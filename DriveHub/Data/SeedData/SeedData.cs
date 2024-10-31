@@ -132,17 +132,5 @@ namespace DriveHub.SeedData
 
             return pods;
         }
-
-        private static IList<DriveHubModel.ApplicationUser> GetUsers(ILogger<Program> logger)
-        {
-            // TODO Write get data from csv method
-            throw new NotImplementedException();
-        }
-
-        private static IList<Booking> GetBookings(ILogger<Program> logger)
-        {
-            // TODO Write get data from csv method
-            throw new NotImplementedException();
-        }
     }
 }

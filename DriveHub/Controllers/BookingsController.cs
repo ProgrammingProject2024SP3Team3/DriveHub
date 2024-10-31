@@ -76,14 +76,14 @@ namespace DriveHub.Controllers
             var vehicles = await _context.Vehicles.Where(c => c.IsReserved == false).Include(c => c.VehicleRate).ToListAsync();
             var seats = vehicles.Select(c => c.Seats).Distinct().ToList();
             var vehicleRates = await _context.VehicleRates.ToListAsync();
-            var pods = await _context.Pods.Where(c => c.VehicleId != null).Include(c => c.Site).Include(c => c.Vehicle).OrderBy(c => c.SiteId).ToListAsync();
+            var pods = await _context.Pods.Where(c => c.VehicleId != null).Where(c => c.Vehicle.IsReserved == false).Include(c => c.Site).Include(c => c.Vehicle).OrderBy(c => c.SiteId).ToListAsync();
+
             var bookingSearchVM = new BookingSearchVM(
-                vehicles,
                 seats,
                 vehicleRates,
                 pods
                 );
-            return View(bookingSearchVM);
+            return View("Search", bookingSearchVM);
         }
 
         // GET: Bookings/Create
@@ -94,8 +94,8 @@ namespace DriveHub.Controllers
             // Check if user already has an active reservation
             var hasReservation = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
-                .AnyAsync(c => c.BookingStatus == BookingStatus.Reserved || 
-                            c.BookingStatus == BookingStatus.Unpaid || 
+                .AnyAsync(c => c.BookingStatus == BookingStatus.Reserved ||
+                            c.BookingStatus == BookingStatus.Unpaid ||
                             c.BookingStatus == BookingStatus.Collected);
 
             if (hasReservation)
@@ -118,13 +118,13 @@ namespace DriveHub.Controllers
             }
 
             ViewBag.Vehicle = vehicle;
-            return View();
+            return View(nameof(Create));
         }
 
         // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ReservationDto reservationDto)
+        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,StartPodId,QuotedPricePerHour")] ReservationDto reservationDto)
         {
             _logger.LogInformation($"Received POST to make a reservation for vehicle {reservationDto.VehicleId}");
 
@@ -133,8 +133,8 @@ namespace DriveHub.Controllers
                 // Verify if the user has an active reservation
                 bool hasReservation = await _context.Bookings
                     .AnyAsync(c => c.Id == _userManager.GetUserId(User) &&
-                                (c.BookingStatus == BookingStatus.Reserved || 
-                                    c.BookingStatus == BookingStatus.Unpaid || 
+                                (c.BookingStatus == BookingStatus.Reserved ||
+                                    c.BookingStatus == BookingStatus.Unpaid ||
                                     c.BookingStatus == BookingStatus.Collected));
 
                 if (hasReservation)
@@ -151,6 +151,7 @@ namespace DriveHub.Controllers
                     .Include(v => v.VehicleRate)
                     .FirstOrDefaultAsync(v => v.VehicleId == reservationDto.VehicleId);
 
+
                 if (vehicle == null || vehicle.IsReserved)
                 {
                     _logger.LogWarning("Vehicle is unavailable or already reserved.");
@@ -161,11 +162,12 @@ namespace DriveHub.Controllers
                 // Fetch the start pod and validate it
                 var startPod = await _context.Pods
                     .Include(p => p.Site)
+                    .Include(p => p.Vehicle)
                     .FirstOrDefaultAsync(p => p.PodId == reservationDto.StartPodId);
 
-                if (startPod == null)
+                if (startPod == null || startPod.Vehicle == null)
                 {
-                    _logger.LogError("Invalid start pod specified.");
+                    _logger.LogError("Invalid start pod or vehicle not in pod.");
                     return View(nameof(Error));
                 }
 
@@ -207,8 +209,6 @@ namespace DriveHub.Controllers
             }
         }
 
-
-
         /// <summary>
         /// Displays current (in-progress) bookings for the logged-in user.
         /// </summary>
@@ -246,13 +246,20 @@ namespace DriveHub.Controllers
         public async Task<IActionResult> Extend(string id)
         {
             var booking = await _context.Bookings
+                .Where(c => c.BookingId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .FirstOrDefaultAsync();
 
             if (booking == null)
             {
-                _logger.LogInformation("Current: No active reservation found for the user.");
+                _logger.LogWarning("Extend: No active reservation found for the user.");
+                return View(nameof(Error));
+            }
+
+            if (booking.IsExtended)
+            {
+                _logger.LogWarning("Extend: Reservation already extended.");
                 return View(nameof(Error));
             }
 
@@ -281,7 +288,7 @@ namespace DriveHub.Controllers
                 .OrderByDescending(c => c.Expires)
                 .ToListAsync();
 
-            return View(bookings);
+            return View("Past", bookings);
         }
 
         public async Task<IActionResult> Details(string id)
@@ -302,19 +309,31 @@ namespace DriveHub.Controllers
                 return NotFound();
             }
 
-            return View(booking);
+            return View("Details", booking);
         }
 
         public async Task<IActionResult> Cancel(string id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var booking = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(m => m.BookingId == id)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
                 .ThenInclude(d => d.VehicleRate)
-                .FirstOrDefaultAsync(m => m.BookingId == id);
+                .FirstOrDefaultAsync();
 
-            return View(booking);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            return View("Cancel", booking);
         }
 
         [HttpPost, ActionName("Cancel")]
@@ -453,7 +472,7 @@ namespace DriveHub.Controllers
 
             if (booking == null || booking.Receipt == null)
             {
-                _logger.LogWarning($"Invoice not found: {id}");
+                _logger.LogWarning($"Receipt not found: {id}");
                 return NotFound();
             }
 
@@ -472,7 +491,7 @@ namespace DriveHub.Controllers
             }
         }
 
-        public async Task<IActionResult> PrintReport(int id)
+        public async Task<IActionResult> PrintReport()
         {
             Settings.License = LicenseType.Community;
 
@@ -488,6 +507,11 @@ namespace DriveHub.Controllers
                 .Include(c => c.Receipt)
                 .ToListAsync();
 
+            if (bookings.Count == 0)
+            {
+                return NotFound();
+            }
+
             try
             {
                 var doc = new BookingsDocument(bookings);
@@ -500,7 +524,6 @@ namespace DriveHub.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
 
         private bool BookingExists(string id)
         {

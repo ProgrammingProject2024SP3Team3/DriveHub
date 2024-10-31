@@ -2,13 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using DriveHub.Data;
 using DriveHubModel;
-using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using DriveHubModel;
 using Microsoft.AspNetCore.Identity;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Stripe;
-using DriveHub.SeedData;
 
 namespace DriveHub.Controllers
 {
@@ -22,7 +17,7 @@ namespace DriveHub.Controllers
 
         public PaymentsController(
             ApplicationDbContext context,
-            ILogger<BookingsController> logger,
+            ILogger<PaymentsController> logger,
             UserManager<IdentityUser> userManager,
             IConfiguration configuration
         )
@@ -33,18 +28,25 @@ namespace DriveHub.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// The payment was successful
+        /// </summary>
+        /// <param name="id">PaymentId</param>
+        /// <returns>RedirectToAction</returns>
         public async Task<IActionResult> Success(string id)
         {
             _logger.LogInformation($"Payment successful for {id}");
 
             var booking = await _context.Bookings
                   .Where(c => c.PaymentId == id)
+                  .Where(c => c.Id == _userManager.GetUserId(User))
+                  .Where(c => c.BookingStatus == BookingStatus.Unpaid)
                   .Include(c => c.Invoice)
                   .FirstOrDefaultAsync();
 
             if (booking == null || booking.Invoice == null)
             {
-                _logger.LogError($"Bad booking id {id}");
+                _logger.LogError($"Bad payment id {id}");
                 return RedirectToAction("Error", "Bookings");
             }
 
@@ -60,6 +62,11 @@ namespace DriveHub.Controllers
             return RedirectToAction("Details", "Bookings", new { id = booking.BookingId });
         }
 
+        /// <summary>
+        /// The payment was not successful
+        /// </summary>
+        /// <param name="id">PaymentId</param>
+        /// <returns>RedirectToAction</returns>
         public async Task<IActionResult> Cancel(string id)
         {
             _logger.LogInformation($"Payment failed for {id}");
@@ -72,6 +79,8 @@ namespace DriveHub.Controllers
 
             var booking = await _context.Bookings
               .Where(c => c.PaymentId == id)
+              .Where(c => c.Id == _userManager.GetUserId(User))
+              .Where(c => c.BookingStatus == BookingStatus.Unpaid)
               .FirstOrDefaultAsync();
 
             if (booking == null)

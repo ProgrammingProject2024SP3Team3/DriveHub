@@ -104,7 +104,7 @@
                         let currDate = new Date()
                         let diffInMillis = currDate - startDate
                         let diffInMins = diffInMillis / (1000 * 60)
-                        let currCost = diffInMins * pricePerMinute
+                        let currCost = Math.round(diffInMins) * pricePerMinute
 
                         document.getElementById("live-cost").innerHTML = currCost.toFixed(2)
                         document.getElementById("live-minutes").innerHTML = diffInMins.toFixed(0)

@@ -25,7 +25,8 @@
 <section class="services-section-wrapper" style="padding-top: 8rem;">
     <div class="custom-container text-center">
         <div class="row g-4">
-            @if (SignInManager.IsSignedIn(User)) {
+            @if (SignInManager.IsSignedIn(User))
+            {
                 <a class="col-lg-4 text-decoration-none text-dark service-link" href="@(Url.Content("~/Identity/Account/Manage"))">
                     <div class="card shadow-sm h-100 service-card bg-light">
                         <div class="card-body">
@@ -35,9 +36,11 @@
                         </div>
                     </div>
                 </a>
-            } else {
-               <!-- Register & Verify Card -->
-               <a class="col-lg-4 text-decoration-none text-dark service-link" href="@(Url.Content("~/Identity/Account/Register"))">
+            }
+            else
+            {
+                <!-- Register & Verify Card -->
+                <a class="col-lg-4 text-decoration-none text-dark service-link" href="@(Url.Content("~/Identity/Account/Register"))">
                     <div class="card shadow-sm h-100 service-card bg-light">
                         <div class="card-body">
                             <i class="bi bi-person-check display-3"></i>
@@ -109,13 +112,15 @@
     </div>
 </section>
 
-<script>
-    // Hero fade in code
-    window.addEventListener('DOMContentLoaded', function () {
-        const heroHeading = document.querySelector('.hero-heading');
+@section Scripts {
+    <script>
+        // Hero fade in code
+        window.addEventListener('DOMContentLoaded', function () {
+            const heroHeading = document.querySelector('.hero-heading');
 
-        setTimeout(() => {
-            heroHeading.classList.add('scrolled');
-        }, 500);
-    });
-</script>
+            setTimeout(() => {
+                heroHeading.classList.add('scrolled');
+            }, 500);
+        });
+    </script>
+}
