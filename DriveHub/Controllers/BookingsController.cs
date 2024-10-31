@@ -314,12 +314,24 @@ namespace DriveHub.Controllers
 
         public async Task<IActionResult> Cancel(string id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var booking = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(m => m.BookingId == id)
                 .Include(c => c.StartPod)
                 .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
                 .ThenInclude(d => d.VehicleRate)
-                .FirstOrDefaultAsync(m => m.BookingId == id);
+                .FirstOrDefaultAsync();
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
 
             return View("Cancel", booking);
         }

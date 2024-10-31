@@ -1,4 +1,3 @@
-using DriveHubModel;
 using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
@@ -6,6 +5,9 @@ using DriveHub.Models.Dto;
 
 namespace DriveHubTests
 {
+    /// <summary>    
+    /// User A has collected Iron Stallion
+    /// </summary>
     public class BookingTests_SET2
     {
         BookingTestFixtures Fixture;

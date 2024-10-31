@@ -7,6 +7,21 @@ namespace DriveHubTests
     {
         VehiclesTestFixtures Fixture;
 
+
+        [Fact]
+        public async Task Set4_UserA_Pickup_ShouldRedirectToSearch()
+        {
+            // Arrange
+            Fixture = new VehiclesTestFixtures(4, "usera");
+
+            // Act
+            var result = await Fixture.VehiclesController.Pickup("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+
+            // Assert
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Search", redirectToActionResult.ActionName);
+        }
+
         [Fact]
         public async Task Set4_UserA_Dropoff_ShouldReturnError()
         {

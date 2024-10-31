@@ -1,5 +1,4 @@
-﻿
-namespace DriveHubTests
+﻿namespace DriveHubTests
 {
     internal class User
     {

@@ -44,9 +44,7 @@ namespace DriveHub.Controllers
                   .Include(c => c.Invoice)
                   .FirstOrDefaultAsync();
 
-            //var booking = await _context.Bookings.FirstOrDefaultAsync(c => c.PaymentId == id);
-
-            if (booking == null)
+            if (booking == null || booking.Invoice == null)
             {
                 _logger.LogError($"Bad payment id {id}");
                 return RedirectToAction("Error", "Bookings");
