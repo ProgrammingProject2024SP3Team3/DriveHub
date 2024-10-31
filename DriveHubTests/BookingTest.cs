@@ -292,5 +292,18 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
         }
+
+        [Fact]
+        public async Task Set7_UserB_Extend_ShouldReturnError()
+        {
+            Fixture = new BookingTestFixtures(7, "userb");
+
+            // Act
+            var result = await Fixture.BookingsController.Extend("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Error", viewResult.ViewName);
+        }
     }
 }

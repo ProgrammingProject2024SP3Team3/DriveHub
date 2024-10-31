@@ -17,7 +17,7 @@ namespace DriveHub.Controllers
 
         public PaymentsController(
             ApplicationDbContext context,
-            ILogger<BookingsController> logger,
+            ILogger<PaymentsController> logger,
             UserManager<IdentityUser> userManager,
             IConfiguration configuration
         )
@@ -39,12 +39,15 @@ namespace DriveHub.Controllers
 
             var booking = await _context.Bookings
                   .Where(c => c.PaymentId == id)
+                  .Where(c => c.Id == _userManager.GetUserId(User))
                   .Include(c => c.Invoice)
                   .FirstOrDefaultAsync();
 
-            if (booking == null || booking.Invoice == null)
+            //var booking = await _context.Bookings.FirstOrDefaultAsync(c => c.PaymentId == id);
+
+            if (booking == null)
             {
-                _logger.LogError($"Bad booking id {id}");
+                _logger.LogError($"Bad payment id {id}");
                 return RedirectToAction("Error", "Bookings");
             }
 
@@ -77,6 +80,7 @@ namespace DriveHub.Controllers
 
             var booking = await _context.Bookings
               .Where(c => c.PaymentId == id)
+              .Where(c => c.Id == _userManager.GetUserId(User))
               .FirstOrDefaultAsync();
 
             if (booking == null)
