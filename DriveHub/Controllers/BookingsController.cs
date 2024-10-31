@@ -280,9 +280,9 @@ namespace DriveHub.Controllers
                 .Where(c => c.BookingStatus != BookingStatus.Collected)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .OrderByDescending(c => c.Expires)
@@ -295,11 +295,11 @@ namespace DriveHub.Controllers
         {
             var booking = await _context.Bookings
                 .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
-                .ThenInclude(d => d.VehicleRate)
+                    .ThenInclude(d => d.VehicleRate)
                 .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
@@ -323,9 +323,9 @@ namespace DriveHub.Controllers
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(m => m.BookingId == id)
                 .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.Vehicle)
-                .ThenInclude(d => d.VehicleRate)
+                    .ThenInclude(d => d.VehicleRate)
                 .FirstOrDefaultAsync();
 
             if (booking == null)
@@ -396,7 +396,7 @@ namespace DriveHub.Controllers
                 .AsNoTracking()
                 .Where(c => c.BookingId == BookingId)
                 .Include(c => c.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
+                    .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.Invoice)
                 .FirstOrDefaultAsync();
 
@@ -463,9 +463,9 @@ namespace DriveHub.Controllers
                 .Where(c => c.BookingStatus == BookingStatus.Complete)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .FirstOrDefaultAsync();
@@ -500,17 +500,12 @@ namespace DriveHub.Controllers
                 .Where(c => c.BookingStatus == BookingStatus.Complete)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .ToListAsync();
-
-            if (bookings.Count == 0)
-            {
-                return NotFound();
-            }
 
             try
             {
