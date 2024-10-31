@@ -2,13 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using DriveHub.Data;
 using DriveHubModel;
-using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using DriveHubModel;
 using Microsoft.AspNetCore.Identity;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Stripe;
-using DriveHub.SeedData;
 
 namespace DriveHub.Controllers
 {
@@ -33,6 +28,11 @@ namespace DriveHub.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// The payment was successful
+        /// </summary>
+        /// <param name="id">PaymentId</param>
+        /// <returns>RedirectToAction</returns>
         public async Task<IActionResult> Success(string id)
         {
             _logger.LogInformation($"Payment successful for {id}");
@@ -60,6 +60,11 @@ namespace DriveHub.Controllers
             return RedirectToAction("Details", "Bookings", new { id = booking.BookingId });
         }
 
+        /// <summary>
+        /// The payment was not successful
+        /// </summary>
+        /// <param name="id">PaymentId</param>
+        /// <returns>RedirectToAction</returns>
         public async Task<IActionResult> Cancel(string id)
         {
             _logger.LogInformation($"Payment failed for {id}");

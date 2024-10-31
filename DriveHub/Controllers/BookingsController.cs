@@ -244,13 +244,20 @@ namespace DriveHub.Controllers
         public async Task<IActionResult> Extend(string id)
         {
             var booking = await _context.Bookings
+                .Where(c => c.BookingId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
                 .FirstOrDefaultAsync();
 
             if (booking == null)
             {
-                _logger.LogInformation("Current: No active reservation found for the user.");
+                _logger.LogWarning("Extend: No active reservation found for the user.");
+                return View(nameof(Error));
+            }
+
+            if (booking.IsExtended)
+            {
+                _logger.LogWarning("Extend: Reservation already extended.");
                 return View(nameof(Error));
             }
 
