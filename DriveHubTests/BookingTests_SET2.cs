@@ -31,7 +31,26 @@ namespace DriveHubTests
             Fixture = new BookingTestFixtures(2, "usera");
 
             // Act
-            var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+            var result = await Fixture.BookingsController.Create("36d4bc1e-6159-46df-ad98-da93a38bcc82");
+
+            // Assert
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Current", redirectToActionResult.ActionName);
+        }
+
+        [Fact]
+        public async Task Set2_UserA_CreateConfirmed_RedirectsToCurrent()
+        {
+            // Arrange
+            Fixture = new BookingTestFixtures(2, "usera");
+
+            var reservationDto = new ReservationDto();
+            reservationDto.VehicleId = "36d4bc1e-6159-46df-ad98-da93a38bcc82";
+            reservationDto.StartPodId = "e904170e-a945-4edd-802a-72e214e89cdb";
+            reservationDto.QuotedPricePerHour = 20m;
+
+            // Act
+            var result = await Fixture.BookingsController.Create(reservationDto);
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);

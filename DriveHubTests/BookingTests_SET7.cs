@@ -117,5 +117,53 @@ namespace DriveHubTests
             Assert.NotNull(booking);
             Assert.Equal(BookingStatus.Cancelled, booking.BookingStatus);
         }
+
+        [Fact]
+        public async Task Set7_UserA_PrintInvoice_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(7, "usera");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintInvoice(1);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Set7_UserA_PrintReport_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(7, "usera");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintReport();
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Set7_UserB_PrintInvoice_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(7, "userb");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintInvoice(1);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Set7_UserB_PrintReport_ShouldReturnNotFound()
+        {
+            Fixture = new BookingTestFixtures(7, "userb");
+
+            // Act
+            var result = await Fixture.BookingsController.PrintReport();
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
     }
 }
