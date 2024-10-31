@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using DriveHub.Data;
 using DriveHub.Controllers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace DriveHubTests
 {
@@ -31,6 +32,7 @@ namespace DriveHubTests
             var uniqueDbName = Guid.NewGuid().ToString();
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(uniqueDbName)
+                .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                 .Options;
 
             Context = new ApplicationDbContext(options);

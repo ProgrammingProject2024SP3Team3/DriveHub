@@ -10,6 +10,8 @@ namespace DriveHubTests
     {
         BookingTestFixtures Fixture;
 
+        // Set 1 Tests
+
         [Fact]
         public async Task Set1_UserA_Search_ShouldRedirectToCurrent()
         {
@@ -37,7 +39,7 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set1_UserA_CreateConfirmed_ShouldReturnCurrent()
+        public async Task Set1_UserA_CreateConfirmed_ShouldRedirectToCurrent()
         {
             // Arrange
             Fixture = new BookingTestFixtures(1, "usera");
@@ -49,9 +51,8 @@ namespace DriveHubTests
             reservationDto.QuotedPricePerHour = 20m;
 
             // Act
-            var result = await Fixture.BookingsController.Create(reservationDto.BookingId);
+            var result = await Fixture.BookingsController.Create(reservationDto);
 
-            // Assert
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Current", redirectToActionResult.ActionName);
@@ -145,6 +146,46 @@ namespace DriveHubTests
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
         }
+
+        [Fact]
+        public async Task Set1_UserB_CreateConfirmed_IronStallionReturnsErrorView()
+        {
+            // Arrange
+            Fixture = new BookingTestFixtures(1, "userb");
+
+            var reservationDto = new ReservationDto();
+            reservationDto.VehicleId = "cac6a77c-59fd-4d0e-b557-9a3230a79e9a";
+            reservationDto.StartPodId = "454f2073-c06d-4dfa-a976-d8f1d2cc93d2";
+            reservationDto.QuotedPricePerHour = 27.50m;
+
+            // Act
+            var result = await Fixture.BookingsController.Create(reservationDto);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Error", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task Set1_UserB_CreateConfirmed_LightningMcSpeedShouldReturnDetails()
+        {
+            // Arrange
+            Fixture = new BookingTestFixtures(1, "userb");
+
+            var reservationDto = new ReservationDto();
+            reservationDto.VehicleId = "eeb7b72c-b362-4513-b84b-baa954c83ce0";
+            reservationDto.StartPodId = "454f2073-c06d-4dfa-a976-d8f1d2cc93d2";
+            reservationDto.QuotedPricePerHour = 27.50m;
+
+            // Act
+            var result = await Fixture.BookingsController.Create(reservationDto);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Details", viewResult.ViewName);
+        }
+
+        // Set 2
 
         [Fact]
         public async Task Set2_UserA_Create_ShouldRedirectToCurrent()

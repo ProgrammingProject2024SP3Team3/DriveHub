@@ -124,7 +124,7 @@ namespace DriveHub.Controllers
         // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ReservationDto reservationDto)
+        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,StartPodId,QuotedPricePerHour")] ReservationDto reservationDto)
         {
             _logger.LogInformation($"Received POST to make a reservation for vehicle {reservationDto.VehicleId}");
 
@@ -140,7 +140,7 @@ namespace DriveHub.Controllers
                 if (hasReservation)
                 {
                     ViewBag.Message = "You have a current booking.";
-                    return View(nameof(Current));
+                    return RedirectToAction(nameof(Current));
                 }
 
                 // Start transaction to ensure atomic operations
