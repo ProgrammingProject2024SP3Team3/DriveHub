@@ -20,7 +20,7 @@ namespace DriveHubTests
         public Mock<ILogger<BookingsController>> BookingsLogger { get; private set; }
         public UserManager<IdentityUser> UserManager { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
+        public Mock<IConfiguration> MockConfiguration { get; private set; }
 
         private User UserA = new User("0e4ed3e4-bc98-44c4-acc0-e7aa647ae703", "usera@test.com");
 
@@ -37,13 +37,20 @@ namespace DriveHubTests
 
             Context = new ApplicationDbContext(options);
             BookingsLogger = new Mock<ILogger<BookingsController>>();
+            MockConfiguration = new Mock<IConfiguration>();
+
+            // Mock the configuration
+            MockConfiguration.Setup(c => c["StripeKey"])
+                .Returns("sk_test_51QBlxHFqWUoHjTKqFGpJ01qSOCzZRbKVPvlIskkh9ib14aTSPPh6hlCnAYgd6i6ppLaqVpFgiA7czGhUs4RESZWd00bKIdnhHE");
+            MockConfiguration.Setup(c => c["Domain"])
+                .Returns("http://localhost:5203");
 
             // Seed the database with test data using TestDataBuilder
             TestDataBuilder.SeedData(Context, set);
 
             // Mock the UserManager and set up the controller
             UserManager = MockUserManager();
-            BookingsController = new BookingsController(Context, BookingsLogger.Object, UserManager, Configuration);
+            BookingsController = new BookingsController(Context, BookingsLogger.Object, UserManager, MockConfiguration.Object);
 
             // Set up a default mock authenticated user for tests
             SetMockAuthenticatedUser(userName);

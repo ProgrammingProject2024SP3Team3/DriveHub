@@ -477,7 +477,7 @@ namespace DriveHub.Controllers
             }
         }
 
-        public async Task<IActionResult> PrintReport(int id)
+        public async Task<IActionResult> PrintReport()
         {
             Settings.License = LicenseType.Community;
 
@@ -492,6 +492,11 @@ namespace DriveHub.Controllers
                 .Include(c => c.Invoice)
                 .Include(c => c.Receipt)
                 .ToListAsync();
+
+            if (bookings.Count == 0)
+            {
+                return NotFound();
+            }
 
             try
             {

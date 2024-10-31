@@ -3,7 +3,7 @@ using Xunit;
 
 namespace DriveHubTests
 {
-    public class PaymentsTests
+    public class PaymentsTests_SET3
     {
         PaymentsTestFixtures Fixture;
 

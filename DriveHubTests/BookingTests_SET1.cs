@@ -6,7 +6,7 @@ using DriveHub.Models.Dto;
 
 namespace DriveHubTests
 {
-    public class BookingTests
+    public class BookingTests_SET1
     {
         BookingTestFixtures Fixture;
 
@@ -201,129 +201,6 @@ namespace DriveHubTests
         public async Task Set1_UserB_Extend_ShouldReturnError()
         {
             Fixture = new BookingTestFixtures(1, "userb");
-
-            // Act
-            var result = await Fixture.BookingsController.Extend("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Error", viewResult.ViewName);
-        }
-
-        // Set 2
-
-        [Fact]
-        public async Task Set2_UserA_Create_ShouldRedirectToCurrent()
-        {
-            Fixture = new BookingTestFixtures(2, "usera");
-
-            // Act
-            var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
-
-            // Assert
-            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Current", redirectToActionResult.ActionName);
-        }
-
-        [Fact]
-        public async Task Set2_UserB_Search_ShouldReturn9Vehicles()
-        {
-            Fixture = new BookingTestFixtures(2, "userb");
-
-            // Act
-            var result = await Fixture.BookingsController.Search();
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
-            Assert.Equal(9, model.Pods.Count);
-        }
-
-        [Fact]
-        public async Task Set2_UserA_Search_ShouldRedirectToCurrent()
-        {
-            Fixture = new BookingTestFixtures(2, "usera");
-
-            // Act
-            var result = await Fixture.BookingsController.Search();
-
-            // Assert
-            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Current", redirectToActionResult.ActionName);
-        }
-
-        [Fact]
-        public async Task Set2_UserB_Search_CannotFindIronStallion()
-        {
-            Fixture = new BookingTestFixtures(2, "userb");
-
-            // Act
-            var result = await Fixture.BookingsController.Search();
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<BookingSearchVM>(viewResult.Model);
-            Assert.False(model.Pods.Where(c => c.VehicleId == "cac6a77c-59fd-4d0e-b557-9a3230a79e9a").Any());
-        }
-
-        [Fact]
-        public async Task Set2_UserB_Create_IronStallionRedirectsToError()
-        {
-            Fixture = new BookingTestFixtures(2, "userb");
-
-            // Act
-            var result = await Fixture.BookingsController.Create("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Error", viewResult.ViewName);
-        }
-
-        // Set 4 Tests
-
-        [Fact]
-        public async Task Set4_UserA_PrintInvoice_ShouldReturnFile()
-        {
-            Fixture = new BookingTestFixtures(4, "usera");
-
-            // Act
-            var result = await Fixture.BookingsController.PrintInvoice(1);
-
-            // Assert
-            var viewResult = Assert.IsType<FileContentResult>(result);
-            //Assert.Equal("Error", viewResult.ViewName);
-        }
-
-        [Fact]
-        public async Task Set4_UserB_PrintInvoice_ShouldReturnNotFound()
-        {
-            Fixture = new BookingTestFixtures(4, "userb");
-
-            // Act
-            var result = await Fixture.BookingsController.PrintInvoice(1);
-
-            // Assert
-            var viewResult = Assert.IsType<NotFoundResult>(result);
-        }
-
-        // Set 7 Tests
-        [Fact]
-        public async Task Set7_UserA_Extend_ShouldReturnError()
-        {
-            Fixture = new BookingTestFixtures(7, "usera");
-
-            // Act
-            var result = await Fixture.BookingsController.Extend("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("Error", viewResult.ViewName);
-        }
-
-        [Fact]
-        public async Task Set7_UserB_Extend_ShouldReturnError()
-        {
-            Fixture = new BookingTestFixtures(7, "userb");
 
             // Act
             var result = await Fixture.BookingsController.Extend("b8075e83-6e70-4dee-b76a-22e8c7ee7ec1");
