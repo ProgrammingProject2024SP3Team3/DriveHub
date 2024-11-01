@@ -37,7 +37,7 @@ namespace Admin.Controllers
             var model = new HomeDto
             {
                 NumberOfUsers = await _context.Users.CountAsync(),
-                NumberOfTripsTaken = await _context.Bookings.CountAsync(),
+                NumberOfTripsTaken = await _context.Invoices.CountAsync(),
                 CarsUsed = await _context.Vehicles.CountAsync(v => v.IsReserved),
                 CarsTotal = await _context.Vehicles.CountAsync(),
                 TotalRevenue = revenuePerDay.Sum(r => r.Revenue),
