@@ -203,15 +203,18 @@ namespace Admin.Controllers
             }
 
             var booking = await _context.Bookings
-                .Include(b => b.ApplicationUser)
+                .Where(m => m.BookingId == id)
                 .Include(b => b.EndPod)
                 .Include(b => b.StartPod)
                 .Include(b => b.Vehicle)
-                .FirstOrDefaultAsync(m => m.BookingId == id);
+                .FirstOrDefaultAsync();
+
             if (booking == null)
             {
                 return NotFound();
             }
+
+            ViewBag.User = (await _context.Users.FindAsync(booking.Id)).UserName;
 
             return View(booking);
         }
