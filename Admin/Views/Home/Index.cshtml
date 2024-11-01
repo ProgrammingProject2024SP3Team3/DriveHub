@@ -1,8 +1,50 @@
-﻿@{
+﻿@model Admin.Models.Dto.HomeDto
+
+@{
     ViewData["Title"] = "Admin";
+    var revenuePerDay = ViewBag.RevenuePerDay;
 }
 
-<div class="text-center">
-    <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/DriveHubLogoNoBackground.png" />
-        <h1 class="display-4">DriveHub Admin Portal</h1>
+<div class="row text-center">
+    <div class="col-3 d-flex align-items-center">
+        <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/website/DriveHubLogoNoBackground.png" />
+    </div>
+    <div class="col-9 text-lg-start">
+        <dl class="row">
+            <h1>DriveHub Admin Portal</h1>
+            <dt class="col-sm-4">Total DriveHub users</dt>
+            <dd class="col-sm-8">@Model.NumberOfUsers</dd>
+            <dt class="col-sm-4">Total trips taken</dt>
+            <dd class="col-sm-8">@Model.NumberOfTripsTaken</dd>
+            <dt class="col-sm-4">Total cars in use</dt>
+            <dd class="col-sm-8">@Model.CarsUsed / @Model.CarsTotal</dd>
+            <dt class="col-sm-4">Total revenue</dt>
+            <dd class="col-sm-8">@Model.TotalRevenue.ToString("c")</dd>
+        </dl>
+        <div id="myChart" style="max-width:700px; height:400px"></div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        var revenueData = @Html.Raw(Json.Serialize(revenuePerDay));
+
+        var xValues = revenueData.map(r => r.date);
+        var yValues = revenueData.map(r => r.revenue);
+
+        var data = [{
+            x: xValues,
+            y: yValues,
+            type: "bar"
+        }];
+
+        var layout = {
+            xaxis: { title: "Date" },
+            yaxis: { title: "Revenue" },
+            title: "Revenue Per Day in AUD"
+        };
+
+        Plotly.newPlot("myChart", data, layout, { displayModeBar: false });
+    </script>
+}

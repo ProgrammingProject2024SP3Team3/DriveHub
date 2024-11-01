@@ -143,7 +143,7 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set2_UserA_PrintReport_ShouldReturnNotFound()
+        public async Task Set2_UserA_PrintReport_ShouldReturnFile()
         {
             Fixture = new BookingTestFixtures(2, "usera");
 
@@ -151,7 +151,7 @@ namespace DriveHubTests
             var result = await Fixture.BookingsController.PrintReport();
 
             // Assert
-            Assert.IsType<NotFoundResult>(result);
+            Assert.IsType<FileContentResult>(result);
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set2_UserB_PrintReport_ShouldReturnNotFound()
+        public async Task Set2_UserB_PrintReport_ShouldReturnFile()
         {
             Fixture = new BookingTestFixtures(2, "userb");
 
@@ -175,7 +175,7 @@ namespace DriveHubTests
             var result = await Fixture.BookingsController.PrintReport();
 
             // Assert
-            Assert.IsType<NotFoundResult>(result);
+            Assert.IsType<FileContentResult>(result);
         }
     }
 }
