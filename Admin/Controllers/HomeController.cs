@@ -41,7 +41,6 @@ namespace Admin.Controllers
                 CarsUsed = await _context.Vehicles.CountAsync(v => v.IsReserved),
                 CarsTotal = await _context.Vehicles.CountAsync(),
                 TotalRevenue = revenuePerDay.Sum(r => r.Revenue),
-                Receipts = await _context.Receipts.ToListAsync()
             };
 
             ViewBag.RevenuePerDay = revenuePerDay;
