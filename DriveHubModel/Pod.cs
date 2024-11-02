@@ -40,7 +40,6 @@ namespace DriveHubModel
             string? vehicleId,
             string podName)
         {
-            PodId = Guid.NewGuid().ToString();
             SiteId = siteId;
             VehicleId = vehicleId;
             PodName = podName;

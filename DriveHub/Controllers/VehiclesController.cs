@@ -57,16 +57,20 @@ namespace DriveHub.Controllers
                 .ThenInclude(c => c.Site)
                 .SingleAsync();
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 _logger.LogWarning($"Booking not found for id: {id}");
-                return RedirectToAction("Search", "Bookings");
+
+                if (!vehicle.IsReserved) return RedirectToAction("Create", "Bookings", new { id });
+                else return RedirectToAction("Search", "Bookings");
             }
 
             if (booking == null)
             {
                 _logger.LogWarning($"Vehicle not found {id}");
-                return RedirectToAction("Search", "Bookings");
+
+                if (!vehicle.IsReserved) return RedirectToAction("Create", "Bookings", new { id });
+                else return RedirectToAction("Search", "Bookings");
             }
 
             _logger.LogInformation($"Pickup OK - {booking.BookingId}");
