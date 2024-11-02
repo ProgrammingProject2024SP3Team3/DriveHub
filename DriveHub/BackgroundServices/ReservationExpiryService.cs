@@ -26,7 +26,7 @@ namespace DriveHub.BackgroundServices
 
                 _logger.LogInformation("ReservationExpiry service is waiting a minute.");
 
-                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                await Task.Delay(TimeSpan.FromMinutes(15), cancellationToken);
             }
         }
 
