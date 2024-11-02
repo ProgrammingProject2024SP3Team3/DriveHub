@@ -1,11 +1,13 @@
 ﻿using Admin.Data;
 using DriveHubModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Controllers
 {
+    [Authorize]
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -16,19 +18,62 @@ namespace Admin.Controllers
         }
 
         // GET: Bookings
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string searchUser, string startPodFilter, string endPodFilter)
         {
-            var bookings = await _context.Bookings
-                .Include(b => b.EndPod)
-                .ThenInclude(c => c.Site)
-                .Include(b => b.StartPod)
-                .ThenInclude(c => c.Site)
-                .Include(b => b.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
-                .ToListAsync();
+            ViewData["StartTimeSortParm"] = String.IsNullOrEmpty(sortOrder) ? "start_desc" : "";
+            ViewData["EndTimeSortParm"] = sortOrder == "EndTime" ? "end_desc" : "EndTime";
+            ViewData["CurrentFilter"] = searchUser;
+            ViewData["StartPodFilter"] = startPodFilter;
+            ViewData["EndPodFilter"] = endPodFilter;
 
-            return View(bookings);
+            var bookings = from b in _context.Bookings
+                           .Include(b => b.EndPod)
+                           .ThenInclude(c => c.Site)
+                           .Include(b => b.StartPod)
+                           .ThenInclude(c => c.Site)
+                           .Include(b => b.Vehicle)
+                           .ThenInclude(c => c.VehicleRate)
+                           select b;
+
+            // Filter by user
+            if (!String.IsNullOrEmpty(searchUser))
+            {
+                bookings = bookings.Where(b => b.Id.Contains(searchUser));
+            }
+
+            // Filter by start pod
+            if (!String.IsNullOrEmpty(startPodFilter))
+            {
+                bookings = bookings.Where(b => b.StartPod.PodName.Contains(startPodFilter));
+            }
+
+            // Filter by end pod
+            if (!String.IsNullOrEmpty(endPodFilter))
+            {
+                bookings = bookings.Where(b => b.EndPod.PodName.Contains(endPodFilter));
+            }
+
+            // Sort the results
+            switch (sortOrder)
+            {
+                case "start_desc":
+                    bookings = bookings.OrderByDescending(b => b.StartTime);
+                    break;
+                case "EndTime":
+                    bookings = bookings.OrderBy(b => b.EndTime);
+                    break;
+                case "end_desc":
+                    bookings = bookings.OrderByDescending(b => b.EndTime);
+                    break;
+                default:
+                    bookings = bookings.OrderBy(b => b.StartTime);
+                    break;
+            }
+
+            return View(await bookings.AsNoTracking().ToListAsync());
         }
+
+
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(string id)
@@ -39,14 +84,22 @@ namespace Admin.Controllers
             }
 
             var booking = await _context.Bookings
-                .Include(b => b.EndPod)
                 .Include(b => b.StartPod)
+                .ThenInclude(c => c.Site)
+                .Include(b => b.EndPod)
+                .ThenInclude(c => c.Site)
                 .Include(b => b.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .Include(b => b.Invoice)
+                .Include(b => b.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
+
             if (booking == null)
             {
                 return NotFound();
             }
+
+            ViewBag.User = (await _context.Users.FindAsync(booking.Id)).UserName;
 
             return View(booking);
         }
@@ -74,6 +127,7 @@ namespace Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
@@ -149,15 +203,18 @@ namespace Admin.Controllers
             }
 
             var booking = await _context.Bookings
-                .Include(b => b.ApplicationUser)
+                .Where(m => m.BookingId == id)
                 .Include(b => b.EndPod)
                 .Include(b => b.StartPod)
                 .Include(b => b.Vehicle)
-                .FirstOrDefaultAsync(m => m.BookingId == id);
+                .FirstOrDefaultAsync();
+
             if (booking == null)
             {
                 return NotFound();
             }
+
+            ViewBag.User = (await _context.Users.FindAsync(booking.Id)).UserName;
 
             return View(booking);
         }

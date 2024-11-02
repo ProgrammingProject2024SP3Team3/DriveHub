@@ -1,0 +1,2 @@
+BookingId,Expires,IsExtended,PaymentId,VehicleId,Id,StartPodId,EndPodId,StartTime,EndTime,PricePerHour,PricePerMinute,BookingStatus
+9a8e14f7-5259-4e0e-ada6-ab4af1ab55e1,2024-10-30 14:11:49.3402861,0,20106fbd-e255-4833-b77a-2de5e854cafb,cac6a77c-59fd-4d0e-b557-9a3230a79e9a,0e4ed3e4-bc98-44c4-acc0-e7aa647ae703,e904170e-a945-4edd-802a-72e214e89cdb,NULL,NULL,NULL,20.00,0.34,Cancelled

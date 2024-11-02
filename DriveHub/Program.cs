@@ -1,5 +1,6 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using DriveHub.BackgroundServices;
 using DriveHub.Data;
 using DriveHub.SeedData;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,8 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
+
     // Set up Key Vault client
     var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
     builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
@@ -27,6 +30,10 @@ else
 
     connection = secret.Value;
 }
+
+// Add worker service to automatically run in the background.
+builder.Services.AddHostedService<ReservationExpiryService>();
+builder.Services.AddHttpContextAccessor();
 
 // Configure logging
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
@@ -90,6 +97,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("en-AU")
 });
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

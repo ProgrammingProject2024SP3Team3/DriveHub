@@ -2,16 +2,24 @@
 using Microsoft.EntityFrameworkCore;
 using Admin.Data;
 using DriveHubModel;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Admin.Models.Dto;
 
 namespace Admin.Controllers
 {
+    [Authorize]
     public class ApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public ApplicationUsersController(ApplicationDbContext context)
+        public ApplicationUsersController(
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: VehicleRates
@@ -122,6 +130,7 @@ namespace Admin.Controllers
 
             var applicationUser = await _context.Users
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (applicationUser == null)
             {
                 return NotFound();
@@ -143,6 +152,47 @@ namespace Admin.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> PasswordReset(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var pwresetDto = new Models.Dto.ResetPasswordDto();
+            pwresetDto.Id = id;
+            pwresetDto.UserName = user.UserName;
+            pwresetDto.Email = user.Email;
+            pwresetDto.EmailConfirmed = user.EmailConfirmed;
+
+            return View(pwresetDto);
+        }
+
+        public async Task<ActionResult> ResetUserPassword([Bind("Id,UserName,Email,EmailConfirmed,NewPassword")] ResetPasswordDto passwordDto)
+        {
+            // Find User
+            var user = await _context.Users.Where(x => x.Id == passwordDto.Id).SingleOrDefaultAsync();
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Remove the existing password
+            await _userManager.RemovePasswordAsync(user);
+
+            // Add the new password
+            await _userManager.AddPasswordAsync(user, passwordDto.NewPassword);
+            return RedirectToAction(nameof(Details), new { passwordDto.Id });
         }
 
         private bool UserExists(string id)

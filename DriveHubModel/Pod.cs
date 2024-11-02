@@ -40,6 +40,7 @@ namespace DriveHubModel
             string? vehicleId,
             string podName)
         {
+            PodId = Guid.NewGuid().ToString();
             SiteId = siteId;
             VehicleId = vehicleId;
             PodName = podName;
@@ -47,8 +48,7 @@ namespace DriveHubModel
 
         [Key]
         [Required]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string PodId { get; set; }
+        public string PodId { get; set; } = Guid.NewGuid().ToString();
 
         [ForeignKey("Site")]
         [Required]

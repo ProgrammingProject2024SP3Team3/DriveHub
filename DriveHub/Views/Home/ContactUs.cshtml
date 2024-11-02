@@ -1,33 +1,247 @@
+@model DriveHubModel.Contact
+
 @{
     ViewData["Title"] = "Contact Us";
 }
 
-<h1 class="mb-6">@ViewData["Title"]</h1>
-<form>
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+<style>
+.car-universe {
+  /* parent div used to prevent .car-road overflowing */
+  overflow: hidden;
+}
+.car-road{
+  width: 80px;
+  overflow: hidden;
+  position: relative;
+  animation: driveRight 12s linear infinite;
+}
+@@keyframes driveRight {
+  /* drive the car across div and start again */
+  0% {
+    left: -100px;
+  }
+  100% {
+    left: 100%;
+  }
+}
+.car{
+  width: 80px;
+  position: relative;
+}
+
+@@-webkit-keyframes rotateWheel {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}
+
+@@keyframes rotateWheel {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}
+
+.car-base{
+  background: #00A8E8;
+  width: 100%;
+  height: 15px;
+  border-radius: 2px 5px 8px 8px;
+}
+
+.car-top{
+  height: 25px;
+  width: 50px;
+  background: #00A8E8;
+  margin-bottom: -12px;
+  border-radius: 100px / 50px;
+  margin-left: 10px;
+  position: relative;
+}
+
+.car-top::before{
+  width: 0;
+  height: 0;
+  border-top: 12px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 30px solid #00A8E8;
+  position: absolute;
+  left: -7px;
+  content: '';
+}
+
+.car-top::after{
+  position: absolute;
+  right: -20px;
+  content: '';
+  top: 10px;
+  border-radius: 50% 50% 0 0;
+  width: 45px;
+  height: 6px;
+  background: #00A8E8;
+}
+
+.window{
+  position: absolute;
+  background: white;
+  width: 30px;
+  height: 8px;
+  top: 3px;
+  border-radius: 50% 50% 0 0;
+  left: 8px;
+}
+
+.window::before{
+  content: '';
+  position: absolute;
+  left: 15px;
+  background: #00A8E8;
+  height: 100%;
+  width: 4px;
+}
+
+.wheel{
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffc107;
+  position: absolute;
+  border: 2px solid;
+  -webkit-animation: rotateWheel 0.7s infinite linear;
+  animation: rotateWheel 0.7s infinite linear;
+}
+
+.wheel::before{
+  content: '';
+  width: 10px;
+  height: 10px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.wheel:after{
+  content: '';
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4a4a4a;
+}
+
+.wheel-left{
+  left: 8px;
+  bottom: -7px;
+}
+
+.wheel-right{
+  right: 8px;
+  bottom: -7px;
+}
+
+.head-light{
+  position: absolute;
+  background: #ffc107;
+  right: 1px;
+  top: 12px;
+  border-radius: 50% 15px 15px 50%;
+  width: 7px;
+  height: 3px;
+}
+
+.road{
+  position:relative;
+  width: 100%;
+  margin-top: 5px;
+  animation: border-dance 0.5s infinite linear;
+  height: 3px;
+  background-image: linear-gradient(to left, #ccc 0%, #ccc 20%, #fff 20%, #fff 40%, #ccc 40%, #ccc 60%, #fff 60%, #fff 80%, #ccc 80%);
+}
+
+@@keyframes border-dance {
+  0% {
+    left: 40px;
+  }
+
+  100% {
+    left: 0px;
+  }
+}
+</style>
+
+<h1 class="title-style pb-4" style="">@ViewData["Title"]</h1>
+<div class="car-universe">
+  <div class="car-road">
+    <div class="car">
+      <div class="car-top">
+        <div class="window">
         </div>
-        <div class="col-md-6">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+      </div>
+      <div class="car-base">
+      </div>
+      <div class="wheel-left wheel">
+        <div class="wheel-spike">
         </div>
+        <div class="wheel-center">
+        </div>
+      </div>
+      <div class="wheel-right wheel">
+        <div class="wheel-spike">
+        </div>
+        <div class="wheel-center">
+        </div>
+      </div>
+      <div class="head-light"></div>
     </div>
+    <div class="road">
+    </div>
+  </div>
+</div>
+<div class="container-fluid p-4" style="background-color: #f8f9fa;">
+    <div class="container mt-5 p-5" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);">
 
-    <div class="mb-3">
-        <label for="subject" class="form-label">Subject</label>
-        <input type="text" class="form-control" id="subject" placeholder="Subject">
-    </div>
+        <form asp-action="ContactUs">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-    <div class="mb-4">
-        <label for="message" class="form-label">Message</label>
-        <textarea class="form-control" id="message" rows="5" placeholder="Your Message" required></textarea>
-    </div>
+            <!-- Name and Email Fields Row -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label asp-for="Name" class="form-label fw-semibold" style="color: #555;">Name</label>
+                    <input asp-for="Name" class="form-control" style="padding: 0.75rem; border-radius: 6px; border: 1px solid #ddd;" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label fw-semibold" style="color: #555;">Email</label>
+                    <input asp-for="Email" class="form-control" style="padding: 0.75rem; border-radius: 6px; border: 1px solid #ddd;" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
 
-    <div class="text-center">
-        <button type="submit" class="btn btn-primary btn-lg">
-            Send Message
-        </button>
+            <!-- Subject Field -->
+            <div class="mb-4">
+                <label asp-for="Subject" class="form-label fw-semibold" style="color: #555;">Subject</label>
+                <input asp-for="Subject" class="form-control" style="padding: 0.75rem; border-radius: 6px; border: 1px solid #ddd;" />
+                <span asp-validation-for="Subject" class="text-danger"></span>
+            </div>
+
+            <!-- Message Field -->
+            <div class="mb-4">
+                <label asp-for="Message" class="form-label fw-semibold" style="color: #555;">Message</label>
+                <textarea asp-for="Message" class="form-control" rows="5" style="padding: 0.75rem; border-radius: 6px; border: 1px solid #ddd;"></textarea>
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <input type="submit" value="Send Message" class="btn btn-primary fw-bold" style="padding: 0.75rem 2.5rem; font-size: 1rem; border-radius: 6px; background-color: #00A8E8; border-color: #00A8E8; color: #fff; transition: background-color 0.3s ease;"
+                onmouseover="this.style.backgroundColor='#008bb5'" onmouseout="this.style.backgroundColor='#00A8E8'">
+            </div>
+        </form>
     </div>
-</form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

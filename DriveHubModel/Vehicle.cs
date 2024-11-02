@@ -19,6 +19,10 @@ using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
+
+    /// <summary>
+    /// A vehiclel in the DriveHub fleet.
+    /// </summary>
     public class Vehicle
     {
         public Vehicle() { }
@@ -75,12 +79,15 @@ namespace DriveHubModel
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VehicleId { get; set; }
+        public string VehicleId { get; set; } = Guid.NewGuid().ToString();
 
         [ForeignKey("VehicleRate")]
         [DisplayName("Price Category")]
         [Required]
         public string VehicleRateId { get; set; }
+
+        [Required]
+        public bool IsReserved { get; set; } = false;
 
         [Required]
         public string Make { get; set; }

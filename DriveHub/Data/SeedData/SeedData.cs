@@ -23,6 +23,7 @@ namespace DriveHub.SeedData
                     vehicleRate.VehicleRateId,
                     vehicleRate.Description,
                     vehicleRate.PricePerHour,
+                    vehicleRate.PricePerMinute,
                     vehicleRate.EffectiveDate
                     );
                 context.Add(vehicleRateDb);
@@ -61,9 +62,9 @@ namespace DriveHub.SeedData
             }
             context.SaveChanges();
 
-            //context.Database.ExecuteSqlRaw(@"CREATE SPATIAL INDEX IX_Sites_Location 
-            //                               ON [Sites]([Location]) 
-            //                               USING GEOGRAPHY_AUTO_GRID;");
+            context.Database.ExecuteSqlRaw(@"CREATE SPATIAL INDEX IX_Sites_Location 
+                                           ON [Sites]([Location]) 
+                                           USING GEOGRAPHY_AUTO_GRID;");
 
             foreach (var pod in GetPods(logger))
             {
@@ -130,18 +131,6 @@ namespace DriveHub.SeedData
             }
 
             return pods;
-        }
-
-        private static IList<DriveHubModel.ApplicationUser> GetUsers(ILogger<Program> logger)
-        {
-            // TODO Write get data from csv method
-            throw new NotImplementedException();
-        }
-
-        private static IList<Booking> GetBookings(ILogger<Program> logger)
-        {
-            // TODO Write get data from csv method
-            throw new NotImplementedException();
         }
     }
 }

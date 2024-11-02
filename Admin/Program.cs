@@ -1,4 +1,5 @@
 using Admin.Data;
+using Admin.Data.SeedData;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -65,17 +66,28 @@ builder.Services.AddAzureClients(clientBuilder =>
 });
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline and seed data if required
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
+    // Populate database with seed data
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            SeedData.Initialize(services);
+        }
+        catch (Exception ex)
+        {
+            logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error has occurred while seeding the database.");
+        }
+    }
 }
-
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

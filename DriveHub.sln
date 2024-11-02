@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveHub", "DriveHub\DriveHub.csproj", "{58123A56-E7E0-4B46-B9A3-8D0319434F1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveHub", "DriveHub\DriveHub.csproj", "{58123A56-E7E0-4B46-B9A3-8D0319434F1E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveHubModel", "DriveHubModel\DriveHubModel.csproj", "{9E08015D-E896-4221-B36A-EE3B879D2931}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveHubTests", "DriveHubTests\DriveHubTests.csproj", "{F0443D1F-D41C-4BA5-9408-6B1CE5DD0AFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin", "Admin\Admin.csproj", "{C9FB96BC-8728-4A0B-9799-955AE5F30F83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin", "Admin\Admin.csproj", "{C9FB96BC-8728-4A0B-9799-955AE5F30F83}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9E08015D-E896-4221-B36A-EE3B879D2931} = {9E08015D-E896-4221-B36A-EE3B879D2931}
 	EndProjectSection

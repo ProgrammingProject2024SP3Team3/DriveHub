@@ -4,9 +4,14 @@ using DriveHub.Data;
 using DriveHubModel;
 using DriveHub.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using DriveHub.Models.Dto;
 using Microsoft.AspNetCore.Identity;
+using Stripe.Checkout;
+using Stripe;
+using DriveHub.Models.DocumentModels;
+using QuestPDF.Fluent;
+using QuestPDF;
+using QuestPDF.Infrastructure;
 
 namespace DriveHub.Controllers
 {
@@ -16,16 +21,19 @@ namespace DriveHub.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IConfiguration _configuration;
 
         public BookingsController(
             ApplicationDbContext context,
             ILogger<BookingsController> logger,
-            UserManager<IdentityUser> userManager
+            UserManager<IdentityUser> userManager,
+            IConfiguration configuration
         )
         {
             _context = context;
             _logger = logger;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         // GET: Bookings
@@ -49,77 +57,33 @@ namespace DriveHub.Controllers
         /// <returns>The vehicle search page</returns>
         public async Task<IActionResult> Search()
         {
-            var vehicles = await _context.Vehicles.Where(c => c.Pod != null).Include(c => c.VehicleRate).ToListAsync();
+            // Redirect if user has a current reservation
+            var hasReservation = _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(
+                    c => c.BookingStatus == BookingStatus.Reserved ||
+                    c.BookingStatus == BookingStatus.Unpaid ||
+                    c.BookingStatus == BookingStatus.Collected
+                    )
+                .Any();
+
+            if (hasReservation)
+            {
+                ViewBag.Message = "You have a current booking";
+                return RedirectToAction(nameof(Current));
+            }
+
+            var vehicles = await _context.Vehicles.Where(c => c.IsReserved == false).Include(c => c.VehicleRate).ToListAsync();
             var seats = vehicles.Select(c => c.Seats).Distinct().ToList();
             var vehicleRates = await _context.VehicleRates.ToListAsync();
-            var pods = await _context.Pods.Where(c => c.VehicleId != null).Include(c => c.Site).Include(c => c.Vehicle).OrderBy(c => c.SiteId).ToListAsync();
+            var pods = await _context.Pods.Where(c => c.VehicleId != null).Where(c => c.Vehicle.IsReserved == false).Include(c => c.Site).Include(c => c.Vehicle).OrderBy(c => c.SiteId).ToListAsync();
+
             var bookingSearchVM = new BookingSearchVM(
-                vehicles,
                 seats,
                 vehicleRates,
                 pods
                 );
-            return View(bookingSearchVM);
-        }
-
-        /// <summary>
-        /// Displays current (in-progress) bookings for the logged-in user.
-        /// </summary>
-        /// <returns>A view showing in-progress bookings</returns>
-        public async Task<IActionResult> CurrentBookings()
-        {
-            var bookings = await _context.Bookings
-                .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.EndTime > DateTime.Now)
-                .Include(c => c.Vehicle)
-                .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
-                .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
-                .ToListAsync();
-
-            if (!bookings.Any())
-            {
-                _logger.LogInformation("CurrentBookings: No active bookings found for the user.");
-                ViewBag.Message = "You have no current bookings.";
-            }
-
-            return View(bookings);
-        }
-
-        public async Task<IActionResult> PastBookings()
-        {
-            var bookings = await _context.Bookings
-                .Where(c => c.Id == _userManager.GetUserId(User))
-                .Where(c => c.EndTime < DateTime.Now)
-                .Include(c => c.Vehicle)
-                .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
-                .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
-                .ToListAsync();
-
-            return View(bookings);
-        }
-
-        // GET: Bookings/Details/5
-        public async Task<IActionResult> Details(string id)
-        {
-            var booking = await _context.Bookings
-                .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
-                .Include(c => c.EndPod)
-                .ThenInclude(d => d.Site)
-                .Include(c => c.Vehicle)
-                .ThenInclude(d => d.VehicleRate)
-                .FirstOrDefaultAsync(m => m.BookingId == id);
-
-            if (booking == null)
-            {
-                return NotFound();
-            }
-
-            return View(booking);
+            return View("Search", bookingSearchVM);
         }
 
         // GET: Bookings/Create
@@ -127,325 +91,228 @@ namespace DriveHub.Controllers
         {
             _logger.LogInformation($"Received a request to book vehicle {id}");
 
-            // Get a vehicle with its rate, pod and site
+            // Check if user already has an active reservation
+            var hasReservation = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .AnyAsync(c => c.BookingStatus == BookingStatus.Reserved ||
+                            c.BookingStatus == BookingStatus.Unpaid ||
+                            c.BookingStatus == BookingStatus.Collected);
+
+            if (hasReservation)
+            {
+                ViewBag.Message = "User has a current booking";
+                return RedirectToAction(nameof(Current));
+            }
+
+            // Fetch vehicle data including related entities
             var vehicle = await _context.Vehicles
-                .Where(c => c.VehicleId == id)
-                .Include(c => c.Pod)
-                .ThenInclude(c => c.Site)
-                .Include(c => c.VehicleRate)
-                .FirstOrDefaultAsync();
+                .Include(v => v.Pod)
+                .ThenInclude(p => p.Site)
+                .Include(v => v.VehicleRate)
+                .FirstOrDefaultAsync(v => v.VehicleId == id);
 
-            // If we couldn't find the vehicle or it's not currently in a pod then bail out
-            if (vehicle == null || vehicle.Pod == null)
+            if (vehicle == null || vehicle.Pod == null || vehicle.IsReserved)
             {
-                _logger.LogWarning($"Unable to find vehicle or not in pod {id}");
-                return RedirectToAction(nameof(Error));
+                _logger.LogWarning($"Vehicle unavailable or already reserved: {id}");
+                return View(nameof(Error));
             }
 
-            // Get start and empty pods
-            var startPod = vehicle.Pod;
-            var emptyPods = new List<PodVM>();
-            var startPodVM = new PodVM();
-            startPodVM.PodId = startPod.PodId;
-            startPodVM.PodName = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
-            emptyPods.Add(startPodVM);
-
-            var pods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
-            foreach (var pod in pods)
-            {
-                var podVM = new PodVM();
-                podVM.PodId = pod.PodId;
-                podVM.PodName = $"{pod.Site.SiteName} Pod #{pod.PodName}";
-                emptyPods.Add(podVM);
-            }
-
-            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
-            ViewBag.VehicleId = vehicle.VehicleId;
-            ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
-            ViewBag.StartPodId = startPod.PodId;
-            ViewBag.StartSite = $"{startPod.Site.Address}, {startPod.Site.City}";
-            ViewBag.StartSiteLatitude = startPod.Site.Latitude;
-            ViewBag.StartSiteLongitude = startPod.Site.Longitude;
-            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
-            ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
-
-            return View();
+            ViewBag.Vehicle = vehicle;
+            return View(nameof(Create));
         }
 
         // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BookingDto bookingDto)
+        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,StartPodId,QuotedPricePerHour")] ReservationDto reservationDto)
         {
-            _logger.LogInformation($"Received POST to make a booking");
-            _logger.LogInformation(bookingDto.ToString());
+            _logger.LogInformation($"Received POST to make a reservation for vehicle {reservationDto.VehicleId}");
 
-            // Check if booking duration is less than 30 mins
-            var diff = bookingDto.EndTime - bookingDto.StartTime;
-            if (diff.TotalMinutes < 30)
+            try
             {
-                _logger.LogWarning($"The minimum booking duration is 30 mins {bookingDto.StartTime} {bookingDto.EndTime}");
-                ModelState.AddModelError("EndTime", "The minimum booking duration is 30 mins");
-            }
+                // Verify if the user has an active reservation
+                bool hasReservation = await _context.Bookings
+                    .AnyAsync(c => c.Id == _userManager.GetUserId(User) &&
+                                (c.BookingStatus == BookingStatus.Reserved ||
+                                    c.BookingStatus == BookingStatus.Unpaid ||
+                                    c.BookingStatus == BookingStatus.Collected));
 
-            // Check if booking is within one week from today
-            if (bookingDto.StartTime > DateTime.Now.AddDays(7))
-            {
-                _logger.LogWarning($"Bookings cannot be made more than one week in advance. {bookingDto.StartTime}");
-                ModelState.AddModelError("StartTime", "Bookings cannot be made more than one week in advance.");
-            }
+                if (hasReservation)
+                {
+                    ViewBag.Message = "You have a current booking.";
+                    return RedirectToAction(nameof(Current));
+                }
 
-            // Check if start time is in the past
-            if (bookingDto.StartTime < DateTime.Now)
-            {
-                _logger.LogWarning($"Start time must be in the future. {bookingDto.StartTime}");
-                ModelState.AddModelError("StartTime", "Start time must be in the future.");
-            }
+                // Start transaction to ensure atomic operations
+                using var transaction = await _context.Database.BeginTransactionAsync();
 
-            // Check if start time is after end time
-            if (bookingDto.StartTime > bookingDto.EndTime)
-            {
-                _logger.LogWarning($"Start time is after end time {bookingDto.StartTime} {bookingDto.EndTime}");
-                ModelState.AddModelError("StartTime", "Start time must be before end time");
-            }
+                // Fetch vehicle and ensure it exists
+                var vehicle = await _context.Vehicles
+                    .Include(v => v.VehicleRate)
+                    .FirstOrDefaultAsync(v => v.VehicleId == reservationDto.VehicleId);
 
-            // Custom logic to check for overlapping bookings in the database
-            //var conflictingBookings = _context.Bookings
-            //    .Where(b => b.VehicleId == bookingDto.VehicleId &&
-            //                ((b.StartTime <= bookingDto.EndTime && b.StartTime >= bookingDto.StartTime) ||
-            //                 (b.EndTime <= bookingDto.EndTime && b.EndTime >= bookingDto.StartTime)))
-            //    .Any();
 
-            //if (conflictingBookings)
-            //{
-            //    _logger.LogWarning($"The selected vehicle is already booked during this time range. {bookingDto.VehicleId}");
-            //    ModelState.AddModelError("VehicleId", "The selected vehicle is already booked during this time range.");
-            //}
+                if (vehicle == null || vehicle.IsReserved)
+                {
+                    _logger.LogWarning("Vehicle is unavailable or already reserved.");
+                    ViewBag.Message = "This vehicle has already been reserved.";
+                    return View(nameof(Error));
+                }
 
-            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == bookingDto.VehicleId);
-            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == bookingDto.StartPodId);
+                // Fetch the start pod and validate it
+                var startPod = await _context.Pods
+                    .Include(p => p.Site)
+                    .Include(p => p.Vehicle)
+                    .FirstOrDefaultAsync(p => p.PodId == reservationDto.StartPodId);
 
-            // Prevent users from posting illegal data combinations
-            if (vehicle == null ||
-                startPod == null ||
-                vehicle?.VehicleRate.PricePerHour != bookingDto.QuotedPricePerHour ||
-                startPod.VehicleId != vehicle?.VehicleId
+                if (startPod == null || startPod.Vehicle == null)
+                {
+                    _logger.LogError("Invalid start pod or vehicle not in pod.");
+                    return View(nameof(Error));
+                }
+
+                // Prepare and validate the booking
+                var booking = new Booking(
+                    _userManager.GetUserId(User),
+                    reservationDto.VehicleId,
+                    reservationDto.StartPodId,
+                    vehicle.VehicleRate.PricePerHour,
+                    vehicle.VehicleRate.PricePerMinute
                 )
-            {
-                _logger.LogError($"User has posted illegal data {bookingDto}");
-                return RedirectToAction(nameof(Error));
-            }
+                {
+                    Vehicle = vehicle,
+                    StartPod = startPod
+                };
 
-            string? userId = _userManager.GetUserId(User);
-            if (userId == null)
-            {
-                _logger.LogError($"User is not logged in");
-                ModelState.AddModelError("", "Your session has expired. Please login again.");
-            }
+                // Reserve the vehicle
+                vehicle.IsReserved = true;
 
-            if (ModelState.IsValid)
-            {
-                _logger.LogInformation($"Booking is valid");
-                Booking booking = new Booking();
-                booking.BookingId = Guid.NewGuid().ToString();
-                booking.VehicleId = bookingDto.VehicleId;
-                booking.Id = userId;
-                booking.StartPodId = bookingDto.StartPodId;
-                booking.EndPodId = bookingDto.EndPodId;
-                booking.StartTime = bookingDto.StartTime;
-                booking.EndTime = bookingDto.EndTime;
-                booking.PricePerHour = vehicle.VehicleRate.PricePerHour;
-                booking.BookingStatus = BookingStatus.Booked;
+                // Save booking and vehicle updates in a transaction
                 _context.Add(booking);
-                _logger.LogInformation($"Added Booking OK");
-
-                // Remove vehicle from pod
-                startPod.VehicleId = null;
-                startPod.Vehicle = null;
-                _context.Update(startPod);
-
+                _context.Update(vehicle);
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
+                _logger.LogInformation("Reservation successfully created.");
                 return View("Details", booking);
             }
-
-            // -- Return a page with data and errors if the model is not valid --
-            _logger.LogError($"There was an error with booking {bookingDto.ToString()}");
-
-            // Get start pod and empty pods
-            var emptyPods = new List<PodVM>();
-            var startPodVM = new PodVM();
-            startPodVM.PodId = startPod.PodId;
-            startPodVM.PodName = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
-            emptyPods.Add(startPodVM);
-
-            var pods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
-            foreach (var pod in pods)
+            catch (DbUpdateConcurrencyException)
             {
-                var podVM = new PodVM();
-                podVM.PodId = pod.PodId;
-                podVM.PodName = $"{pod.Site.SiteName} Pod #{pod.PodName}";
-                emptyPods.Add(podVM);
+                _logger.LogWarning("Concurrency issue: Vehicle was reserved by another user.");
+                ViewBag.Message = "The vehicle was just reserved by someone else.";
+                return View(nameof(Error));
             }
-
-            // Get the view data
-            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}";
-            ViewBag.VehicleId = vehicle.VehicleId;
-            ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
-            ViewBag.StartPodId = startPod.PodId;
-            ViewBag.StartSite = $"{startPod.Site.Address}, {startPod.Site.City}";
-            ViewBag.StartSiteLatitude = startPod.Site.Latitude;
-            ViewBag.StartSiteLongitude = startPod.Site.Longitude;
-            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
-            ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
-
-            return View(bookingDto);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating reservation.");
+                return View(nameof(Error));
+            }
         }
 
-        // GET: Bookings/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        /// <summary>
+        /// Displays current (in-progress) bookings for the logged-in user.
+        /// </summary>
+        /// <returns>A view showing in-progress bookings</returns>
+        public async Task<IActionResult> Current()
         {
-            var booking = await _context.Bookings.FindAsync(id);
+            var booking = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(
+                    c =>
+                    c.BookingStatus == BookingStatus.Reserved ||
+                    c.BookingStatus == BookingStatus.Unpaid ||
+                    c.BookingStatus == BookingStatus.Collected
+                    )
+                .Include(c => c.Vehicle)
+                .ThenInclude(c => c.VehicleRate)
+                .Include(c => c.StartPod)
+                .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
+                .FirstOrDefaultAsync();
+
+            if (booking == null)
+            {
+                _logger.LogInformation("Current: No active reservation found for the user.");
+                return RedirectToAction(nameof(Search));
+            }
+
+            return View("Details", booking);
+        }
+
+        /// <summary>
+        /// Displays current (in-progress) bookings for the logged-in user.
+        /// </summary>
+        /// <returns>A view showing in-progress bookings</returns>
+        public async Task<IActionResult> Extend(string id)
+        {
+            var booking = await _context.Bookings
+                .Where(c => c.BookingId == id)
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.BookingStatus == BookingStatus.Reserved)
+                .FirstOrDefaultAsync();
+
+            if (booking == null)
+            {
+                _logger.LogWarning("Extend: No active reservation found for the user.");
+                return View(nameof(Error));
+            }
+
+            if (booking.IsExtended)
+            {
+                _logger.LogWarning("Extend: Reservation already extended.");
+                return View(nameof(Error));
+            }
+
+            booking.Expires = booking.Expires.AddMinutes(30);
+            booking.IsExtended = true;
+
+            _context.Update(booking);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Current));
+        }
+
+        public async Task<IActionResult> Past()
+        {
+            var bookings = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.BookingStatus != BookingStatus.Reserved)
+                .Where(c => c.BookingStatus != BookingStatus.Collected)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
+                .Include(c => c.Receipt)
+                .OrderByDescending(c => c.Expires)
+                .ToListAsync();
+
+            return View("Past", bookings);
+        }
+
+        public async Task<IActionResult> Details(string id)
+        {
+            var booking = await _context.Bookings
+                .Include(c => c.StartPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.Vehicle)
+                    .ThenInclude(d => d.VehicleRate)
+                .Include(c => c.Invoice)
+                .Include(c => c.Receipt)
+                .FirstOrDefaultAsync(m => m.BookingId == id);
+
             if (booking == null)
             {
                 return NotFound();
             }
 
-            if (booking.Id != _userManager.GetUserId(User))
-            {
-                return NotFound();
-            }
-
-            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == booking.VehicleId);
-            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == booking.StartPodId);
-
-            if (vehicle == null || startPod == null)
-            {
-                return NotFound();
-            }
-
-            // Get start and empty pods
-            var emptyPods = new List<PodVM>();
-
-            var pods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
-            foreach (var pod in pods)
-            {
-                var podVM = new PodVM();
-                podVM.PodId = pod.PodId;
-                podVM.PodName = $"{pod.Site.SiteName} Pod #{pod.PodName}";
-                emptyPods.Add(podVM);
-            }
-
-            // Create data object
-            var editBookingDto = new EditBookingDto();
-            editBookingDto.BookingId = booking.BookingId;
-            editBookingDto.VehicleId = booking.VehicleId;
-            editBookingDto.StartPodId = booking.StartPodId;
-            editBookingDto.EndPodId = booking.EndPodId;
-            editBookingDto.StartTime = booking.StartTime;
-            editBookingDto.EndTime = booking.EndTime;
-            editBookingDto.QuotedPricePerHour = booking.PricePerHour;
-
-            ViewBag.BookingId = booking.BookingId;
-            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
-            ViewBag.VehicleId = vehicle.VehicleId;
-            ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
-            ViewBag.StartPodId = startPod.PodId;
-            ViewBag.StartSite = $"{startPod.Site.Address}, {startPod.Site.City}";
-            ViewBag.StartSiteLatitude = startPod.Site.Latitude;
-            ViewBag.StartSiteLongitude = startPod.Site.Longitude;
-            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
-            ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
-
-            return View(editBookingDto);
+            return View("Details", booking);
         }
 
-        // POST: Bookings/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, EditBookingDto editBookingDto)
-        {
-            if (id != editBookingDto.BookingId)
-            {
-                return NotFound();
-            }
-
-            var booking = _context.Bookings.Find(id);
-            if (booking == null)
-            {
-                return NotFound();
-            }
-
-            var vehicle = await _context.Vehicles.Include(c => c.VehicleRate).FirstOrDefaultAsync(c => c.VehicleId == booking.VehicleId);
-            var startPod = await _context.Pods.Include(c => c.Site).FirstOrDefaultAsync(c => c.PodId == booking.StartPodId);
-
-            // Check if booking duration is less than 30 mins
-            var diff = editBookingDto.EndTime - editBookingDto.StartTime;
-            if (diff.TotalMinutes < 30)
-            {
-                _logger.LogWarning($"The minimum booking duration is 30 mins {editBookingDto.StartTime} {editBookingDto.EndTime}");
-                ModelState.AddModelError("EndTime", "The minimum booking duration is 30 mins");
-            }
-
-            // Check if booking is within one week from today
-            if (editBookingDto.StartTime > DateTime.Now.AddDays(7))
-            {
-                _logger.LogWarning($"Bookings cannot be made more than one week in advance. {editBookingDto.StartTime}");
-                ModelState.AddModelError("StartTime", "Bookings cannot be made more than one week in advance.");
-            }
-
-            // Check if start time is in the past
-            if (editBookingDto.StartTime < DateTime.Now)
-            {
-                _logger.LogWarning($"Start time must be in the future. {editBookingDto.StartTime}");
-                ModelState.AddModelError("StartTime", "Start time must be in the future.");
-            }
-
-            // Check if start time is after end time
-            if (editBookingDto.StartTime > editBookingDto.EndTime)
-            {
-                _logger.LogWarning($"Start time is after end time {editBookingDto.StartTime} {editBookingDto.EndTime}");
-                ModelState.AddModelError("StartTime", "Start time must be before end time");
-            }
-
-            if (ModelState.IsValid)
-            {
-                booking.EndPod = await _context.Pods.FirstOrDefaultAsync(c =>c.PodId == editBookingDto.EndPodId);
-                booking.StartTime = editBookingDto.StartTime;
-                booking.EndTime = editBookingDto.EndTime;
-                booking.BookingStatus = BookingStatus.Edited;
-                _context.Update(booking);
-                await _context.SaveChangesAsync();
-                return View("Details", booking);
-            }
-
-            // Get start pod and empty pods
-            var emptyPods = new List<PodVM>();
-            var pods = await _context.Pods.Where(c => c.VehicleId == null).Include(c => c.Site).ToListAsync();
-            foreach (var pod in pods)
-            {
-                var podVM = new PodVM();
-                podVM.PodId = pod.PodId;
-                podVM.PodName = $"{pod.Site.SiteName} Pod #{pod.PodName}";
-                emptyPods.Add(podVM);
-            }
-
-            ViewBag.BookingId = booking.BookingId;
-            ViewBag.Vehicle = $"{vehicle.Name} the {vehicle.Make} {vehicle.Model}. {vehicle.RegistrationPlate}";
-            ViewBag.VehicleId = vehicle.VehicleId;
-            ViewBag.StartPod = $"{startPod.Site.SiteName} Pod #{startPod.PodName}";
-            ViewBag.StartPodId = startPod.PodId;
-            ViewBag.StartSite = $"{startPod.Site.Address}, {startPod.Site.City}";
-            ViewBag.StartSiteLatitude = startPod.Site.Latitude;
-            ViewBag.StartSiteLongitude = startPod.Site.Longitude;
-            ViewBag.PricePerHour = vehicle.VehicleRate.PricePerHour;
-            ViewData["Pods"] = new SelectList(emptyPods, "PodId", "PodName", startPod.PodId);
-
-            return View(editBookingDto);
-        }
-
-        // GET: Bookings/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Cancel(string id)
         {
             if (id == null)
             {
@@ -453,31 +320,204 @@ namespace DriveHub.Controllers
             }
 
             var booking = await _context.Bookings
-                .Include(b => b.ApplicationUser)
-                .Include(b => b.Vehicle)
-                .FirstOrDefaultAsync(m => m.BookingId.ToString() == id);
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(m => m.BookingId == id)
+                .Include(c => c.StartPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.Vehicle)
+                    .ThenInclude(d => d.VehicleRate)
+                .FirstOrDefaultAsync();
 
             if (booking == null)
             {
                 return NotFound();
             }
 
-            return View(booking);
+            return View("Cancel", booking);
         }
 
-        // POST: Bookings/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Cancel")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(string id)
+        public async Task<IActionResult> CancelConfirmed(string id)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"CancelConfirmed: Cancelling booking {id}.");
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var booking = await _context.Bookings
+                .FindAsync(id);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            if (booking.BookingStatus != BookingStatus.Reserved)
+            {
+                return NotFound();
+            }
+
+            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(c => c.VehicleId == booking.VehicleId);
+
+            if (vehicle == null)
+            {
+                return View(nameof(Error));
+            }
+
+            booking.BookingStatus = BookingStatus.Cancelled;
+            vehicle.IsReserved = false;
+
+            _context.Update(booking);
+            _context.Update(vehicle);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", "Bookings", new { id = booking.BookingId });
         }
 
+        /// <summary>
+        /// Pay an invoice
+        /// </summary>
+        /// <returns>StatusCodeResult</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Return(string id)
+        public async Task<IActionResult> Pay(string BookingId)
         {
-            return View();
+            _logger.LogInformation($"Pay: Starting payment process for booking {BookingId}.");
+
+            if (string.IsNullOrWhiteSpace(BookingId))
+            {
+                _logger.LogWarning("Pay: BookingId is null or empty.");
+                return View(nameof(Error));
+            }
+
+            var booking = await _context.Bookings
+                .AsNoTracking()
+                .Where(c => c.BookingId == BookingId)
+                .Include(c => c.Vehicle)
+                    .ThenInclude(c => c.VehicleRate)
+                .Include(c => c.Invoice)
+                .FirstOrDefaultAsync();
+
+            if (booking == null || booking.Invoice == null)
+            {
+                _logger.LogWarning($"Pay: Booking not found for BookingId: {BookingId}");
+                return View(nameof(Error));
+            }
+
+            var apiKey = _configuration.GetValue<string>("StripeKey");
+            var client = new StripeClient(apiKey);
+            var domain = _configuration.GetValue<string>("Domain");
+
+            var options = new SessionCreateOptions
+            {
+                LineItems = new List<SessionLineItemOptions>
+                {
+                    new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            Currency = "aud", // Australian dollars
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = $"DriveHub - {booking.BookingId}",
+                                Description = "Payment for your Drivehub ride",
+                            },
+                            UnitAmount = (long)(booking.Invoice.Amount * 100),
+                        },
+                        Quantity = 1,
+                    },
+                },
+                Mode = "payment",
+                SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
+                CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
+            };
+            try
+            {
+                var service = new SessionService(client);
+                Session session = service.Create(options);
+                Response.Headers.Append("Location", session.Url);
+                _logger.LogInformation("Pay: Stripe session created successfully.");
+                return new StatusCodeResult(303);
+            }
+            catch (StripeException ex)
+            {
+                _logger.LogError(ex, "Pay: Error creating Stripe session.");
+                return View(nameof(Error));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Pay: Unexpected error.");
+                return View(nameof(Error));
+            }
+        }
+
+        public async Task<IActionResult> PrintInvoice(int id)
+        {
+            Settings.License = LicenseType.Community;
+
+            var booking = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.Invoice.InvoiceNumber == id)
+                .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
+                .Include(c => c.Receipt)
+                .FirstOrDefaultAsync();
+
+            if (booking == null || booking.Receipt == null)
+            {
+                _logger.LogWarning($"Receipt not found: {id}");
+                return NotFound();
+            }
+
+            _logger.LogInformation($"Generated invoice: {id}");
+
+            try
+            {
+                var doc = new InvoiceDocument(booking);
+                var pdf = doc.GeneratePdf();
+                return File(pdf, "application/pdf", $"DriveHub Inv{id}.pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error generating invoice: {id}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> PrintReport()
+        {
+            Settings.License = LicenseType.Community;
+
+            var bookings = await _context.Bookings
+                .Where(c => c.Id == _userManager.GetUserId(User))
+                .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Include(c => c.Vehicle)
+                .Include(c => c.StartPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.EndPod)
+                    .ThenInclude(d => d.Site)
+                .Include(c => c.Invoice)
+                .Include(c => c.Receipt)
+                .ToListAsync();
+
+            try
+            {
+                var doc = new BookingsDocument(bookings);
+                var pdf = doc.GeneratePdf();
+                return File(pdf, "application/pdf", $"DriveHub Booking Report.pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error generating booking report");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         private bool BookingExists(string id)

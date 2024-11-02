@@ -10,13 +10,13 @@
       "connectionId": "vehiclephotos",
       "dynamicId": null
     },
-    "mssql2": {
-      "type": "mssql",
-      "connectionId": "DriveHubAdminDb"
-    },
     "mssql1": {
       "type": "mssql",
       "connectionId": "DriveHubDb"
+    },
+    "mssql2": {
+      "type": "mssql",
+      "connectionId": "DriveHubAdminDb"
     }
   }
 }

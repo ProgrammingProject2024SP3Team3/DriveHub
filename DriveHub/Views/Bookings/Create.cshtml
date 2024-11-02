@@ -1,178 +1,105 @@
-@model DriveHub.Models.Dto.BookingDto
+@model DriveHub.Models.Dto.ReservationDto
 
 @{
-    ViewData["Title"] = "Make a booking";
+    ViewData["Title"] = "Make a reservation";
+    var Vehicle = ViewBag.Vehicle;
 }
 
-<h1>@ViewBag.Title</h1>
-<p>Make a new booking for @ViewBag.Vehicle</p>
-<div class="mb-3" style="background-color: #f8f9fa;">
-    <div class="p-2 fw-bold fs-4" style="background-color: #FFBA17;">
-        Booking Details
-    </div>
-    <div class="d-flex align-items-center mb-3">
-        <i class="bi bi-geo-alt-fill fs-2 me-3"></i>
-        <div>
-            <p class="mb-0">Pickup DriveHub @ViewBag.StartPod</p>
-            <small>@ViewBag.StartSite</small>
+<div class="booking-info" style="background-color: #f9f9fc; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); border: 1px solid #dee2e6;">
+    <h1 class="" style="">Reserve a Vehicle</h1>
+    <p class="text-center">Reserve @Vehicle.Name the @Vehicle.Make @Vehicle.Model for the next hour</p>
+
+    <div class="mb-3" style="background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+        <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17; border-radius: 8px 8px 0 0;">Creating a Reservation</div>
+
+        <div class="d-flex align-items-center p-3 flex-wrap">
+            <i class="bi bi-geo-alt-fill fs-2 me-3" style="color: #00A8E8;"></i>
+            <div>
+                <p class="mb-0">Pickup at DriveHub @Vehicle.Pod.Site.SiteName Pod #@Vehicle.Pod.PodName</p>
+                <small>@Vehicle.Pod.Site.Address, @Vehicle.Pod.Site.City</small>
+            </div>
+        </div>
+
+        <div class="row p-3">
+            <!-- Left Content Column -->
+            <div class="col-lg-6 col-md-12 mb-3">
+                <ul class="list-group" style="border-radius: 8px; overflow: hidden; border: 1px solid #dee2e6;">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Vehicle:</strong> <span>@Vehicle.Name the @Vehicle.Make @Vehicle.Model</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Registration:</strong> <span>@Vehicle.RegistrationPlate</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Year:</strong> <span>@Vehicle.Year</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Seats:</strong> <span>@Vehicle.Seats</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Category:</strong> <span>@Vehicle.VehicleRate.Description</span>
+                    </li>
+                </ul>
+                <div class="text-end mt-3">
+                    <a asp-action="Search" class="my-2 btn btn-blue fw-bold" style="border-radius: 8px;">Find another car close by?</a>
+                </div>
+            </div>
+
+            <!-- Car Image Section -->
+            <div class="col-lg-6 col-md-12 d-flex justify-content-center align-items-center mb-3">
+                <img class="img-fluid rounded"
+                     src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Vehicle.VehicleId}.jpg"
+                     style="max-width: 100%; height: auto; object-fit: cover; transition: transform 0.3s ease-in-out; border-radius: 8px; max-height: 300px;"
+                     onmouseover="this.style.transform='scale(1.05)'"
+                     onmouseout="this.style.transform='scale(1)'">
+            </div>
         </div>
     </div>
-</div>
-<form asp-action="Create">
-    <div class="row">
-        <div class="col p-3">
-            <label class="form-label">Car</label>
-            <div class="form-control">@ViewBag.Vehicle</div>
-            <input type="hidden" asp-for="VehicleId" value="@ViewBag.VehicleId" />
-            <span asp-validation-for="VehicleId" class="text-danger"></span>
-            <a asp-action="Search" class="small text-right mt-1 btn btn-primary">Find another car close by?</a>
-        </div>
-        <div class="col container-fluid pb-3">
-            <img class="img-fluid" src="https://drivehubstorage.blob.core.windows.net/vehicles/@{
-                @ViewBag.VehicleId
-}.jpg" style="max-width:350px;">
+
+    <div class="mb-3">
+        <div class="p-2 fw-bold fs-4 text-center" style="background-color: #FFBA17; border-radius: 8px;">Booking Cost</div>
+        <div class="text-center bg-white p-3 pb-0" style="border: 1px solid #dee2e6; border-radius: 8px;">
+            <p class="mb-0">Per Hour (pro-rata):</p>
+            <p class="fw-bold fs-1">$<span id="price-per-hour">@Vehicle.VehicleRate.PricePerHour.ToString("F2")/hr</span></p>
         </div>
     </div>
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="StartPodId" value="@ViewBag.StartPodId" />
-    <input type="hidden" asp-for="QuotedPricePerHour" value="@ViewBag.PricePerHour" />
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label asp-for="StartTime" class="control-label">Start time</label>
-            <input asp-for="StartTime" class="form-control" id="StartTime" />
-            <span asp-validation-for="StartTime" class="text-danger"></span>
-        </div>
-        <div class="col-md-6">
-            <label asp-for="EndTime" class="control-label">End time</label>
-            <input asp-for="EndTime" class="form-control" id="EndTime" />
-            <span asp-validation-for="EndTime" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="mt-3">
-        <label for="EndPodId" class="control-label">Return Pod</label>
-        <select asp-for="EndPodId" class="form-select" id="EndPodId" asp-items="ViewBag.Pods"></select>
-        <span asp-validation-for="EndPodId" class="text-danger"></span>
-    </div>
-    <div class="booking-section mb-3">
-        <div class="p-2 fw-bold fs-4" style="background-color: #FFBA17;">Booking Cost</div>
-        <div class="cost-section text-center bg-white p-3" style="border: 1px solid #dee2e6;">
-            <p class="mb-0">Per Hour:</p>
-            <p class="fw-bold fs-1">$<span id="price-per-hour">@ViewBag.PricePerHour.ToString("F2")</span><hr></p>
-            <hr />
-            <p class="mb-0">Total Cost:</p>
-            <p class="fw-bold fs-1 mb-6" id="total-cost">$0</p>
-            <span id="time-validation" class="text-danger"></span>
-        </div>
-    </div>
+
     <div class="text-center">
-        <a asp-action="Search" id="cancel-button" class="btn btn-danger mb-4 fw-bold text-white fs-4">Cancel</a>
-        <input type="submit" value="Create" id="create-button" class="d-none btn btn-primary mb-4 fw-bold text-white fs-4" />
+        <form asp-action="Create">
+            <input type="hidden" asp-for="VehicleId" value="@Vehicle.VehicleId" />
+            <span asp-validation-for="VehicleId" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="StartPodId" value="@Vehicle.Pod.PodId" />
+            <input type="hidden" asp-for="QuotedPricePerHour" value="@Vehicle.VehicleRate.PricePerHour" />
+            <input type="submit" value="Create Reservation" class="btn btn-success mb-4 fw-bold fs-4" style="border-radius: 8px;"/>
+        </form>
     </div>
-</form>
-<div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa;" class="col-12"></div>
 
-<script>
-    // Format the price above to AUD using the locale, style, and currency.
-    let AUDollar = new Intl.NumberFormat('en-AU', {
-        style: 'currency',
-        currency: 'AUD',
-    });
-    var quotedPricePerHour = @ViewBag.PricePerHour;
-    var quotedPrice = 0;
-    var startTime;
-    var endTime;
+    <div class="text-center p-2 fw-bold fs-4" style="background-color: #FFBA17; border-radius: 8px;">Pickup Location</div>
+    <div id="map" style="height: 400px; width: 100%; background-color: #f8f9fa; border-radius: 8px;"></div>
+</div>
 
-    // window.onload = function(){
-    document.querySelector('#StartTime').addEventListener('change', function () {
-        startTime = this.value;
-        console.log(startTime);
 
-        if (endTime != null) {
-            var startDateTime = new Date(startTime);
-            var endDateTime = new Date(endTime);
-            if (endDateTime < startDateTime) {
-                document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
-                document.getElementById("total-cost").innerHTML = "$0.00";
-                document.getElementById("time-validation").innerHTML = "Start time must be before end time";
-                document.getElementById("create-button").classList = "text-center d-none";
-                return;
+@{
+    @section Scripts {
+        <script>
+            function initMap() {
+                // Init Google Map
+                let map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: @Vehicle.Pod.Site.Latitude, lng: @Vehicle.Pod.Site.Longitude },
+                    zoom: 19,
+                    mapTypeId: "roadmap",
+                    mapId: "DRIVEHUB_CREATE"
+                });
+                new google.maps.marker.AdvancedMarkerElement({
+                    map,
+                    title: "Vehicle",
+                    position: { lat: @Vehicle.Pod.Site.Latitude, lng: @Vehicle.Pod.Site.Longitude }
+                })
             }
-            if (startDateTime < new Date()) {
-                document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
-                document.getElementById("total-cost").innerHTML = "$0.00";
-                document.getElementById("time-validation").innerHTML = "Start time must be in the future";
-                document.getElementById("create-button").classList = "text-center d-none";
-                return;
-            }
-            var diff = Math.abs(new Date(startTime) - new Date(endTime));
-            let minutes = Math.floor((diff / 1000) / 60);
-            quotedPrice = minutes * quotedPricePerHour / 60;
-            console.log("price = " + quotedPrice);
-            if (quotedPrice > 0) {
-                document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
-                document.getElementById("time-validation").innerHTML = "";
-                document.getElementById("total-cost").classList = "fw-bold fs-1";
-                document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
-            }
-        }
-    });
-
-    document.querySelector('#EndTime').addEventListener('change', function () {
-        endTime = this.value;
-        console.log(endTime);
-
-        if (startTime != null) {
-            var startDateTime = new Date(startTime);
-            var endDateTime = new Date(endTime);
-            if (endDateTime < startDateTime) {
-                document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
-                document.getElementById("total-cost").innerHTML = "$0.00";
-                document.getElementById("time-validation").innerHTML = "Start time must be before end time";
-                document.getElementById("create-button").classList = "text-center d-none";
-                return;
-            }
-            if (startDateTime < new Date()) {
-                document.getElementById("total-cost").classList = "text-danger fw-bold fs-1";
-                document.getElementById("total-cost").innerHTML = "$0.00";
-                document.getElementById("time-validation").innerHTML = "Start time must be in the future";
-                document.getElementById("create-button").classList = "text-center d-none";
-                return;
-            }
-            var diff = Math.abs(new Date(startTime) - new Date(endTime));
-            let minutes = Math.floor((diff / 1000) / 60);
-            quotedPrice = minutes * quotedPricePerHour / 60;
-            console.log("price = " + quotedPrice);
-            if (quotedPrice > 0) {
-                document.getElementById("total-cost").innerHTML = `${AUDollar.format(quotedPrice)}`;
-                document.getElementById("time-validation").innerHTML = "";
-                document.getElementById("total-cost").classList = "fw-bold fs-1";
-                document.getElementById("create-button").classList = "btn btn-primary mb-4 fw-bold text-white fs-4";
-            }
-        }
-    });
-</script>
-<script>
-    function initMap() {
-        // Init Google Map
-        let map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude },
-            zoom: 19,
-            mapTypeId: "roadmap",
-            mapId: "DRIVEHUB_CREATE"
-        });
-        new google.maps.marker.AdvancedMarkerElement({
-            map,
-            title: "Vehicle",
-            position: { lat: @ViewBag.StartSiteLatitude, lng: @ViewBag.StartSiteLongitude }
-        })
-    }
-</script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
-        defer>
-</script>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBRV0yLBAMIA53_1Y3_TW-HD-RPgTDdxc&callback=initMap&v=weekly&libraries=marker,places,geometry&loading=async"
+                defer>
+        </script>
     }
 }

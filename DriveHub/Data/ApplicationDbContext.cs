@@ -14,6 +14,9 @@ namespace DriveHub.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleRate> VehicleRates { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<Receipt> Receipts { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +46,10 @@ namespace DriveHub.Data
 
             modelBuilder.Entity<VehicleRate>()
                 .Property(c => c.PricePerHour)
+                .HasColumnType("Money");
+
+            modelBuilder.Entity<VehicleRate>()
+                .Property(c => c.PricePerMinute)
                 .HasColumnType("Money");
 
             modelBuilder.Entity<Vehicle>()
@@ -97,12 +104,42 @@ namespace DriveHub.Data
                 .Property(c => c.PricePerHour)
                 .HasColumnType("Money");
 
+            modelBuilder.Entity<Booking>()
+                .Property(c => c.PricePerMinute)
+                .HasColumnType("Money");
+
             modelBuilder
                 .Entity<Booking>()
                 .Property(e => e.BookingStatus)
                 .HasConversion(
                     v => v.ToString(),
                     v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
+
+            modelBuilder
+                .Entity<Booking>()
+                .HasOne(c => c.Invoice)
+                .WithOne(c => c.Booking);
+
+            modelBuilder
+                .Entity<Booking>()
+                .HasOne(c => c.Receipt)
+                .WithOne(c => c.Booking);
+
+            modelBuilder.Entity<Invoice>()
+                .HasOne(c => c.Booking)
+                .WithOne(c => c.Invoice);
+
+            modelBuilder.Entity<Invoice>()
+                .Property(c => c.Amount)
+                .HasColumnType("Money");
+
+            modelBuilder.Entity<Receipt>()
+                .HasOne(c => c.Booking)
+                .WithOne(c => c.Receipt);
+
+            modelBuilder.Entity<Receipt>()
+                .Property(c => c.Amount)
+                .HasColumnType("Money");
         }
     }
 }

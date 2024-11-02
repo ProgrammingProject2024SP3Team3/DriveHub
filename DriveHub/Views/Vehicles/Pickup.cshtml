@@ -1,0 +1,143 @@
+﻿@model DriveHubModel.Booking
+@using DriveHubModel
+@{
+    ViewData["Title"] = "Vehicle Pick up";
+}
+
+<div class="container px-3 py-5">
+<!-- Success Checkmark and Title -->
+<div class="text-center mb-4">
+    <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-lg" 
+         style="width: 70px; height: 70px; font-size: 2rem; background-color: #28a745; color: white;">
+        <i class="bi bi-check2"></i>
+    </div>
+    <h1 class="fw-bold text-dark mt-4 fs-3 fs-md-4 fs-lg-5">Vehicle Picked Up!</h1>
+    <p class="text-muted fs-5 fs-md-4">
+        You have successfully picked up 
+        <span class="fw-bold" style="color: #00A8E8;">@Model.Vehicle.Name</span>, the 
+        <span class="fw-bold">@Model.Vehicle.Make</span> <span class="fw-bold">@Model.Vehicle.Model</span>.
+        <br class="d-none d-md-block"> <!-- Line break only on larger screens -->
+        Your booking has now started, and the car is ready for use.
+    </p>
+</div>
+
+    <!-- Pick-up Details Card -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: #f1f5f9;">
+        <div class="card-body p-4">
+            <h3 class="text-center h4 mb-4" style="color: #28a745;">Pick-up Details</h3>
+            <div class="row g-3 align-items-start">
+                <div class="col-md-6">
+                    <img src="https://drivehubstorage.blob.core.windows.net/vehicles/@{@Model.Vehicle.VehicleId}.jpg" 
+                         alt="Vehicle Image" class="img-fluid rounded-3 shadow-sm w-100" style="object-fit: cover;">
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex flex-column flex-md-row justify-content-between py-2 border-bottom">
+                        <span class="fw-semibold text-secondary">Start Time</span>
+                        <span class="text-dark text-md-end">@Model.StartTime</span>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-between py-2 border-bottom">
+                        <span class="fw-semibold text-secondary">Pick-up Location</span>
+                        <span class="text-dark text-md-end">@Model.StartPod.Site.SiteName Pod #@Model.StartPod.PodName</span>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-between py-2 border-bottom">
+                        <span class="fw-semibold text-secondary">Vehicle</span>
+                        <span class="text-dark text-md-end">@Model.Vehicle.Name the @Model.Vehicle.Make @Model.Vehicle.Model</span>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-between py-2 border-bottom">
+                        <span class="fw-semibold text-secondary">License</span>
+                        <span class="text-dark text-md-end">@Model.Vehicle.RegistrationPlate</span>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-between py-2 border-bottom">
+                        <span class="fw-semibold text-secondary">Colour</span>
+                        <span class="text-dark text-md-end">@Model.Vehicle.Colour</span>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-between py-2">
+                        <span class="fw-semibold text-secondary">Year</span>
+                        <span class="text-dark text-md-end">@Model.Vehicle.Year</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pick-up Instructions -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background-color: #f1f5f9;">
+        <div class="card-body p-4">
+            <h3 class="text-center h4 mb-4" style="color: #28a745;">Pick-up Instructions</h3>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="px-3">
+                        <div class="mb-3">
+                            <h5 class="fw-bold mb-1" style="color: #00A8E8;">🔑 Car Keys</h5>
+                            <p class="text-muted">
+                                Keys are attached near the steering wheel. If you can't find a key, your car may have a keyless ignition - just press the "start" button to get going.
+                            </p>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1" style="color: #00A8E8;">🎯 End Journey</h5>
+                            <p class="text-muted">
+                                To end the journey, drop off the vehicle at one of our many DriveHub pods throughout Melbourne.
+                                Scan the Drop-off QR code and follow the prompts to end the journey.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <img src="https://drivehubstorage.blob.core.windows.net/website/pickup.jpg" 
+                         alt="Booking Instructions" class="img-fluid rounded-3 shadow-sm w-100" style="object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="container text-center mb-4">
+        <div class="row justify-content-center g-3">
+            <div class="col-12 col-md-5 d-grid">
+                <a asp-controller="Vehicles" asp-action="Dropoff" asp-route-id="@Model.VehicleId" 
+                   class="btn btn-md fw-bold text-white shadow-sm" 
+                   style="background-color: #28a745; padding: 10px; border-radius: 8px; font-size: 1rem;"
+                   onmouseover="this.style.backgroundColor='#218838'; this.style.color='white';"
+                   onmouseout="this.style.backgroundColor='#28a745'; this.style.color='white';">
+                    Drop off vehicle
+                </a>
+            </div>
+            <div class="col-12 col-md-5 d-grid">
+                <a asp-controller="Bookings" asp-action="Details" asp-route-id="@Model.BookingId" 
+                   class="btn btn-md fw-bold text-white shadow-sm" 
+                   style="background-color: #17a2b8; padding: 10px; border-radius: 8px; font-size: 1rem;"
+                   onmouseover="this.style.backgroundColor='#117a8b'; this.style.color='white';"
+                   onmouseout="this.style.backgroundColor='#17a2b8'; this.style.color='white';">
+                    Booking Details
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="card border-0 shadow-sm" style="border-radius: 12px; background-color: #eaf5fb;">
+        <div class="card-body p-4">
+            <h3 class="text-center h5 mb-3" style="color: #28a745;">Need Help?</h3>
+            <div class="d-grid gap-3 col-md-8 mx-auto">
+                <a asp-controller="Bookings" asp-action="Index" 
+                   class="btn fw-semibold shadow-sm" 
+                   style="padding: 10px; border: 2px solid #00A8E8; border-radius: 8px; background: rgba(0, 168, 232, 0.2); color: #00A8E8;"
+                   onmouseover="this.style.backgroundColor='#00A8E8'; this.style.color='white';"
+                   onmouseout="this.style.backgroundColor='rgba(0, 168, 232, 0.2)'; this.style.color='#00A8E8';">
+                    How does DriveHub work?
+                </a>
+                <a asp-controller="Home" asp-action="ContactUs" 
+                   class="btn fw-semibold shadow-sm" 
+                   style="padding: 10px; border: 2px solid #00A8E8; border-radius: 8px; color: #00A8E8;"
+                   onmouseover="this.style.backgroundColor='#00A8E8'; this.style.color='white';"
+                   onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00A8E8';">
+                    24/7 Support
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+}

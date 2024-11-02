@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - DriveHub</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/master.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DriveHub.styles.css" asp-append-version="true" />
     <!-- Google fonts-->
     <link href="https://fonts.googleapis.com/css2?family=Protest+Guerrilla&display=swap" rel="stylesheet">
@@ -36,13 +37,13 @@
                         <a class="nav text-light" style="text-decoration: none;" asp-area="" asp-controller="Bookings" asp-action="Index">Bookings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav text-light" style="text-decoration: none;" asp-area="" asp-controller="Home" asp-action="ContactUs">Contact Us</a>
+                        <a class="nav text-light" style="text-decoration: none;" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav text-light" style="text-decoration: none;" asp-area="" asp-controller="Home" asp-action="About">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav text-light" style="text-decoration: none;" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav text-light" style="text-decoration: none;" asp-area="" asp-controller="Home" asp-action="ContactUs">Contact Us</a>
                     </li>
                 </ul>
                 <partial name="_LoginPartial" />
@@ -56,7 +57,7 @@
                 <div class="col-xs-0 col-md-1 col-lg-2"></div>
                 <div class="col-xs-12 col-md-10 col-lg-8">
                     @RenderBody()
-                </<div>
+                </div>
                 <div class="col-xs-0 col-md-1 col-lg-2"></div>
             </div>
         </main>
