@@ -67,10 +67,13 @@ namespace DriveHub.Controllers
                         )
                     .Any();
 
-                if (hasReservation) return RedirectToAction("Details", "Bookings", new { id });
+                if (hasReservation)
+                    return RedirectToAction("Details", "Bookings", new { id });
 
-                if (!vehicle.IsReserved) return RedirectToAction("Create", "Bookings", new { id });
-                else return RedirectToAction("Search", "Bookings");
+                if (!vehicle.IsReserved)
+                    return RedirectToAction("Create", "Bookings", new { id });
+
+                return RedirectToAction("Search", "Bookings");
             }
 
             _logger.LogInformation($"Pickup OK - {booking.BookingId}");
@@ -80,12 +83,25 @@ namespace DriveHub.Controllers
             var startPod = booking.StartPod;
             startPod.Vehicle = null;
 
-            _context.Update(booking);
-            _context.Update(startPod);
-            _context.Update(vehicle);
+            // Using a transaction to ensure data consistency
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.Update(booking);
+                    _context.Update(startPod);
+                    _context.Update(vehicle);
 
-            await _context.SaveChangesAsync();
-
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred during vehicle pickup");
+                    await transaction.RollbackAsync();
+                    return View(nameof(Error));
+                }
+            }
             return View("Pickup", booking);
         }
 
@@ -130,7 +146,7 @@ namespace DriveHub.Controllers
 
             if (!emptyPods.Any())
             {
-                _logger.LogWarning("No empty pods available for drop-off.");
+                _logger.LogError("No empty pods available for drop-off.");
                 return View(nameof(Error));
             }
 
