@@ -8,7 +8,7 @@ namespace DriveHubTests
         VehiclesTestFixtures Fixture;
 
         [Fact]
-        public async Task Set3_UserA_Dropoff_ShouldReturnDetails()
+        public async Task Set3_UserA_Dropoff_ShouldReturnError()
         {
             // Arrange
             Fixture = new VehiclesTestFixtures(3, "usera");
