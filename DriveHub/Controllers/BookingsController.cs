@@ -395,6 +395,7 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .AsNoTracking()
                 .Where(c => c.BookingId == BookingId)
+                .Where(c => c.BookingStatus == BookingStatus.Unpaid)
                 .Include(c => c.Vehicle)
                     .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.Invoice)
