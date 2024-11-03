@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DriveHubModel;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace DriveHubTests
@@ -8,7 +9,7 @@ namespace DriveHubTests
         VehiclesTestFixtures Fixture;
 
         [Fact]
-        public async Task Set6_UserA_Pickup_ShouldRedirectToSearch()
+        public async Task Set6_UserA_Pickup_ShouldReturnCreate()
         {
             // Arrange
             Fixture = new VehiclesTestFixtures(6, "usera");
@@ -18,7 +19,11 @@ namespace DriveHubTests
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Search", redirectToActionResult.ActionName);
+            Assert.Equal("Create", redirectToActionResult.ActionName);
+
+            Assert.NotNull(redirectToActionResult.RouteValues);
+            Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
+            Assert.Equal("cac6a77c-59fd-4d0e-b557-9a3230a79e9a", redirectToActionResult.RouteValues["id"]);
         }
 
         [Fact]
@@ -36,7 +41,7 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set6_UserB_Pickup_ShouldReturnSearch()
+        public async Task Set6_UserB_Pickup_ShouldReturnCreate()
         {
             // Arrange
             Fixture = new VehiclesTestFixtures(6, "userb");
@@ -46,7 +51,10 @@ namespace DriveHubTests
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Search", redirectToActionResult.ActionName);
+            Assert.Equal("Create", redirectToActionResult.ActionName);
+            Assert.NotNull(redirectToActionResult.RouteValues);
+            Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
+            Assert.Equal("cac6a77c-59fd-4d0e-b557-9a3230a79e9a", redirectToActionResult.RouteValues["id"]);
         }
 
         [Fact]

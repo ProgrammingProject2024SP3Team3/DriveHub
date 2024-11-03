@@ -9,7 +9,7 @@ namespace DriveHubTests
 
 
         [Fact]
-        public async Task Set4_UserA_Pickup_ShouldRedirectToSearch()
+        public async Task Set4_UserA_Pickup_ShouldRedirectToCreate()
         {
             // Arrange
             Fixture = new VehiclesTestFixtures(4, "usera");
@@ -19,7 +19,8 @@ namespace DriveHubTests
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Search", redirectToActionResult.ActionName);
+            Assert.Equal("Create", redirectToActionResult.ActionName);
+
         }
 
         [Fact]
@@ -37,6 +38,20 @@ namespace DriveHubTests
         }
 
         [Fact]
+        public async Task Set4_UserB_Pickup_ShouldReturnCreate()
+        {
+            // Arrange
+            Fixture = new VehiclesTestFixtures(4, "userb");
+
+            // Act
+            var result = await Fixture.VehiclesController.Pickup("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
+
+            // Assert
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Create", redirectToActionResult.ActionName);
+        }
+
+        [Fact]
         public async Task Set4_UserB_Dropoff_ShouldReturnError()
         {
             // Arrange
@@ -48,19 +63,6 @@ namespace DriveHubTests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
-        }
-
-        [Fact]
-        public async Task Set4_UserB_Pickup_ShouldReturnSearch()
-        {
-            // Arrange
-            Fixture = new VehiclesTestFixtures(4, "userb");
-
-            // Act
-            var result = await Fixture.VehiclesController.Pickup("cac6a77c-59fd-4d0e-b557-9a3230a79e9a");
-
-            // Assert
-            Assert.IsType<RedirectToActionResult>(result);
         }
     }
 }
