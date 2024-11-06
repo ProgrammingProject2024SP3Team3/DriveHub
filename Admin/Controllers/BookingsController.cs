@@ -149,7 +149,7 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
+            ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "UserName", booking.Id);
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
@@ -188,7 +188,7 @@ namespace Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
+            ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "UserName", booking.Id);
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);

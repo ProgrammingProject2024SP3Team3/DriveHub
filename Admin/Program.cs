@@ -66,6 +66,7 @@ builder.Services.AddAzureClients(clientBuilder =>
 });
 
 var app = builder.Build();
+
 // Configure the HTTP request pipeline and seed data if required
 if (app.Environment.IsDevelopment())
 {

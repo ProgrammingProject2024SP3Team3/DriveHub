@@ -12,20 +12,17 @@ namespace Admin.Controllers
     public class ApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
 
         public ApplicationUsersController(
-            ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+            ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
         // GET: VehicleRates
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Users.ToListAsync());
+            return View(await _context.ApplicationUsers.ToListAsync());
         }
 
         // GET: VehicleRates/Details/5
@@ -36,7 +33,7 @@ namespace Admin.Controllers
                 return NotFound();
             }
 
-            var vehicleRate = await _context.Users
+            var vehicleRate = await _context.ApplicationUsers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (vehicleRate == null)
@@ -77,7 +74,7 @@ namespace Admin.Controllers
                 return NotFound();
             }
 
-            var applicationUser = await _context.Users.FindAsync(id);
+            var applicationUser = await _context.ApplicationUsers.FindAsync(id);
             if (applicationUser == null)
             {
                 return NotFound();
@@ -128,7 +125,7 @@ namespace Admin.Controllers
                 return NotFound();
             }
 
-            var applicationUser = await _context.Users
+            var applicationUser = await _context.ApplicationUsers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (applicationUser == null)
@@ -144,7 +141,7 @@ namespace Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var applicationUser = await _context.Users.FindAsync(id);
+            var applicationUser = await _context.ApplicationUsers.FindAsync(id);
             if (applicationUser != null)
             {
                 _context.Users.Remove(applicationUser);
@@ -161,7 +158,7 @@ namespace Admin.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
+            var user = await _context.ApplicationUsers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (user == null)
@@ -185,7 +182,7 @@ namespace Admin.Controllers
 
         private bool UserExists(string id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _context.ApplicationUsers.Any(e => e.Id == id);
         }
     }
 }

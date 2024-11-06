@@ -18,6 +18,8 @@ namespace DriveHubModel
 {
     public class ApplicationUser : IdentityUser
     {
+        public ApplicationUser() { }
+
         [Required]
         [PersonalData]
         [DisplayName("First name")]
