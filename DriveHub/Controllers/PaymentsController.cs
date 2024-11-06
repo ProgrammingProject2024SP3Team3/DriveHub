@@ -12,13 +12,13 @@ namespace DriveHub.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
 
         public PaymentsController(
             ApplicationDbContext context,
             ILogger<PaymentsController> logger,
-            UserManager<IdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             IConfiguration configuration
         )
         {

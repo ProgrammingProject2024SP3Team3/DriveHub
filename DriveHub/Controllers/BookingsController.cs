@@ -20,13 +20,13 @@ namespace DriveHub.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
 
         public BookingsController(
             ApplicationDbContext context,
             ILogger<BookingsController> logger,
-            UserManager<IdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             IConfiguration configuration
         )
         {
@@ -124,9 +124,9 @@ namespace DriveHub.Controllers
         // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,StartPodId,QuotedPricePerHour")] ReservationDto reservationDto)
+        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,StartPodId,QuotedPricePerHour")] DriveHub.Views.Bookings.Create create)
         {
-            _logger.LogInformation($"Received POST to make a reservation for vehicle {reservationDto.VehicleId}");
+            _logger.LogInformation($"Received POST to make a reservation for vehicle {create.VehicleId}");
 
             try
             {
@@ -149,7 +149,7 @@ namespace DriveHub.Controllers
                 // Fetch vehicle and ensure it exists
                 var vehicle = await _context.Vehicles
                     .Include(v => v.VehicleRate)
-                    .FirstOrDefaultAsync(v => v.VehicleId == reservationDto.VehicleId);
+                    .FirstOrDefaultAsync(v => v.VehicleId == create.VehicleId);
 
 
                 if (vehicle == null || vehicle.IsReserved)
@@ -163,7 +163,7 @@ namespace DriveHub.Controllers
                 var startPod = await _context.Pods
                     .Include(p => p.Site)
                     .Include(p => p.Vehicle)
-                    .FirstOrDefaultAsync(p => p.PodId == reservationDto.StartPodId);
+                    .FirstOrDefaultAsync(p => p.PodId == create.StartPodId);
 
                 if (startPod == null || startPod.Vehicle == null)
                 {
@@ -174,8 +174,8 @@ namespace DriveHub.Controllers
                 // Prepare and validate the booking
                 var booking = new Booking(
                     _userManager.GetUserId(User),
-                    reservationDto.VehicleId,
-                    reservationDto.StartPodId,
+                    create.VehicleId,
+                    create.StartPodId,
                     vehicle.VehicleRate.PricePerHour,
                     vehicle.VehicleRate.PricePerMinute
                 )

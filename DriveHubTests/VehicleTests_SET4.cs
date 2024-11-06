@@ -38,7 +38,7 @@ namespace DriveHubTests
         }
 
         [Fact]
-        public async Task Set4_UserB_Pickup_ShouldReturnCreate()
+        public async Task Set4_UserB_Pickup_ShouldRedirectToCreate()
         {
             // Arrange
             Fixture = new VehiclesTestFixtures(4, "userb");

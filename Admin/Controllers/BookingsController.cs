@@ -27,6 +27,7 @@ namespace Admin.Controllers
             ViewData["EndPodFilter"] = endPodFilter;
 
             var bookings = from b in _context.Bookings
+                           .Include(b => b.ApplicationUser)
                            .Include(b => b.EndPod)
                            .ThenInclude(c => c.Site)
                            .Include(b => b.StartPod)

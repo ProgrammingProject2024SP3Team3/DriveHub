@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace DriveHub.Models.Dto
+namespace DriveHub.Views.Bookings
 {
-    public class ReservationDto
+    public class Create
     {
         [Required]
         public string BookingId { get; set; } = Guid.NewGuid().ToString();

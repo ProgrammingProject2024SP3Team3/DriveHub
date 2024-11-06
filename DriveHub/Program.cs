@@ -3,6 +3,7 @@ using Azure.Security.KeyVault.Secrets;
 using DriveHub.BackgroundServices;
 using DriveHub.Data;
 using DriveHub.SeedData;
+using DriveHubModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -42,8 +43,10 @@ logger.LogInformation("Retrieved connection string: {ConnectionString}", connect
 // Continue your setup...
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connection, x => x.UseNetTopologySuite()));
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 

@@ -10,12 +10,24 @@
  */
 
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace DriveHubModel
 {
     public class ApplicationUser : IdentityUser
     {
+        [Required]
+        [PersonalData]
+        [DisplayName("First name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [PersonalData]
+        [DisplayName("Last name")]
+        public string LastName { get; set; }
+
         [JsonIgnore]
         public virtual IList<Booking> Bookings { get; set; } = new List<Booking>();
     }

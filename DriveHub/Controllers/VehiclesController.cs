@@ -10,12 +10,12 @@ namespace DriveHub.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public VehiclesController(
             ApplicationDbContext context,
             ILogger<VehiclesController> logger,
-            UserManager<IdentityUser> userManager
+            UserManager<ApplicationUser> userManager
         )
         {
             _context = context;

@@ -12,11 +12,11 @@ namespace Admin.Controllers
     public class ApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public ApplicationUsersController(
             ApplicationDbContext context,
-            UserManager<IdentityUser> userManager)
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -180,19 +180,7 @@ namespace Admin.Controllers
 
         public async Task<ActionResult> ResetUserPassword([Bind("Id,UserName,Email,EmailConfirmed,NewPassword")] ResetPasswordDto passwordDto)
         {
-            // Find User
-            var user = await _context.Users.Where(x => x.Id == passwordDto.Id).SingleOrDefaultAsync();
-            if (user == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Remove the existing password
-            await _userManager.RemovePasswordAsync(user);
-
-            // Add the new password
-            await _userManager.AddPasswordAsync(user, passwordDto.NewPassword);
-            return RedirectToAction(nameof(Details), new { passwordDto.Id });
+            throw new NotImplementedException();
         }
 
         private bool UserExists(string id)
