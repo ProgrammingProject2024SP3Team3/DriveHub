@@ -46,7 +46,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<AdminDbContext>();
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+}
 
 builder.Services.AddControllersWithViews();
 

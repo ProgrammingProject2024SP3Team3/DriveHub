@@ -60,7 +60,10 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+}
 builder.Services.AddControllersWithViews();
 
 // Store in session

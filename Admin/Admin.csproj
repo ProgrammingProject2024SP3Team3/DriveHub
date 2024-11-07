@@ -39,10 +39,4 @@
 		<ProjectReference Include="..\DriveHubModel\DriveHubModel.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Update="Data\SeedData\Users.csv">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
 </Project>
