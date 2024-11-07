@@ -86,11 +86,11 @@ namespace Admin.Controllers
 
             var booking = await _context.Bookings
                 .Include(b => b.StartPod)
-                .ThenInclude(c => c.Site)
+                    .ThenInclude(c => c.Site)
                 .Include(b => b.EndPod)
-                .ThenInclude(c => c.Site)
+                    .ThenInclude(c => c.Site)
                 .Include(b => b.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
+                    .ThenInclude(c => c.VehicleRate)
                 .Include(b => b.Invoice)
                 .Include(b => b.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
@@ -135,8 +135,8 @@ namespace Admin.Controllers
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
-            List<BookingStatus> bookingStatuses = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
-            ViewData["BookingStatus"] = new SelectList(bookingStatuses);
+            List<BookingStatus> bookingStatus = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
+            ViewData["BookingStatus"] = new SelectList(bookingStatus);
             return View(booking);
         }
 

@@ -71,20 +71,6 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
-    // Populate database with seed data
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        try
-        {
-            SeedData.Initialize(services);
-        }
-        catch (Exception ex)
-        {
-            logger = services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "An error has occurred while seeding the database.");
-        }
-    }
 }
 else
 {
