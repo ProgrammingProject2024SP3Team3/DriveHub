@@ -462,6 +462,7 @@ namespace DriveHub.Controllers
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.Invoice.InvoiceNumber == id)
                 .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Include(c => c.ApplicationUser)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                     .ThenInclude(d => d.Site)
@@ -499,6 +500,7 @@ namespace DriveHub.Controllers
             var bookings = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Include(c => c.ApplicationUser)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                     .ThenInclude(d => d.Site)

@@ -87,34 +87,45 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("")] ApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed")] Admin.View.ApplicationUsers.Edit applicationUser)
         {
+            ApplicationUser user;
             if (id != applicationUser.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            user = await _context.ApplicationUsers.FindAsync(id);
+
+            if (user == null)
             {
-                try
-                {
-                    _context.Update(applicationUser);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(applicationUser.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            return View(applicationUser);
+
+            try
+            {
+                user.FirstName = applicationUser.FirstName;
+                user.LastName = applicationUser.LastName;
+                user.Email = applicationUser.Email;
+                user.EmailConfirmed = applicationUser.EmailConfirmed;
+                user.PhoneNumber = applicationUser.PhoneNumber;
+                user.PhoneNumberConfirmed = applicationUser.PhoneNumberConfirmed;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(applicationUser.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: VehicleRates/Delete/5
@@ -149,35 +160,6 @@ namespace Admin.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> PasswordReset(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.ApplicationUsers
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var pwresetDto = new Models.Dto.ResetPasswordDto();
-            pwresetDto.Id = id;
-            pwresetDto.UserName = user.UserName;
-            pwresetDto.Email = user.Email;
-            pwresetDto.EmailConfirmed = user.EmailConfirmed;
-
-            return View(pwresetDto);
-        }
-
-        public async Task<ActionResult> ResetUserPassword([Bind("Id,UserName,Email,EmailConfirmed,NewPassword")] ResetPasswordDto passwordDto)
-        {
-            throw new NotImplementedException();
         }
 
         private bool UserExists(string id)

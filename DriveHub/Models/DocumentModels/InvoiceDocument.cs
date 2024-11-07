@@ -81,8 +81,10 @@ namespace DriveHub.Models.DocumentModels
                 {
                     row.RelativeItem().Component(new AddressComponent("From", new Address()));
                     row.ConstantItem(50);
+                    row.RelativeItem().Component(new Invoicee("To", Model.ApplicationUser));
                 });
                 column.Item().Element(ComposeTable);
+                column.Item().PaddingRight(5).AlignRight().Text($"Includes GST: {(Model.Invoice.Amount*0.11m):C}").SemiBold();
                 column.Item().PaddingRight(5).AlignRight().Text($"Total paid: {Model.Invoice.Amount:C}").SemiBold();
             });
         }
@@ -155,6 +157,30 @@ public class AddressComponent : IComponent
             column.Item().Text($"{Address.City}, {Address.State}");
             column.Item().Text(Address.Email);
             column.Item().Text(Address.Phone);
+        });
+    }
+}
+
+public class Invoicee : IComponent
+{
+    private string Title { get; }
+    ApplicationUser ApplicationUser { get; set; }
+
+    public Invoicee(string title, ApplicationUser user)
+    {
+        Title = title;
+        ApplicationUser = user;
+    }
+
+    public void Compose(IContainer container)
+    {
+        container.ShowEntire().Column(column =>
+        {
+            column.Spacing(2);
+            column.Item().Text(Title).SemiBold();
+            column.Item().PaddingBottom(5).LineHorizontal(1);
+            column.Item().Text($"{ApplicationUser.FirstName} {ApplicationUser.LastName}");
+            column.Item().Text(ApplicationUser.UserName);
         });
     }
 }

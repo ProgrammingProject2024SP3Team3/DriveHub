@@ -44,7 +44,7 @@ namespace DriveHubTests
             // Arrange
             Fixture = new BookingTestFixtures(2, "usera");
 
-            var reservationDto = new ReservationDto();
+            var reservationDto = new DriveHub.Views.Bookings.Create();
             reservationDto.VehicleId = "36d4bc1e-6159-46df-ad98-da93a38bcc82";
             reservationDto.StartPodId = "e904170e-a945-4edd-802a-72e214e89cdb";
             reservationDto.QuotedPricePerHour = 20m;
@@ -117,7 +117,7 @@ namespace DriveHubTests
             // Arrange
             Fixture = new BookingTestFixtures(2, "userb");
 
-            var reservationDto = new ReservationDto();
+            var reservationDto = new DriveHub.Views.Bookings.Create();
             reservationDto.VehicleId = "cac6a77c-59fd-4d0e-b557-9a3230a79e9a";
             reservationDto.StartPodId = "e904170e-a945-4edd-802a-72e214e89cdb";
             reservationDto.QuotedPricePerHour = 20m;

@@ -87,9 +87,11 @@ namespace DriveHub.Models.DocumentModels
                 {
                     row.RelativeItem().Component(new AddressComponent("From", new Address()));
                     row.ConstantItem(50);
+                    row.RelativeItem().Component(new Invoicee("To", Bookings[0].ApplicationUser));
                 });
                 column.Item().Element(ComposeTable);
 
+                column.Item().PaddingRight(5).AlignRight().Text($"Incl. GST: {(TotalAmount * 0.11m):C}").SemiBold();
                 column.Item().PaddingRight(5).AlignRight().Text($"Total: {TotalAmount:C}").SemiBold();
             });
         }
@@ -105,6 +107,7 @@ namespace DriveHub.Models.DocumentModels
                     columns.RelativeColumn(4); // Trip
                     columns.RelativeColumn(); // Minutes Used
                     columns.RelativeColumn(); // Price Per Minute
+                    columns.RelativeColumn(); // GST
                     columns.RelativeColumn(); // Total
                 });
 
@@ -114,9 +117,10 @@ namespace DriveHub.Models.DocumentModels
                     header.Cell().Text("Trip").Style(headerStyle);
                     header.Cell().Text("Minutes").Style(headerStyle);
                     header.Cell().Text("Price Per Minute").Style(headerStyle);
+                    header.Cell().Text("Incl. GST").Style(headerStyle);
                     header.Cell().AlignRight().Text("Total").Style(headerStyle);
 
-                    header.Cell().ColumnSpan(5).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
+                    header.Cell().ColumnSpan(6).PaddingTop(6).BorderBottom(1).BorderColor(Colors.Black);
                 });
 
                 foreach (var booking in Bookings)
@@ -126,6 +130,7 @@ namespace DriveHub.Models.DocumentModels
                     table.Cell().Element(CellStyle).Text($"{booking.StartPod.Site.SiteName} to {booking.EndPod?.Site.SiteName}");
                     table.Cell().Element(CellStyle).Text($"{totalMinutes}");
                     table.Cell().Element(CellStyle).Text($"{booking.PricePerMinute:C}");
+                    table.Cell().Element(CellStyle).Text($"{(booking.Invoice?.Amount * 0.11m):C}");
                     table.Cell().Element(CellStyle).AlignRight().Text($"{booking.Invoice?.Amount:C}");
 
                     static IContainer CellStyle(IContainer container) =>

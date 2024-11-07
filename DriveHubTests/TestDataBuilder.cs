@@ -36,7 +36,7 @@ public static class TestDataBuilder
 
                 if (values.Length < 15) continue; // Ensure there are enough values
 
-                var user = new IdentityUser
+                var user = new ApplicationUser
                 {
                     Id = values[0],
                     UserName = values[1],
@@ -52,7 +52,9 @@ public static class TestDataBuilder
                     TwoFactorEnabled = ParseBoolean(values[11]), // Handle incorrect formats
                     LockoutEnd = ParseDateTime(values[12]), // Handle '0' or empty strings
                     LockoutEnabled = ParseBoolean(values[13]), // Handle incorrect formats
-                    AccessFailedCount = int.Parse(values[14])
+                    AccessFailedCount = int.Parse(values[14]),
+                    FirstName = values[15],
+                    LastName = values[16],
                 };
 
                 if (!context.Users.Any(u => u.Id == user.Id))

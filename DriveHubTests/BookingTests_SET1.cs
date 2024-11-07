@@ -58,7 +58,7 @@ namespace DriveHubTests
             // Arrange
             Fixture = new BookingTestFixtures(1, "usera");
 
-            var reservationDto = new ReservationDto();
+            var reservationDto = new DriveHub.Views.Bookings.Create();
             reservationDto.VehicleId = "cac6a77c-59fd-4d0e-b557-9a3230a79e9a";
             reservationDto.StartPodId = "e904170e-a945-4edd-802a-72e214e89cdb";
             reservationDto.QuotedPricePerHour = 20m;
@@ -166,7 +166,7 @@ namespace DriveHubTests
             // Arrange
             Fixture = new BookingTestFixtures(1, "userb");
 
-            var reservationDto = new ReservationDto();
+            var reservationDto = new DriveHub.Views.Bookings.Create();
             reservationDto.VehicleId = "cac6a77c-59fd-4d0e-b557-9a3230a79e9a";
             reservationDto.StartPodId = "454f2073-c06d-4dfa-a976-d8f1d2cc93d2";
             reservationDto.QuotedPricePerHour = 27.50m;
@@ -185,7 +185,7 @@ namespace DriveHubTests
             // Arrange
             Fixture = new BookingTestFixtures(1, "userb");
 
-            var reservationDto = new ReservationDto();
+            var reservationDto = new DriveHub.Views.Bookings.Create();
             reservationDto.VehicleId = "eeb7b72c-b362-4513-b84b-baa954c83ce0";
             reservationDto.StartPodId = "454f2073-c06d-4dfa-a976-d8f1d2cc93d2";
             reservationDto.QuotedPricePerHour = 27.50m;
