@@ -4,7 +4,6 @@ using Admin.Data;
 using DriveHubModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Admin.Models.Dto;
 
 namespace Admin.Controllers
 {
@@ -12,11 +11,22 @@ namespace Admin.Controllers
     public class ApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUserStore<ApplicationUser> _userStore;
+        private readonly IUserEmailStore<ApplicationUser> _emailStore;
+        private readonly ILogger<ApplicationUsersController> _logger;
 
         public ApplicationUsersController(
-            ApplicationDbContext context)
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext context,
+            IUserStore<ApplicationUser> userStore,
+            ILogger<ApplicationUsersController> logger)
         {
+            _userManager = userManager;
             _context = context;
+            _userStore = userStore;
+            _emailStore = GetEmailStore();
+            _logger = logger;
         }
 
         // GET: VehicleRates
@@ -55,13 +65,27 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("")] ApplicationUser applicationUser)
+        public async Task<IActionResult> Create(string id, [Bind("Id,UserName,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed")] Admin.View.ApplicationUsers.Create applicationUser)
         {
+
             if (ModelState.IsValid)
             {
-                _context.Add(applicationUser);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var user = CreateUser();
+                user.FirstName = applicationUser.FirstName;
+                user.LastName = applicationUser.LastName;
+                user.EmailConfirmed = applicationUser.EmailConfirmed;
+                user.PhoneNumber = applicationUser.PhoneNumber;
+                user.PhoneNumberConfirmed = applicationUser.PhoneNumberConfirmed;
+
+                await _userStore.SetUserNameAsync(user, applicationUser.Email, CancellationToken.None);
+                await _emailStore.SetEmailAsync(user, applicationUser.Email, CancellationToken.None);
+                var result = await _userManager.CreateAsync(user, applicationUser.Password);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User created a new account with password.");
+                    return View(nameof(Details), new { applicationUser.Id });
+                }                
             }
             return View(applicationUser);
         }
@@ -165,6 +189,29 @@ namespace Admin.Controllers
         private bool UserExists(string id)
         {
             return _context.ApplicationUsers.Any(e => e.Id == id);
+        }
+
+        private ApplicationUser CreateUser()
+        {
+            try
+            {
+                return Activator.CreateInstance<ApplicationUser>();
+            }
+            catch
+            {
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+            }
+        }
+
+        private IUserEmailStore<ApplicationUser> GetEmailStore()
+        {
+            if (!_userManager.SupportsUserEmail)
+            {
+                throw new NotSupportedException("The default UI requires a user store with email support.");
+            }
+            return (IUserEmailStore<ApplicationUser>)_userStore;
         }
     }
 }

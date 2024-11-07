@@ -87,12 +87,17 @@ namespace DriveHub.Models.DocumentModels
                 {
                     row.RelativeItem().Component(new AddressComponent("From", new Address()));
                     row.ConstantItem(50);
-                    row.RelativeItem().Component(new Invoicee("To", Bookings[0].ApplicationUser));
+
+                    if (Bookings.Count == 0)
+                        row.RelativeItem().Component(new Invoicee("To", null));
+
+                    else
+                        row.RelativeItem().Component(new Invoicee("To", Bookings[0].ApplicationUser));
                 });
                 column.Item().Element(ComposeTable);
 
                 column.Item().PaddingRight(5).AlignRight().Text($"Incl. GST: {(TotalAmount * 0.11m):C}").SemiBold();
-                column.Item().PaddingRight(5).AlignRight().Text($"Total: {TotalAmount:C}").SemiBold();
+                column.Item().PaddingRight(5).AlignRight().Text($"Total: {TotalAmount:C}").Bold();
             });
         }
 

@@ -313,3 +313,15 @@ public static class TestDataBuilder
         return value.Equals("true", StringComparison.OrdinalIgnoreCase) || value == "1";
     }
 }
+
+internal class User
+{
+    public string Id { get; set; }
+    public string UserName { get; set; }
+
+    public User(string id, string userName)
+    {
+        Id = id;
+        UserName = userName;
+    }
+}

@@ -112,6 +112,8 @@ namespace Admin.Controllers
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName");
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName");
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name");
+            List<BookingStatus> bookingStatuses = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
+            ViewData["BookingStatus"] = new SelectList(bookingStatuses);
             return View();
         }
 
