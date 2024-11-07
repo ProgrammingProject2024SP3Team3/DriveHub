@@ -11,21 +11,13 @@ namespace Admin.Controllers
     public class ApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IUserStore<ApplicationUser> _userStore;
-        private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<ApplicationUsersController> _logger;
 
         public ApplicationUsersController(
-            UserManager<ApplicationUser> userManager,
             ApplicationDbContext context,
-            IUserStore<ApplicationUser> userStore,
             ILogger<ApplicationUsersController> logger)
         {
-            _userManager = userManager;
             _context = context;
-            _userStore = userStore;
-            _emailStore = GetEmailStore();
             _logger = logger;
         }
 
@@ -65,30 +57,54 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string id, [Bind("Id,UserName,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed")] Admin.View.ApplicationUsers.Create applicationUser)
+        public async Task<IActionResult> Create(string id, [Bind("Id,UserName,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,Password,ConfirmPassword")] Admin.Views.ApplicationUsers.Create create)
         {
-
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-                user.FirstName = applicationUser.FirstName;
-                user.LastName = applicationUser.LastName;
-                user.EmailConfirmed = applicationUser.EmailConfirmed;
-                user.PhoneNumber = applicationUser.PhoneNumber;
-                user.PhoneNumberConfirmed = applicationUser.PhoneNumberConfirmed;
+                var user = new ApplicationUser
+                {
+                    Id = create.Id,
+                    UserName = create.UserName,
+                    NormalizedUserName = create.UserName.ToUpper(),
+                    Email = create.Email,
+                    NormalizedEmail = create.Email.ToUpper(),
+                    EmailConfirmed = create.EmailConfirmed,
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString(), 
+                    PhoneNumber = create.PhoneNumber,
+                    PhoneNumberConfirmed = create.PhoneNumberConfirmed,
+                    TwoFactorEnabled = false,
+                    LockoutEnd = null, 
+                    LockoutEnabled = false,
+                    AccessFailedCount = 0, 
+                    FirstName = create.FirstName,
+                    LastName = create.LastName,
+                };
 
-                await _userStore.SetUserNameAsync(user, applicationUser.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, applicationUser.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, applicationUser.Password);
+                var paw = new PasswordHasher<ApplicationUser>();
+                user.PasswordHash = paw.HashPassword(user, create.Password);
 
-                if (result.Succeeded)
+                if (!_context.Users.Any(u => u.Id == user.Id))
+                {
+                    _context.Users.Add(user);
+                }
+                else
+                {
+                    // Optionally handle case where user already exists
+                }
+
+                var result = await _context.SaveChangesAsync(); 
+
+                if (result > 0)
                 {
                     _logger.LogInformation("User created a new account with password.");
-                    return View(nameof(Details), new { applicationUser.Id });
-                }                
+                    return RedirectToAction(nameof(Details), new { id = user.Id });
+                }
             }
-            return View(applicationUser);
+            ViewBag.Error = "There was an error creating the user. Please review your data entry and try again."; 
+            return View(create);
         }
+
 
         // GET: VehicleRates/Edit/5
         public async Task<IActionResult> Edit(string id)
@@ -111,7 +127,7 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed")] Admin.View.ApplicationUsers.Edit applicationUser)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed")] Admin.Views.ApplicationUsers.Edit applicationUser)
         {
             ApplicationUser user;
             if (id != applicationUser.Id)
@@ -205,13 +221,5 @@ namespace Admin.Controllers
             }
         }
 
-        private IUserEmailStore<ApplicationUser> GetEmailStore()
-        {
-            if (!_userManager.SupportsUserEmail)
-            {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
-            }
-            return (IUserEmailStore<ApplicationUser>)_userStore;
-        }
     }
 }

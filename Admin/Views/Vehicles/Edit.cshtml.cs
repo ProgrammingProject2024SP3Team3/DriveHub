@@ -1,7 +1,7 @@
 ﻿/**
- * Vehicle
+ * Edit
  * 
- * Vehicle.cs 17/09/2024
+ * Edit.cs 17/09/2024
  *
  * author: Ian McElwaine s3863018@rmit.student.edu.au
  * author: Sean Atherton s3893785@student.rmit.edu.au
@@ -13,13 +13,10 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 
-namespace Admin.Models.Dto
+namespace Admin.Views.Vehicles
 {
-    public class Vehicle
+    public class Edit
     {
         [Required]
         public string VehicleId { get; set; }
@@ -51,6 +48,9 @@ namespace Admin.Models.Dto
 
         [Required]
         public string Name { get; set; }
+
+        [Required]
+        public bool IsReserved { get; set; }
 
         public override string ToString()
         {

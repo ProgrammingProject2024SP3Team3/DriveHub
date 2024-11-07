@@ -122,7 +122,7 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,Id,StartPodId,EndPodId,StartTime,EndTime,PricePerHour,BookingStatus")] Booking booking)
+        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,Id,StartPodId,EndPodId,StartTime,EndTime,PricePerHour,PricePerMinute,BookingStatus")] Booking booking)
         {
             if (ModelState.IsValid)
             {
@@ -135,6 +135,8 @@ namespace Admin.Controllers
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
+            List<BookingStatus> bookingStatuses = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
+            ViewData["BookingStatus"] = new SelectList(bookingStatuses);
             return View(booking);
         }
 
@@ -155,6 +157,8 @@ namespace Admin.Controllers
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
+            List<BookingStatus> bookingStatuses = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
+            ViewData["BookingStatus"] = new SelectList(bookingStatuses);
             return View(booking);
         }
 
@@ -194,6 +198,8 @@ namespace Admin.Controllers
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
+            List<BookingStatus> bookingStatuses = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
+            ViewData["BookingStatus"] = new SelectList(bookingStatuses);
             return View(booking);
         }
 

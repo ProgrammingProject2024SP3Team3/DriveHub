@@ -34,7 +34,7 @@ namespace Admin.Controllers
                 })
                 .ToListAsync();
 
-            var model = new HomeDto
+            var model = new Admin.Views.Home.Index
             {
                 NumberOfUsers = await _context.Users.CountAsync(),
                 NumberOfTripsTaken = await _context.Invoices.CountAsync(),

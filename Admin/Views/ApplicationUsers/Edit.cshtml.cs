@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Admin.View.ApplicationUsers
+namespace Admin.Views.ApplicationUsers
 {
     public class Edit
     {
@@ -15,10 +15,19 @@ namespace Admin.View.ApplicationUsers
         [Required]
         public string Email { get; set; }
         [Required]
+        [Display(Name = "Email confirmed")]
         public bool EmailConfirmed { get; set; }
+
+        [RegularExpression(@"^04[0-9]{8}", ErrorMessage = "Must be in the format 04xxxxxxxx")]
+        [Display(Name = "Mobile number")]
+        public string? PhoneNumber { get; set; }
+
         [Required]
-        public string PhoneNumber { get; set; }
-        [Required]
+        [Display(Name = "Mobile number confirmed")]
         public bool PhoneNumberConfirmed { get; set; }
+
+        [Required]
+        [Display(Name = "Two factor enabled")]
+        public bool TwoFactorEnabled { get; set; }
     }
 }

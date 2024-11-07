@@ -6,46 +6,46 @@
 <h1>@ViewData["Title"]</h1>
 <div>
     <dl class="row">
-        <dt class="col-sm-3">
+        <dt class="col-sm-3 py-2">
             @Html.DisplayNameFor(model => model.Id)
         </dt>
-        <dd class="col-sm-9">
+        <dd class="col-sm-9 py-2">
             @Html.DisplayFor(model => model.Id)
         </dd>
-        <dt class="col-sm-3">
+        <dt class="col-sm-3 py-2">
             Full name
         </dt>
-        <dd class="col-sm-9">
+        <dd class="col-sm-9 py-2">
             @Model.FirstName @Model.LastName
         </dd>
-        <dt class="col-sm-3">
+        <dt class="col-sm-3 py-2">
             @Html.DisplayNameFor(model => model.Email)
         </dt>
-        <dd class="col-sm-9">
+        <dd class="col-sm-9 py-2">
             @Html.DisplayFor(model => model.Email)
         </dd>
-        <dt class="col-sm-3">
+        <dt class="col-sm-3 py-2">
             @Html.DisplayNameFor(model => model.EmailConfirmed)
         </dt>
-        <dd class="col-sm-9 form-check form-switch">
+        <dd class="col-sm-9 form-check form-switch py-2">
             <input asp-for="EmailConfirmed" class="form-check-input" type="checkbox" role="switch" disabled>
         </dd>
-        <dt class="col-sm-3">
+        <dt class="col-sm-3 py-2">
             @Html.DisplayNameFor(model => model.PhoneNumber)
         </dt>
-        <dd class="col-sm-9">
+        <dd class="col-sm-9 py-2">
             @Html.DisplayFor(model => model.PhoneNumber)
         </dd>
-        <dt class="col-sm-3">
+        <dt class="col-sm-3 py-2">
             Phone number confirmed
         </dt>
-        <dd class="col-sm-9 form-check form-switch">
+        <dd class="col-sm-9 form-check form-switch py-2">
             <input asp-for="PhoneNumberConfirmed" class="form-check-input" type="checkbox" role="switch" disabled>
         </dd>
-        <dt class="col-sm-3">
+        <dt class="col-sm-3 py-2">
             Two factor enabled
         </dt>
-        <dd class="col-sm-9 form-check form-switch">
+        <dd class="col-sm-9 form-check form-switch py-2">
             <input asp-for="TwoFactorEnabled" class="form-check-input" type="checkbox" role="switch" disabled>
         </dd>
     </dl>
