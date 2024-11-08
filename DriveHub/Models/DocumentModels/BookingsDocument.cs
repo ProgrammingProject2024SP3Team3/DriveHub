@@ -96,8 +96,9 @@ namespace DriveHub.Models.DocumentModels
                 });
                 column.Item().Element(ComposeTable);
 
-                column.Item().PaddingRight(5).AlignRight().Text($"Incl. GST: {(TotalAmount * 0.11m):C}").SemiBold();
-                column.Item().PaddingRight(5).AlignRight().Text($"Total: {TotalAmount:C}").Bold();
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"Subtotal: {(TotalAmount * 0.89m):C}");
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"GST: {(TotalAmount * 0.11m):C}");
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"Total paid: {TotalAmount:C}").Bold();
             });
         }
 
@@ -122,7 +123,7 @@ namespace DriveHub.Models.DocumentModels
                     header.Cell().Text("Trip").Style(headerStyle);
                     header.Cell().Text("Minutes").Style(headerStyle);
                     header.Cell().Text("Price Per Minute").Style(headerStyle);
-                    header.Cell().Text("Incl. GST").Style(headerStyle);
+                    header.Cell().Text("GST").Style(headerStyle);
                     header.Cell().AlignRight().Text("Total").Style(headerStyle);
 
                     header.Cell().ColumnSpan(6).PaddingTop(6).BorderBottom(1).BorderColor(Colors.Black);

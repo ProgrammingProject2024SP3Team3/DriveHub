@@ -73,6 +73,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
+    app.UseDeveloperExceptionPage();
 }
 else
 {

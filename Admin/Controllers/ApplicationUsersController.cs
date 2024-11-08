@@ -46,66 +46,6 @@ namespace Admin.Controllers
             return View(vehicleRate);
         }
 
-        // GET: VehicleRates/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: VehicleRates/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string id, [Bind("Id,UserName,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,Password,ConfirmPassword")] Admin.Views.ApplicationUsers.Create create)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser
-                {
-                    Id = create.Id,
-                    UserName = create.UserName,
-                    NormalizedUserName = create.UserName.ToUpper(),
-                    Email = create.Email,
-                    NormalizedEmail = create.Email.ToUpper(),
-                    EmailConfirmed = create.EmailConfirmed,
-                    SecurityStamp = Guid.NewGuid().ToString(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString(),
-                    PhoneNumber = create.PhoneNumber,
-                    PhoneNumberConfirmed = create.PhoneNumberConfirmed,
-                    TwoFactorEnabled = false,
-                    LockoutEnd = null,
-                    LockoutEnabled = false,
-                    AccessFailedCount = 0,
-                    FirstName = create.FirstName,
-                    LastName = create.LastName,
-                };
-
-                var paw = new PasswordHasher<ApplicationUser>();
-                user.PasswordHash = paw.HashPassword(user, create.Password);
-
-                if (!_context.Users.Any(u => u.Id == user.Id))
-                {
-                    _context.Users.Add(user);
-                }
-                else
-                {
-                    // Optionally handle case where user already exists
-                }
-
-                var result = await _context.SaveChangesAsync();
-
-                if (result > 0)
-                {
-                    _logger.LogInformation("User created a new account with password.");
-                    return RedirectToAction(nameof(Details), new { id = user.Id });
-                }
-            }
-            ViewBag.Error = "There was an error creating the user. Please review your data entry and try again.";
-            return View(create);
-        }
-
-
         // GET: VehicleRates/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -163,6 +103,7 @@ namespace Admin.Controllers
                 user.FirstName = applicationUser.FirstName;
                 user.LastName = applicationUser.LastName;
                 user.Email = applicationUser.Email;
+                user.NormalizedEmail = applicationUser.Email.ToUpper();
                 user.EmailConfirmed = applicationUser.EmailConfirmed;
                 user.PhoneNumber = applicationUser.PhoneNumber;
                 user.PhoneNumberConfirmed = applicationUser.PhoneNumberConfirmed;

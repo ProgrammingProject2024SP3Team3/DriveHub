@@ -1,6 +1,7 @@
 ﻿using DriveHubModel;
 using global::QuestPDF.Helpers;
 using global::QuestPDF.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using QuestPDF.Fluent;
 
 namespace DriveHub.Models.DocumentModels
@@ -84,8 +85,9 @@ namespace DriveHub.Models.DocumentModels
                     row.RelativeItem().Component(new Invoicee("To", Model.ApplicationUser));
                 });
                 column.Item().Element(ComposeTable);
-                column.Item().PaddingRight(5).AlignRight().Text($"Includes GST: {(Model.Invoice.Amount * 0.11m):C}").SemiBold();
-                column.Item().PaddingRight(5).AlignRight().Text($"Total paid: {Model.Invoice.Amount:C}").Bold();
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"Subtotal: {(Model.Invoice.Amount * 0.89m):C}");
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"GST: {(Model.Invoice.Amount * 0.11m):C}");
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"Total paid: {Model.Invoice.Amount:C}").Bold();
             });
         }
 

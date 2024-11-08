@@ -80,6 +80,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
+    app.UseDeveloperExceptionPage();
+
     // Populate database with seed data
     using (var scope = app.Services.CreateScope())
     {
