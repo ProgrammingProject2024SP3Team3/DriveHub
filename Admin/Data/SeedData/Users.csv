@@ -1,2 +1,0 @@
-Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount
-ac94a920-126d-4149-9f85-98b9c7b47980,admin@drivehub.au,ADMIN@DRIVEHUB.AU,admin@drivehub.au,ADMIN@DRIVEHUB.AU,1,AQAAAAIAAYagAAAAEDQrg6Kb4LXN7PuiiLuXd4wcrq6dIBm5+Kq/htZ/6TUEDThc0yGE7HLCjAyKjlIIaQ==,BYJGPCU4OJG67DSIGGOXTARSTAPZ4LU6,ec7822c3-44df-45b7-97c6-3e9f12356a46,NULL,0,0,NULL,1,0

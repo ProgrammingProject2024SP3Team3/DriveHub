@@ -1,8 +1,8 @@
 ﻿using DriveHubModel;
 
-namespace Admin.Models.Dto
+namespace Admin.Views.Home
 {
-    public class HomeDto
+    public class Index
     {
         public int NumberOfUsers { get; set; }
         public int NumberOfTripsTaken { get; set; }

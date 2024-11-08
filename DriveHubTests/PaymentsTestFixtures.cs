@@ -10,6 +10,7 @@ using DriveHub.Data;
 using DriveHub.Controllers;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using DriveHubModel;
 
 namespace DriveHubTests
 {
@@ -18,7 +19,7 @@ namespace DriveHubTests
         public ApplicationDbContext Context { get; private set; }
         public PaymentsController PaymentsController { get; private set; }
         public Mock<ILogger<PaymentsController>> PaymentsLogger { get; private set; }
-        public UserManager<IdentityUser> UserManager { get; private set; }
+        public UserManager<ApplicationUser> UserManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -50,14 +51,14 @@ namespace DriveHubTests
         }
 
         // Public method to allow other test classes to reuse the mocked UserManager
-        public UserManager<IdentityUser> MockUserManager()
+        public UserManager<ApplicationUser> MockUserManager()
         {
-            var userStore = new Mock<IUserStore<IdentityUser>>().Object;
-            return new UserManager<IdentityUser>(userStore, new Mock<IOptions<IdentityOptions>>().Object,
-                new Mock<IPasswordHasher<IdentityUser>>().Object, Array.Empty<IUserValidator<IdentityUser>>(),
-                Array.Empty<IPasswordValidator<IdentityUser>>(), new Mock<ILookupNormalizer>().Object,
+            var userStore = new Mock<IUserStore<ApplicationUser>>().Object;
+            return new UserManager<ApplicationUser>(userStore, new Mock<IOptions<IdentityOptions>>().Object,
+                new Mock<IPasswordHasher<ApplicationUser>>().Object, Array.Empty<IUserValidator<ApplicationUser>>(),
+                Array.Empty<IPasswordValidator<ApplicationUser>>(), new Mock<ILookupNormalizer>().Object,
                 new Mock<IdentityErrorDescriber>().Object, null,
-                new Mock<ILogger<UserManager<IdentityUser>>>().Object);
+                new Mock<ILogger<UserManager<ApplicationUser>>>().Object);
         }
 
         // Method to mock an authenticated user for tests that require it

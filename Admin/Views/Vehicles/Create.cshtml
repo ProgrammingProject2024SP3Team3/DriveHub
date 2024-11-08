@@ -1,4 +1,4 @@
-﻿@model DriveHubModel.Vehicle
+﻿@model Admin.Views.Vehicles.Create
 
 @{
     ViewData["Title"] = "Create";
@@ -15,6 +15,11 @@
             <div class="form-group">
                 <label asp-for="VehicleRateId" class="control-label"></label>
                 <select asp-for="VehicleRateId" class ="form-control" asp-items="ViewBag.VehicleRateId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Make" class="control-label"></label>
@@ -45,6 +50,16 @@
                 <label asp-for="Seats" class="control-label"></label>
                 <input asp-for="Seats" class="form-control" />
                 <span asp-validation-for="Seats" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Colour" class="control-label"></label>
+                <input asp-for="Colour" class="form-control" />
+                <span asp-validation-for="Colour" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check form-switch py-3">
+                <label asp-for="IsReserved" class="control-label"></label>
+                <input asp-for="IsReserved" class="form-check-input" type="checkbox" role="switch">
+                <span asp-validation-for="IsReserved" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

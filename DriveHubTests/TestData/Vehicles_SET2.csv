@@ -7,5 +7,5 @@ VehicleId,VehicleRateId,IsReserved,Make,Model,RegistrationPlate,State,Year,Seats
 417b7216-6148-4a40-9458-99db17987790,798e5cce-92bb-493f-915c-f251c0dd674e,0,Hyundai,i30,STH001,VIC,2022,5,Black,Stealth Rocket
 4e0f6bb8-4835-4960-87ab-b89e21c78ab4,2452a253-031c-4de5-a6db-03691eac644b,0,Tesla,Model Y,WAR001,VIC,2023,5,Red,Road Warrior
 5780bc06-a5e2-4598-9eea-7cb90b55e169,4f040b3d-f4a9-4b8a-95f7-ed06ea181c34,0,Toyota,RAV4,RDR001,VIC,2021,5,White,Night Rider
-cac6a77c-59fd-4d0e-b557-9a3230a79e9a,798e5cce-92bb-493f-915c-f251c0dd674e,0,Hyundai,i30,STA001,VIC,2023,5,Silver,Iron Stallion
+cac6a77c-59fd-4d0e-b557-9a3230a79e9a,798e5cce-92bb-493f-915c-f251c0dd674e,1,Hyundai,i30,STA001,VIC,2023,5,Silver,Iron Stallion
 eeb7b72c-b362-4513-b84b-baa954c83ce0,4f040b3d-f4a9-4b8a-95f7-ed06ea181c34,0,Mazda,CX-5,MCS001,VIC,2023,5,Red,Lightning McSpeed

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
@@ -16,6 +16,7 @@ namespace Admin.Data
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Receipt> Receipts { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

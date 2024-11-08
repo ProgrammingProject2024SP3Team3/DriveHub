@@ -1,6 +1,7 @@
 ﻿using DriveHubModel;
 using global::QuestPDF.Helpers;
 using global::QuestPDF.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using QuestPDF.Fluent;
 
 namespace DriveHub.Models.DocumentModels
@@ -57,7 +58,7 @@ namespace DriveHub.Models.DocumentModels
                 row.RelativeItem().Column(column =>
                 {
                     column
-                        .Item().Text($"Invoice #{Model.Invoice.InvoiceNumber}")
+                        .Item().Text($"Tax Invoice #{Model.Invoice.InvoiceNumber}")
                         .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
                     column.Item().Text(text =>
                     {
@@ -81,9 +82,12 @@ namespace DriveHub.Models.DocumentModels
                 {
                     row.RelativeItem().Component(new AddressComponent("From", new Address()));
                     row.ConstantItem(50);
+                    row.RelativeItem().Component(new Invoicee("To", Model.ApplicationUser));
                 });
                 column.Item().Element(ComposeTable);
-                column.Item().PaddingRight(5).AlignRight().Text($"Total paid: {Model.Invoice.Amount:C}").SemiBold();
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"Subtotal: {(Model.Invoice.Amount * 0.89m):C}");
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"GST: {(Model.Invoice.Amount * 0.11m):C}");
+                column.Item().PaddingVertical(-6).PaddingRight(5).AlignRight().Text($"Total paid: {Model.Invoice.Amount:C}").Bold();
             });
         }
 
@@ -155,6 +159,42 @@ public class AddressComponent : IComponent
             column.Item().Text($"{Address.City}, {Address.State}");
             column.Item().Text(Address.Email);
             column.Item().Text(Address.Phone);
+        });
+    }
+}
+
+public class Invoicee : IComponent
+{
+    private string Title { get; }
+    ApplicationUser? ApplicationUser { get; set; }
+
+    public Invoicee(string title, ApplicationUser user)
+    {
+        Title = title;
+        ApplicationUser = user;
+    }
+
+    public void Compose(IContainer container)
+    {
+        string name;
+        string email;
+        if (ApplicationUser != null)
+        {
+            name = $"{ApplicationUser.FirstName} {ApplicationUser.LastName}";
+            email = ApplicationUser.UserName;
+        }
+        else
+        {
+            name = "";
+            email = "";
+        }
+        container.ShowEntire().Column(column =>
+        {
+            column.Spacing(2);
+            column.Item().Text(Title).SemiBold();
+            column.Item().PaddingBottom(5).LineHorizontal(1);
+            column.Item().Text(name);
+            column.Item().Text(email);
         });
     }
 }

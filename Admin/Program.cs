@@ -1,5 +1,4 @@
 using Admin.Data;
-using Admin.Data.SeedData;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +46,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<AdminDbContext>();
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+}
 
 builder.Services.AddControllersWithViews();
 
@@ -66,24 +68,12 @@ builder.Services.AddAzureClients(clientBuilder =>
 });
 
 var app = builder.Build();
+
 // Configure the HTTP request pipeline and seed data if required
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
-    // Populate database with seed data
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        try
-        {
-            SeedData.Initialize(services);
-        }
-        catch (Exception ex)
-        {
-            logger = services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "An error has occurred while seeding the database.");
-        }
-    }
+    app.UseDeveloperExceptionPage();
 }
 else
 {

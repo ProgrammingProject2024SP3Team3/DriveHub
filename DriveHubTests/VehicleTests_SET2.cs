@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using DriveHubModel;
 
 namespace DriveHubTests
 {
@@ -8,7 +9,7 @@ namespace DriveHubTests
         VehiclesTestFixtures Fixture;
 
         [Fact]
-        public async Task Set2_UserA_Pickup_ShouldRedirectToSearch()
+        public async Task Set2_UserA_Pickup_ShouldRedirectToDetails()
         {
             // Arrange
             Fixture = new VehiclesTestFixtures(2, "usera");
@@ -18,7 +19,11 @@ namespace DriveHubTests
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Search", redirectToActionResult.ActionName);
+            Assert.Equal("Details", redirectToActionResult.ActionName);
+
+            Assert.NotNull(redirectToActionResult.RouteValues);
+            Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
+            Assert.Equal("cac6a77c-59fd-4d0e-b557-9a3230a79e9a", redirectToActionResult.RouteValues["id"]);
         }
 
         [Fact]

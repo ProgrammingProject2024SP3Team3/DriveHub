@@ -10,12 +10,12 @@ namespace DriveHub.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public VehiclesController(
             ApplicationDbContext context,
             ILogger<VehiclesController> logger,
-            UserManager<IdentityUser> userManager
+            UserManager<ApplicationUser> userManager
         )
         {
             _context = context;
@@ -44,10 +44,7 @@ namespace DriveHub.Controllers
 
             _logger.LogInformation($"Found vehicle {id}");
 
-            Booking? booking = null;
-            try
-            {
-                booking = await _context.Bookings
+            var booking = await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Reserved)
@@ -55,17 +52,27 @@ namespace DriveHub.Controllers
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(c => c.Site)
-                .SingleAsync();
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning($"Booking not found for id: {id}");
-                return RedirectToAction("Search", "Bookings");
-            }
+                .FirstOrDefaultAsync();
 
             if (booking == null)
             {
-                _logger.LogWarning($"Vehicle not found {id}");
+                _logger.LogWarning($"Booking not found for id: {id}");
+
+                var hasReservation = _context.Bookings
+                    .Where(c => c.Id == _userManager.GetUserId(User))
+                    .Where(
+                        c => c.BookingStatus == BookingStatus.Reserved ||
+                        c.BookingStatus == BookingStatus.Unpaid ||
+                        c.BookingStatus == BookingStatus.Collected
+                        )
+                    .Any();
+
+                if (hasReservation)
+                    return RedirectToAction("Details", "Bookings", new { id });
+
+                if (!vehicle.IsReserved)
+                    return RedirectToAction("Create", "Bookings", new { id });
+
                 return RedirectToAction("Search", "Bookings");
             }
 
@@ -76,12 +83,25 @@ namespace DriveHub.Controllers
             var startPod = booking.StartPod;
             startPod.Vehicle = null;
 
-            _context.Update(booking);
-            _context.Update(startPod);
-            _context.Update(vehicle);
+            // Using a transaction to ensure data consistency
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.Update(booking);
+                    _context.Update(startPod);
+                    _context.Update(vehicle);
 
-            await _context.SaveChangesAsync();
-
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred during vehicle pickup");
+                    await transaction.RollbackAsync();
+                    return View(nameof(Error));
+                }
+            }
             return View("Pickup", booking);
         }
 
@@ -106,10 +126,7 @@ namespace DriveHub.Controllers
 
             _logger.LogInformation($"Found vehicle {id}");
 
-            Booking? booking = null;
-            try
-            {
-                booking = await _context.Bookings
+            var booking = await _context.Bookings
                 .Where(c => c.VehicleId == id)
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Collected)
@@ -117,13 +134,7 @@ namespace DriveHub.Controllers
                 .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
                 .ThenInclude(c => c.Site)
-                .SingleAsync();
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning($"Booking not found for id: {id}");
-                return View(nameof(Error));
-            }
+                .FirstOrDefaultAsync();
 
             if (booking == null || booking?.BookingId == null || booking.StartTime == null)
             {
@@ -135,7 +146,7 @@ namespace DriveHub.Controllers
 
             if (!emptyPods.Any())
             {
-                _logger.LogWarning("No empty pods available for drop-off.");
+                _logger.LogError("No empty pods available for drop-off.");
                 return View(nameof(Error));
             }
 

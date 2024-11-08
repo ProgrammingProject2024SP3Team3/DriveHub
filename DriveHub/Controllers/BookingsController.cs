@@ -20,13 +20,13 @@ namespace DriveHub.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
 
         public BookingsController(
             ApplicationDbContext context,
             ILogger<BookingsController> logger,
-            UserManager<IdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             IConfiguration configuration
         )
         {
@@ -124,16 +124,16 @@ namespace DriveHub.Controllers
         // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,StartPodId,QuotedPricePerHour")] ReservationDto reservationDto)
+        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,StartPodId,QuotedPricePerHour")] DriveHub.Views.Bookings.Create create)
         {
-            _logger.LogInformation($"Received POST to make a reservation for vehicle {reservationDto.VehicleId}");
+            _logger.LogInformation($"Received POST to make a reservation for vehicle {create.VehicleId}");
 
             try
             {
                 // Verify if the user has an active reservation
                 bool hasReservation = await _context.Bookings
                     .AnyAsync(c => c.Id == _userManager.GetUserId(User) &&
-                                (c.BookingStatus == BookingStatus.Reserved ||
+                                   (c.BookingStatus == BookingStatus.Reserved ||
                                     c.BookingStatus == BookingStatus.Unpaid ||
                                     c.BookingStatus == BookingStatus.Collected));
 
@@ -149,7 +149,7 @@ namespace DriveHub.Controllers
                 // Fetch vehicle and ensure it exists
                 var vehicle = await _context.Vehicles
                     .Include(v => v.VehicleRate)
-                    .FirstOrDefaultAsync(v => v.VehicleId == reservationDto.VehicleId);
+                    .FirstOrDefaultAsync(v => v.VehicleId == create.VehicleId);
 
 
                 if (vehicle == null || vehicle.IsReserved)
@@ -163,7 +163,7 @@ namespace DriveHub.Controllers
                 var startPod = await _context.Pods
                     .Include(p => p.Site)
                     .Include(p => p.Vehicle)
-                    .FirstOrDefaultAsync(p => p.PodId == reservationDto.StartPodId);
+                    .FirstOrDefaultAsync(p => p.PodId == create.StartPodId);
 
                 if (startPod == null || startPod.Vehicle == null)
                 {
@@ -174,8 +174,8 @@ namespace DriveHub.Controllers
                 // Prepare and validate the booking
                 var booking = new Booking(
                     _userManager.GetUserId(User),
-                    reservationDto.VehicleId,
-                    reservationDto.StartPodId,
+                    create.VehicleId,
+                    create.StartPodId,
                     vehicle.VehicleRate.PricePerHour,
                     vehicle.VehicleRate.PricePerMinute
                 )
@@ -219,14 +219,14 @@ namespace DriveHub.Controllers
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(
                     c =>
-                    c.BookingStatus == BookingStatus.Reserved ||
-                    c.BookingStatus == BookingStatus.Unpaid ||
-                    c.BookingStatus == BookingStatus.Collected
+                        c.BookingStatus == BookingStatus.Reserved ||
+                        c.BookingStatus == BookingStatus.Unpaid ||
+                        c.BookingStatus == BookingStatus.Collected
                     )
                 .Include(c => c.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
+                    .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.Invoice)
                 .FirstOrDefaultAsync();
 
@@ -395,6 +395,7 @@ namespace DriveHub.Controllers
             var booking = await _context.Bookings
                 .AsNoTracking()
                 .Where(c => c.BookingId == BookingId)
+                .Where(c => c.BookingStatus == BookingStatus.Unpaid)
                 .Include(c => c.Vehicle)
                     .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.Invoice)
@@ -461,6 +462,7 @@ namespace DriveHub.Controllers
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.Invoice.InvoiceNumber == id)
                 .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Include(c => c.ApplicationUser)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                     .ThenInclude(d => d.Site)
@@ -498,6 +500,7 @@ namespace DriveHub.Controllers
             var bookings = await _context.Bookings
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(c => c.BookingStatus == BookingStatus.Complete)
+                .Include(c => c.ApplicationUser)
                 .Include(c => c.Vehicle)
                 .Include(c => c.StartPod)
                     .ThenInclude(d => d.Site)

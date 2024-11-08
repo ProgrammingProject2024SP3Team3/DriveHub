@@ -4,7 +4,6 @@ using Admin.Data;
 using DriveHubModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Admin.Models.Dto;
 
 namespace Admin.Controllers
 {
@@ -12,20 +11,20 @@ namespace Admin.Controllers
     public class ApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly ILogger<ApplicationUsersController> _logger;
 
         public ApplicationUsersController(
             ApplicationDbContext context,
-            UserManager<IdentityUser> userManager)
+            ILogger<ApplicationUsersController> logger)
         {
             _context = context;
-            _userManager = userManager;
+            _logger = logger;
         }
 
         // GET: VehicleRates
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Users.ToListAsync());
+            return View(await _context.ApplicationUsers.ToListAsync());
         }
 
         // GET: VehicleRates/Details/5
@@ -36,7 +35,7 @@ namespace Admin.Controllers
                 return NotFound();
             }
 
-            var vehicleRate = await _context.Users
+            var vehicleRate = await _context.ApplicationUsers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (vehicleRate == null)
@@ -47,28 +46,6 @@ namespace Admin.Controllers
             return View(vehicleRate);
         }
 
-        // GET: VehicleRates/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: VehicleRates/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("")] ApplicationUser applicationUser)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(applicationUser);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(applicationUser);
-        }
-
         // GET: VehicleRates/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -77,12 +54,23 @@ namespace Admin.Controllers
                 return NotFound();
             }
 
-            var applicationUser = await _context.Users.FindAsync(id);
+            var applicationUser = await _context.ApplicationUsers.FindAsync(id);
             if (applicationUser == null)
             {
                 return NotFound();
             }
-            return View(applicationUser);
+
+            var editUser = new Admin.Views.ApplicationUsers.Edit();
+            editUser.Id = id;
+            editUser.UserName = applicationUser.UserName;
+            editUser.FirstName = applicationUser.FirstName;
+            editUser.LastName = applicationUser.LastName;
+            editUser.Email = applicationUser.Email;
+            editUser.EmailConfirmed = applicationUser.EmailConfirmed;
+            editUser.PhoneNumber = applicationUser.PhoneNumber;
+            editUser.PhoneNumberConfirmed = applicationUser.PhoneNumberConfirmed;
+
+            return View(editUser);
         }
 
         // POST: VehicleRates/Edit/5
@@ -90,34 +78,52 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("")] ApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled")] Admin.Views.ApplicationUsers.Edit applicationUser)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(applicationUser);
+            }
+
+            ApplicationUser user;
             if (id != applicationUser.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            user = await _context.ApplicationUsers.FindAsync(id);
+
+            if (user == null)
             {
-                try
-                {
-                    _context.Update(applicationUser);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(applicationUser.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            return View(applicationUser);
+
+            try
+            {
+                user.FirstName = applicationUser.FirstName;
+                user.LastName = applicationUser.LastName;
+                user.Email = applicationUser.Email;
+                user.NormalizedEmail = applicationUser.Email.ToUpper();
+                user.EmailConfirmed = applicationUser.EmailConfirmed;
+                user.PhoneNumber = applicationUser.PhoneNumber;
+                user.PhoneNumberConfirmed = applicationUser.PhoneNumberConfirmed;
+                user.TwoFactorEnabled = applicationUser.TwoFactorEnabled;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(applicationUser.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: VehicleRates/Delete/5
@@ -128,7 +134,7 @@ namespace Admin.Controllers
                 return NotFound();
             }
 
-            var applicationUser = await _context.Users
+            var applicationUser = await _context.ApplicationUsers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (applicationUser == null)
@@ -144,7 +150,7 @@ namespace Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var applicationUser = await _context.Users.FindAsync(id);
+            var applicationUser = await _context.ApplicationUsers.FindAsync(id);
             if (applicationUser != null)
             {
                 _context.Users.Remove(applicationUser);
@@ -154,50 +160,24 @@ namespace Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> PasswordReset(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var pwresetDto = new Models.Dto.ResetPasswordDto();
-            pwresetDto.Id = id;
-            pwresetDto.UserName = user.UserName;
-            pwresetDto.Email = user.Email;
-            pwresetDto.EmailConfirmed = user.EmailConfirmed;
-
-            return View(pwresetDto);
-        }
-
-        public async Task<ActionResult> ResetUserPassword([Bind("Id,UserName,Email,EmailConfirmed,NewPassword")] ResetPasswordDto passwordDto)
-        {
-            // Find User
-            var user = await _context.Users.Where(x => x.Id == passwordDto.Id).SingleOrDefaultAsync();
-            if (user == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Remove the existing password
-            await _userManager.RemovePasswordAsync(user);
-
-            // Add the new password
-            await _userManager.AddPasswordAsync(user, passwordDto.NewPassword);
-            return RedirectToAction(nameof(Details), new { passwordDto.Id });
-        }
-
         private bool UserExists(string id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _context.ApplicationUsers.Any(e => e.Id == id);
         }
+
+        private ApplicationUser CreateUser()
+        {
+            try
+            {
+                return Activator.CreateInstance<ApplicationUser>();
+            }
+            catch
+            {
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+            }
+        }
+
     }
 }

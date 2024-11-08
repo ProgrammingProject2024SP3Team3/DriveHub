@@ -1,9 +1,10 @@
-﻿using System.ComponentModel;
+﻿using DriveHubModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Admin.Models.Dto
+namespace Admin.Views.Bookings
 {
-    public class EditBookingDto
+    public class Edit
     {
         [Required]
         public string BookingId { get; set; }
@@ -28,5 +29,14 @@ namespace Admin.Models.Dto
         [DisplayName("Price per hour")]
         [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal PricePerHour { get; set; }
+
+        [Required]
+        [DataType(DataType.Currency)]
+        [DisplayName("Price per hour")]
+        [DisplayFormat(DataFormatString = "{0:C}")]
+        public decimal PricePerMinute { get; set; }
+
+        [Required]
+        public BookingStatus BookingStatus { get; set; }
     }
 }

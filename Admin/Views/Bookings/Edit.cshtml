@@ -49,8 +49,13 @@
                 <span asp-validation-for="PricePerHour" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="PricePerMinute" class="control-label"></label>
+                <input asp-for="PricePerMinute" class="form-control" />
+                <span asp-validation-for="PricePerMinute" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="BookingStatus" class="control-label"></label>
-                <select asp-for="BookingStatus" class="form-control"></select>
+                <select asp-for="BookingStatus" class="form-control" asp-items="ViewBag.BookingStatus"></select>
                 <span asp-validation-for="BookingStatus" class="text-danger"></span>
             </div>
             <div class="form-group">

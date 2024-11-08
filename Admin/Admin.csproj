@@ -39,17 +39,4 @@
 		<ProjectReference Include="..\DriveHubModel\DriveHubModel.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Content Update="Views\ApplicationUsers\PasswordReset.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Data\SeedData\Users.csv">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
 </Project>

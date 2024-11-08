@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Admin.Data;
 using DriveHubModel;
 using Microsoft.AspNetCore.Authorization;
+using Admin.Views.Vehicles;
 
 namespace Admin.Controllers
 {
@@ -59,16 +60,29 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("VehicleId,VehicleRateId,Make,Model,RegistrationPlate,State,Year,Seats")] Vehicle vehicle)
+        public async Task<IActionResult> Create([Bind("VehicleId,VehicleRateId,Make,Model,RegistrationPlate,State,Year,Seats,Colour,Name,IsReserved")] Views.Vehicles.Create vehicleDto)
         {
             if (ModelState.IsValid)
             {
+                var vehicle = new Vehicle();
+                vehicle.VehicleId = vehicleDto.VehicleId;
+                vehicle.VehicleRateId = vehicleDto.VehicleRateId;
+                vehicle.Make = vehicleDto.Make;
+                vehicle.Model = vehicleDto.Model;
+                vehicle.RegistrationPlate = vehicleDto.RegistrationPlate;
+                vehicle.State = vehicleDto.State;
+                vehicle.Year = vehicleDto.Year;
+                vehicle.Seats = vehicleDto.Seats;
+                vehicle.IsReserved = vehicleDto.IsReserved;
+                vehicle.Name = vehicleDto.Name;
+                vehicle.Colour = vehicleDto.Colour;
+
                 _context.Add(vehicle);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = vehicle.VehicleId });
             }
-            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description", vehicle.VehicleRateId);
-            return View(vehicle);
+            ViewData["VehicleRateId"] = new SelectList(_context.VehicleRates, "VehicleRateId", "Description", vehicleDto.VehicleRateId);
+            return View(vehicleDto);
         }
 
         // GET: Vehicles/Edit/5
@@ -93,7 +107,7 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Admin.Models.Dto.Vehicle vehicleDto)
+        public async Task<IActionResult> Edit(string id, Views.Vehicles.Edit vehicleDto)
         {
             _logger.LogInformation($"Editing {id}");
             _logger.LogInformation($"Editing {vehicleDto.ToString()}");
@@ -121,7 +135,7 @@ namespace Admin.Controllers
             {
                 try
                 {
-                    _logger.LogWarning($"Model is valid {id}");                  
+                    _logger.LogWarning($"Model is valid {id}");
 
                     vehicle.VehicleRateId = vehicleDto.VehicleRateId;
                     vehicle.Name = vehicleDto.Name;
@@ -132,6 +146,7 @@ namespace Admin.Controllers
                     vehicle.Year = vehicleDto.Year;
                     vehicle.Seats = vehicleDto.Seats;
                     vehicle.Colour = vehicleDto.Colour;
+                    vehicle.IsReserved = vehicleDto.IsReserved;
 
                     _context.Update(vehicle);
                     _logger.LogWarning($"Updated {id}");

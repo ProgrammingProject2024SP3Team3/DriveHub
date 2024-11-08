@@ -27,6 +27,7 @@ namespace Admin.Controllers
             ViewData["EndPodFilter"] = endPodFilter;
 
             var bookings = from b in _context.Bookings
+                           .Include(b => b.ApplicationUser)
                            .Include(b => b.EndPod)
                            .ThenInclude(c => c.Site)
                            .Include(b => b.StartPod)
@@ -85,11 +86,11 @@ namespace Admin.Controllers
 
             var booking = await _context.Bookings
                 .Include(b => b.StartPod)
-                .ThenInclude(c => c.Site)
+                    .ThenInclude(c => c.Site)
                 .Include(b => b.EndPod)
-                .ThenInclude(c => c.Site)
+                    .ThenInclude(c => c.Site)
                 .Include(b => b.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
+                    .ThenInclude(c => c.VehicleRate)
                 .Include(b => b.Invoice)
                 .Include(b => b.Receipt)
                 .FirstOrDefaultAsync(m => m.BookingId == id);
@@ -111,6 +112,8 @@ namespace Admin.Controllers
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName");
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName");
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name");
+            List<BookingStatus> bookingStatuses = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
+            ViewData["BookingStatus"] = new SelectList(bookingStatuses);
             return View();
         }
 
@@ -119,19 +122,16 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,Id,StartPodId,EndPodId,StartTime,EndTime,PricePerHour,BookingStatus")] Booking booking)
+        public async Task<IActionResult> Create([Bind("BookingId,VehicleId,Id,StartPodId,EndPodId,StartTime,EndTime,PricePerHour,PricePerMinute,BookingStatus")] Booking booking)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(booking);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = booking.BookingId });
             }
 
-            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
-            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
+            PopulateDropDowns(booking);
             return View(booking);
         }
 
@@ -148,10 +148,7 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
-            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
+            PopulateDropDowns(booking);
             return View(booking);
         }
 
@@ -162,7 +159,7 @@ namespace Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("BookingId,VehicleId,Id,StartPodId,EndPodId,StartTime,EndTime,PricePerHour,BookingStatus")] Booking booking)
         {
-            if (id != booking.BookingId)
+            if (id != booking.Id)
             {
                 return NotFound();
             }
@@ -173,6 +170,7 @@ namespace Admin.Controllers
                 {
                     _context.Update(booking);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Details), new { id = booking.BookingId });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -182,17 +180,26 @@ namespace Admin.Controllers
                     }
                     else
                     {
+                        // Log the exception here or provide user feedback
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
+
+            PopulateDropDowns(booking);
+            return View(booking);
+        }
+
+        private void PopulateDropDowns(Booking booking)
+        {
+            ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "UserName", booking.Id);
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
-            return View(booking);
+            List<BookingStatus> bookingStatuses = new List<BookingStatus> { BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Complete };
+            ViewData["BookingStatus"] = new SelectList(bookingStatuses);
         }
+
 
         // GET: Bookings/Delete/5
         public async Task<IActionResult> Delete(string id)
