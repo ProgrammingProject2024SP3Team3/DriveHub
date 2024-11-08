@@ -57,7 +57,7 @@ namespace DriveHub.Models.DocumentModels
                 row.RelativeItem().Column(column =>
                 {
                     column
-                        .Item().Text($"Invoice #{Model.Invoice.InvoiceNumber}")
+                        .Item().Text($"Tax Invoice #{Model.Invoice.InvoiceNumber}")
                         .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
                     column.Item().Text(text =>
                     {

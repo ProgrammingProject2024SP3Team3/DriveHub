@@ -133,7 +133,7 @@ namespace DriveHub.Controllers
                 // Verify if the user has an active reservation
                 bool hasReservation = await _context.Bookings
                     .AnyAsync(c => c.Id == _userManager.GetUserId(User) &&
-                                (c.BookingStatus == BookingStatus.Reserved ||
+                                   (c.BookingStatus == BookingStatus.Reserved ||
                                     c.BookingStatus == BookingStatus.Unpaid ||
                                     c.BookingStatus == BookingStatus.Collected));
 
@@ -219,14 +219,14 @@ namespace DriveHub.Controllers
                 .Where(c => c.Id == _userManager.GetUserId(User))
                 .Where(
                     c =>
-                    c.BookingStatus == BookingStatus.Reserved ||
-                    c.BookingStatus == BookingStatus.Unpaid ||
-                    c.BookingStatus == BookingStatus.Collected
+                        c.BookingStatus == BookingStatus.Reserved ||
+                        c.BookingStatus == BookingStatus.Unpaid ||
+                        c.BookingStatus == BookingStatus.Collected
                     )
                 .Include(c => c.Vehicle)
-                .ThenInclude(c => c.VehicleRate)
+                    .ThenInclude(c => c.VehicleRate)
                 .Include(c => c.StartPod)
-                .ThenInclude(d => d.Site)
+                    .ThenInclude(d => d.Site)
                 .Include(c => c.Invoice)
                 .FirstOrDefaultAsync();
 

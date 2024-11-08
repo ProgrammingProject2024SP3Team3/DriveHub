@@ -11,14 +11,18 @@ DriveHub is a comprehensive vehicle reservation and management system built on a
 
 ## Table of Contents
 
+- [Applications](#applications)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Running Tests](#running-tests)
-- [Contributing](#contributing)
-- [License](#license)
+
+## Applications
+
+- DriveHub: The customer facing website hosted at https://drivehub.au
+- Admin: The administrative portal hosted at https://portal.drivehub.au
 
 ## Features
 
@@ -56,10 +60,10 @@ DriveHub is a comprehensive vehicle reservation and management system built on a
    ```
 2. **Install Dependencies**: Ensure you have the required .NET SDK and other dependencies installed.
 
-3. **Configure the Database**: Update the appsettings.json with your SQL Server connection string.
+3. **Configure the Databases**: Update the appsettings.json with your SQL Server connection string.
     ```json
     "ConnectionStrings": {
-        "DefaultConnection": "Server=your_server;Database=your_db;User Id=your_user;Password=your_password;"
+        "DriveHub": "Server=your_server;Database=your_db;User Id=your_user;Password=your_password;"
     }
     ```
 
@@ -69,7 +73,7 @@ DriveHub is a comprehensive vehicle reservation and management system built on a
     dotnet ef database update
     ```
 
-5. **Build and Run the Application\***:
+5. **Build and Run the Application(s)**:
 
     ```bash
     dotnet build
@@ -106,7 +110,7 @@ Securely process payments using Stripe.
 
 Generate and download PDF reports and invoices.
 
-**Running Tests**
+## Running Tests
 To run the tests, use the following command:
 
 ```bash

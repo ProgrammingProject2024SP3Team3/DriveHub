@@ -128,15 +128,10 @@ namespace Admin.Controllers
             {
                 _context.Add(booking);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = booking.BookingId });
             }
 
-            ViewData["Id"] = new SelectList(_context.Users, "Id", "UserName", booking.Id);
-            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
-            List<BookingStatus> bookingStatus = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
-            ViewData["BookingStatus"] = new SelectList(bookingStatus);
+            PopulateDropDowns(booking);
             return View(booking);
         }
 
@@ -153,12 +148,7 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "UserName", booking.Id);
-            ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
-            ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
-            List<BookingStatus> bookingStatuses = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
-            ViewData["BookingStatus"] = new SelectList(bookingStatuses);
+            PopulateDropDowns(booking);
             return View(booking);
         }
 
@@ -169,7 +159,7 @@ namespace Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("BookingId,VehicleId,Id,StartPodId,EndPodId,StartTime,EndTime,PricePerHour,BookingStatus")] Booking booking)
         {
-            if (id != booking.BookingId)
+            if (id != booking.Id)
             {
                 return NotFound();
             }
@@ -180,6 +170,7 @@ namespace Admin.Controllers
                 {
                     _context.Update(booking);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Details), new { id = booking.BookingId });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -189,19 +180,26 @@ namespace Admin.Controllers
                     }
                     else
                     {
+                        // Log the exception here or provide user feedback
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+
+            PopulateDropDowns(booking);
+            return View(booking);
+        }
+
+        private void PopulateDropDowns(Booking booking)
+        {
             ViewData["Id"] = new SelectList(_context.ApplicationUsers, "Id", "UserName", booking.Id);
             ViewData["EndPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.EndPodId);
             ViewData["StartPodId"] = new SelectList(_context.Pods, "PodId", "PodName", booking.StartPodId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "Name", booking.VehicleId);
-            List<BookingStatus> bookingStatuses = [BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Expired, BookingStatus.Complete];
+            List<BookingStatus> bookingStatuses = new List<BookingStatus> { BookingStatus.Reserved, BookingStatus.Expired, BookingStatus.Cancelled, BookingStatus.Complete };
             ViewData["BookingStatus"] = new SelectList(bookingStatuses);
-            return View(booking);
         }
+
 
         // GET: Bookings/Delete/5
         public async Task<IActionResult> Delete(string id)

@@ -70,13 +70,13 @@ namespace Admin.Controllers
                     NormalizedEmail = create.Email.ToUpper(),
                     EmailConfirmed = create.EmailConfirmed,
                     SecurityStamp = Guid.NewGuid().ToString(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString(), 
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
                     PhoneNumber = create.PhoneNumber,
                     PhoneNumberConfirmed = create.PhoneNumberConfirmed,
                     TwoFactorEnabled = false,
-                    LockoutEnd = null, 
+                    LockoutEnd = null,
                     LockoutEnabled = false,
-                    AccessFailedCount = 0, 
+                    AccessFailedCount = 0,
                     FirstName = create.FirstName,
                     LastName = create.LastName,
                 };
@@ -93,7 +93,7 @@ namespace Admin.Controllers
                     // Optionally handle case where user already exists
                 }
 
-                var result = await _context.SaveChangesAsync(); 
+                var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
                 {
@@ -101,7 +101,7 @@ namespace Admin.Controllers
                     return RedirectToAction(nameof(Details), new { id = user.Id });
                 }
             }
-            ViewBag.Error = "There was an error creating the user. Please review your data entry and try again."; 
+            ViewBag.Error = "There was an error creating the user. Please review your data entry and try again.";
             return View(create);
         }
 
@@ -119,7 +119,18 @@ namespace Admin.Controllers
             {
                 return NotFound();
             }
-            return View(applicationUser);
+
+            var editUser = new Admin.Views.ApplicationUsers.Edit();
+            editUser.Id = id;
+            editUser.UserName = applicationUser.UserName;
+            editUser.FirstName = applicationUser.FirstName;
+            editUser.LastName = applicationUser.LastName;
+            editUser.Email = applicationUser.Email;
+            editUser.EmailConfirmed = applicationUser.EmailConfirmed;
+            editUser.PhoneNumber = applicationUser.PhoneNumber;
+            editUser.PhoneNumberConfirmed = applicationUser.PhoneNumberConfirmed;
+
+            return View(editUser);
         }
 
         // POST: VehicleRates/Edit/5
@@ -127,8 +138,13 @@ namespace Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed")] Admin.Views.ApplicationUsers.Edit applicationUser)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,FirstName,LastName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled")] Admin.Views.ApplicationUsers.Edit applicationUser)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(applicationUser);
+            }
+
             ApplicationUser user;
             if (id != applicationUser.Id)
             {
@@ -150,6 +166,7 @@ namespace Admin.Controllers
                 user.EmailConfirmed = applicationUser.EmailConfirmed;
                 user.PhoneNumber = applicationUser.PhoneNumber;
                 user.PhoneNumberConfirmed = applicationUser.PhoneNumberConfirmed;
+                user.TwoFactorEnabled = applicationUser.TwoFactorEnabled;
 
                 _context.Update(user);
                 await _context.SaveChangesAsync();
