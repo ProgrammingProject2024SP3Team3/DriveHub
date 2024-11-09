@@ -12,39 +12,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connection = String.Empty;
+builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.json");
+var connection = builder.Configuration.GetConnectionString("DriveHubDb");
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-    connection = builder.Configuration.GetConnectionString("DriveHubDb");
-}
-else
-{
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
-
-    // Set up Key Vault client
-    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
-    builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
-
-    var client = new SecretClient(keyVaultEndpoint, new DefaultAzureCredential());
-    KeyVaultSecret secret = await client.GetSecretAsync("DriveHubDb");
-
-    connection = secret.Value;
-}
-
-// Add worker service to automatically run in the background.
-builder.Services.AddHostedService<ReservationExpiryService>();
-builder.Services.AddHttpContextAccessor();
-
-// Configure logging
-var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Retrieved connection string: {ConnectionString}", connection);
-
-// Continue your setup...
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connection, x => x.UseNetTopologySuite()));
+    options.UseMySQL(connection));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -74,6 +46,10 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Add worker service to automatically run in the background.
+builder.Services.AddHostedService<ReservationExpiryService>();
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline and seed data if required
@@ -92,7 +68,7 @@ if (app.Environment.IsDevelopment())
         }
         catch (Exception ex)
         {
-            logger = services.GetRequiredService<ILogger<Program>>();
+            var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error has occurred while seeding the database.");
         }
     }

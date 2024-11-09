@@ -1,7 +1,6 @@
 ﻿using DriveHubModel;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 
 namespace DriveHub.Data
 {
@@ -35,22 +34,9 @@ namespace DriveHub.Data
             modelBuilder.Entity<Pod>()
                .HasKey(c => c.PodId);
 
-            // Set "geography" column type for spatial data in the Site entity
-            modelBuilder.Entity<Site>()
-               .Property(l => l.Location)
-               .HasColumnType("geography");
-
             modelBuilder.Entity<VehicleRate>()
                 .HasMany(c => c.Vehicles)
                 .WithOne(c => c.VehicleRate);
-
-            modelBuilder.Entity<VehicleRate>()
-                .Property(c => c.PricePerHour)
-                .HasColumnType("Money");
-
-            modelBuilder.Entity<VehicleRate>()
-                .Property(c => c.PricePerMinute)
-                .HasColumnType("Money");
 
             modelBuilder.Entity<Vehicle>()
                 .HasOne(c => c.VehicleRate)
@@ -100,14 +86,6 @@ namespace DriveHub.Data
                 .HasForeignKey(c => c.EndPodId)
                 .OnDelete(DeleteBehavior.ClientNoAction);
 
-            modelBuilder.Entity<Booking>()
-                .Property(c => c.PricePerHour)
-                .HasColumnType("Money");
-
-            modelBuilder.Entity<Booking>()
-                .Property(c => c.PricePerMinute)
-                .HasColumnType("Money");
-
             modelBuilder
                 .Entity<Booking>()
                 .Property(e => e.BookingStatus)
@@ -129,17 +107,10 @@ namespace DriveHub.Data
                 .HasOne(c => c.Booking)
                 .WithOne(c => c.Invoice);
 
-            modelBuilder.Entity<Invoice>()
-                .Property(c => c.Amount)
-                .HasColumnType("Money");
-
             modelBuilder.Entity<Receipt>()
                 .HasOne(c => c.Booking)
                 .WithOne(c => c.Receipt);
 
-            modelBuilder.Entity<Receipt>()
-                .Property(c => c.Amount)
-                .HasColumnType("Money");
         }
     }
 }
