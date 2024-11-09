@@ -376,10 +376,86 @@ namespace DriveHub.Controllers
             return RedirectToAction("Details", "Bookings", new { id = booking.BookingId });
         }
 
+        // Live payments
         /// <summary>
         /// Pay an invoice
         /// </summary>
         /// <returns>StatusCodeResult</returns>
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Pay(string BookingId)
+        //{
+        //    _logger.LogInformation($"Pay: Starting payment process for booking {BookingId}.");
+
+        //    if (string.IsNullOrWhiteSpace(BookingId))
+        //    {
+        //        _logger.LogWarning("Pay: BookingId is null or empty.");
+        //        return View(nameof(Error));
+        //    }
+
+        //    var booking = await _context.Bookings
+        //        .AsNoTracking()
+        //        .Where(c => c.BookingId == BookingId)
+        //        .Where(c => c.BookingStatus == BookingStatus.Unpaid)
+        //        .Include(c => c.Vehicle)
+        //            .ThenInclude(c => c.VehicleRate)
+        //        .Include(c => c.Invoice)
+        //        .FirstOrDefaultAsync();
+
+        //    if (booking == null || booking.Invoice == null)
+        //    {
+        //        _logger.LogWarning($"Pay: Booking not found for BookingId: {BookingId}");
+        //        return View(nameof(Error));
+        //    }
+
+        //    var apiKey = _configuration.GetValue<string>("StripeKey");
+        //    var client = new StripeClient(apiKey);
+        //    var domain = _configuration.GetValue<string>("Domain");
+
+        //    var options = new SessionCreateOptions
+        //    {
+        //        LineItems = new List<SessionLineItemOptions>
+        //        {
+        //            new SessionLineItemOptions
+        //            {
+        //                PriceData = new SessionLineItemPriceDataOptions
+        //                {
+        //                    Currency = "aud", // Australian dollars
+        //                    ProductData = new SessionLineItemPriceDataProductDataOptions
+        //                    {
+        //                        Name = $"DriveHub - {booking.BookingId}",
+        //                        Description = "Payment for your Drivehub ride",
+        //                    },
+        //                    UnitAmount = (long)(booking.Invoice.Amount * 100),
+        //                },
+        //                Quantity = 1,
+        //            },
+        //        },
+        //        Mode = "payment",
+        //        SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
+        //        CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
+        //    };
+        //    try
+        //    {
+        //        var service = new SessionService(client);
+        //        Session session = service.Create(options);
+        //        Response.Headers.Append("Location", session.Url);
+        //        _logger.LogInformation("Pay: Stripe session created successfully.");
+        //        return new StatusCodeResult(303);
+        //    }
+        //    catch (StripeException ex)
+        //    {
+        //        _logger.LogError(ex, "Pay: Error creating Stripe session.");
+        //        return View(nameof(Error));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Pay: Unexpected error.");
+        //        return View(nameof(Error));
+        //    }
+        //}
+
+        // Dummy payments
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Pay(string BookingId)
@@ -407,51 +483,9 @@ namespace DriveHub.Controllers
                 return View(nameof(Error));
             }
 
-            var apiKey = _configuration.GetValue<string>("StripeKey");
-            var client = new StripeClient(apiKey);
-            var domain = _configuration.GetValue<string>("Domain");
+            _logger.LogInformation("Pay: Dummy payment session created successfully.");
 
-            var options = new SessionCreateOptions
-            {
-                LineItems = new List<SessionLineItemOptions>
-                {
-                    new SessionLineItemOptions
-                    {
-                        PriceData = new SessionLineItemPriceDataOptions
-                        {
-                            Currency = "aud", // Australian dollars
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = $"DriveHub - {booking.BookingId}",
-                                Description = "Payment for your Drivehub ride",
-                            },
-                            UnitAmount = (long)(booking.Invoice.Amount * 100),
-                        },
-                        Quantity = 1,
-                    },
-                },
-                Mode = "payment",
-                SuccessUrl = $"{domain}/Payments/Success/{booking.PaymentId}",
-                CancelUrl = $"{domain}/Payments/Cancel/{booking.PaymentId}",
-            };
-            try
-            {
-                var service = new SessionService(client);
-                Session session = service.Create(options);
-                Response.Headers.Append("Location", session.Url);
-                _logger.LogInformation("Pay: Stripe session created successfully.");
-                return new StatusCodeResult(303);
-            }
-            catch (StripeException ex)
-            {
-                _logger.LogError(ex, "Pay: Error creating Stripe session.");
-                return View(nameof(Error));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Pay: Unexpected error.");
-                return View(nameof(Error));
-            }
+            return RedirectToAction("Success", "Payments", new { id = booking.PaymentId });
         }
 
         public async Task<IActionResult> PrintInvoice(int id)

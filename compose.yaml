@@ -1,0 +1,7 @@
+services:
+  drivehub:
+    image: drivehub-image
+    container_name: drivehub
+    ports:
+      - 5555:8080
+    restart: unless-stopped
