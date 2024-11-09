@@ -2,9 +2,8 @@ using DriveHub.BackgroundServices;
 using DriveHub.Data;
 using DriveHub.SeedData;
 using DriveHubModel;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using DriveHub.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +25,9 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Lockout.MaxFailedAccessAttempts = 3;
     options.Lockout.AllowedForNewUsers = true;
 });
+
+// Configure Data Protection to persist keys in a specific directory
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys")).SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
