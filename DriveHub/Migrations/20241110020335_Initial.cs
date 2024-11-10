@@ -1,13 +1,12 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace Admin.Migrations
+namespace DriveHub.Migrations
 {
     /// <inheritdoc />
-    public partial class ApplicationDb : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,8 +79,7 @@ namespace Admin.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Latitude = table.Column<double>(type: "float", nullable: false),
-                    Longitude = table.Column<double>(type: "float", nullable: false),
-                    Location = table.Column<Point>(type: "geography", nullable: false)
+                    Longitude = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -94,8 +92,8 @@ namespace Admin.Migrations
                 {
                     VehicleRateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
-                    PricePerMinute = table.Column<decimal>(type: "Money", nullable: false),
+                    PricePerHour = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PricePerMinute = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     EffectiveDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -275,8 +273,8 @@ namespace Admin.Migrations
                     EndPodId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PricePerHour = table.Column<decimal>(type: "Money", nullable: false),
-                    PricePerMinute = table.Column<decimal>(type: "Money", nullable: false),
+                    PricePerHour = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PricePerMinute = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     BookingStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -313,7 +311,7 @@ namespace Admin.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Amount = table.Column<decimal>(type: "Money", nullable: false)
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -334,7 +332,7 @@ namespace Admin.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Amount = table.Column<decimal>(type: "Money", nullable: false)
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {

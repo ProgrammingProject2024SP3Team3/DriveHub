@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Admin.Migrations.AdminDb
+namespace Admin.Migrations
 {
     /// <inheritdoc />
     public partial class AdminDb : Migration

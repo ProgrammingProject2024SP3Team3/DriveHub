@@ -1,52 +1,26 @@
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using DriveHub.BackgroundServices;
 using DriveHub.Data;
 using DriveHub.SeedData;
 using DriveHubModel;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using DriveHub.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 var connection = String.Empty;
-
 if (builder.Environment.IsDevelopment())
-{
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-    connection = builder.Configuration.GetConnectionString("DriveHubDb");
-}
 else
-{
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
 
-    // Set up Key Vault client
-    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
-    builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+connection = builder.Configuration.GetConnectionString("DriveHubDb");
 
-    var client = new SecretClient(keyVaultEndpoint, new DefaultAzureCredential());
-    KeyVaultSecret secret = await client.GetSecretAsync("DriveHubDb");
-
-    connection = secret.Value;
-}
-
-// Add worker service to automatically run in the background.
-builder.Services.AddHostedService<ReservationExpiryService>();
-builder.Services.AddHttpContextAccessor();
-
-// Configure logging
-var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Retrieved connection string: {ConnectionString}", connection);
-
-// Continue your setup...
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connection, x => x.UseNetTopologySuite()));
+    options.UseSqlServer(connection));
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -57,8 +31,11 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Lockout.AllowedForNewUsers = true;
 });
 
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+// Configure Data Protection to persist keys in a specific directory in docker
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys")).SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+
+//builder.Services.AddTransient<IEmailSender, EmailSender>();
+//builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 if (builder.Environment.IsDevelopment())
 {
@@ -73,6 +50,10 @@ builder.Services.AddSession(options =>
     // Make the session cookie essential.
     options.Cookie.IsEssential = true;
 });
+
+// Add worker service to automatically run in the background.
+builder.Services.AddHostedService<ReservationExpiryService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -92,7 +73,7 @@ if (app.Environment.IsDevelopment())
         }
         catch (Exception ex)
         {
-            logger = services.GetRequiredService<ILogger<Program>>();
+            var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error has occurred while seeding the database.");
         }
     }
@@ -119,7 +100,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     DefaultRequestCulture = new RequestCulture("en-AU")
 });
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();

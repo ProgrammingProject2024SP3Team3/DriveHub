@@ -2,9 +2,7 @@ using Admin.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,24 +11,13 @@ var appConnection = String.Empty;
 var adminConnection = String.Empty;
 
 if (builder.Environment.IsDevelopment())
-{
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-    appConnection = builder.Configuration.GetConnectionString("DriveHubDb");
-    adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
-}
+
 else
-{
-    // Set up Key Vault client
-    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
-    builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
 
-    var client = new SecretClient(keyVaultEndpoint, new DefaultAzureCredential());
-    KeyVaultSecret driveHubDbsecret = await client.GetSecretAsync("DriveHubDb");
-    KeyVaultSecret driveHubAdminDbsecret = await client.GetSecretAsync("DriveHubAdminDb");
-
-    appConnection = driveHubDbsecret.Value;
-    adminConnection = driveHubAdminDbsecret.Value;
-}
+appConnection = builder.Configuration.GetConnectionString("DriveHubDb");
+adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
 
 // Configure logging
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
@@ -41,16 +28,17 @@ builder.Services.AddDbContext<AdminDbContext>(options =>
     options.UseSqlServer(adminConnection));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(appConnection, x => x.UseNetTopologySuite()));
+    options.UseSqlServer(appConnection));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<AdminDbContext>();
 
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 }
-
+// Configure Data Protection to persist keys in a specific directory in docker
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys")).SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 builder.Services.AddControllersWithViews();
 
 // Store in session
@@ -59,12 +47,6 @@ builder.Services.AddSession(options =>
 {
     // Make the session cookie essential.
     options.Cookie.IsEssential = true;
-});
-
-builder.Services.AddAzureClients(clientBuilder =>
-{
-    clientBuilder.AddBlobServiceClient(builder.Configuration["VehiclePhotos:blob"]!, preferMsi: true);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["VehiclePhotos:queue"]!, preferMsi: true);
 });
 
 var app = builder.Build();
@@ -87,7 +69,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     DefaultRequestCulture = new RequestCulture("en-AU")
 });
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 

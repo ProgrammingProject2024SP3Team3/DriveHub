@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NetTopologySuite.Geometries;
 
 #nullable disable
 
@@ -126,10 +125,10 @@ namespace DriveHub.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PricePerHour")
-                        .HasColumnType("Money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PricePerMinute")
-                        .HasColumnType("Money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("StartPodId")
                         .IsRequired()
@@ -194,7 +193,7 @@ namespace DriveHub.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceNumber"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("Money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("BookingId")
                         .IsRequired()
@@ -246,7 +245,7 @@ namespace DriveHub.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptNumber"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("Money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("BookingId")
                         .IsRequired()
@@ -281,10 +280,6 @@ namespace DriveHub.Migrations
 
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
-
-                    b.Property<Point>("Location")
-                        .IsRequired()
-                        .HasColumnType("geography");
 
                     b.Property<double>("Longitude")
                         .HasColumnType("float");
@@ -367,10 +362,10 @@ namespace DriveHub.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("PricePerHour")
-                        .HasColumnType("Money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PricePerMinute")
-                        .HasColumnType("Money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("VehicleRateId");
 
