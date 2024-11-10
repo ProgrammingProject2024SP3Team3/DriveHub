@@ -18,5 +18,10 @@ RUN dotnet publish "Admin.csproj" -c Release -o /App
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:6c4df091e4e531bb93bdbfe7e7f0998e7ced344f54426b7e874116a3dc3233ff
 WORKDIR /App
+
+# Set the time zone 
+RUN apt-get update && apt-get install -y tzdata
+ENV TZ=Australia/Melbourne
+
 COPY --from=build-env /App .
 ENTRYPOINT ["dotnet", "Admin.dll"]
