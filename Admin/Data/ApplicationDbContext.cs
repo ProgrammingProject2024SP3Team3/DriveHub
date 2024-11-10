@@ -35,11 +35,6 @@ namespace Admin.Data
             modelBuilder.Entity<Pod>()
                .HasKey(c => c.PodId);
 
-            // Set "geography" column type for spatial data in the Site entity
-            modelBuilder.Entity<Site>()
-               .Property(l => l.Location)
-               .HasColumnType("geography");
-
             modelBuilder.Entity<VehicleRate>()
                 .HasMany(c => c.Vehicles)
                 .WithOne(c => c.VehicleRate);
@@ -140,6 +135,7 @@ namespace Admin.Data
             modelBuilder.Entity<Receipt>()
                 .Property(c => c.Amount)
                 .HasColumnType("Money");
+
         }
     }
 }

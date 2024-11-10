@@ -9,8 +9,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.json");
-var connection = builder.Configuration.GetConnectionString("DriveHubDb");
+var connection = String.Empty;
+if (builder.Environment.IsDevelopment())
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+else
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
+
+connection = builder.Configuration.GetConnectionString("DriveHubDb");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connection));

@@ -4,17 +4,19 @@ using Admin.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace Admin.Migrations
+namespace Admin.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241110040508_ApplicationDb")]
+    partial class ApplicationDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -282,10 +284,6 @@ namespace Admin.Migrations
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
 
-                    b.Property<Point>("Location")
-                        .IsRequired()
-                        .HasColumnType("geography");
-
                     b.Property<double>("Longitude")
                         .HasColumnType("float");
 
@@ -305,7 +303,6 @@ namespace Admin.Migrations
             modelBuilder.Entity("DriveHubModel.Vehicle", b =>
                 {
                     b.Property<string>("VehicleId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Colour")
@@ -356,7 +353,6 @@ namespace Admin.Migrations
             modelBuilder.Entity("DriveHubModel.VehicleRate", b =>
                 {
                     b.Property<string>("VehicleRateId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
