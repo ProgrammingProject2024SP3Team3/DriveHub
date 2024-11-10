@@ -42,7 +42,6 @@ namespace DriveHubModel
         }
 
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VehicleRateId { get; set; } = Guid.NewGuid().ToString();
 
         [Required]

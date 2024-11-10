@@ -38,6 +38,14 @@ namespace DriveHub.Data
                 .HasMany(c => c.Vehicles)
                 .WithOne(c => c.VehicleRate);
 
+            modelBuilder.Entity<VehicleRate>()
+                .Property(c => c.PricePerHour)
+                .HasColumnType("Money");
+
+            modelBuilder.Entity<VehicleRate>()
+                .Property(c => c.PricePerMinute)
+                .HasColumnType("Money");
+
             modelBuilder.Entity<Vehicle>()
                 .HasOne(c => c.VehicleRate)
                 .WithMany(c => c.Vehicles)
@@ -86,6 +94,14 @@ namespace DriveHub.Data
                 .HasForeignKey(c => c.EndPodId)
                 .OnDelete(DeleteBehavior.ClientNoAction);
 
+            modelBuilder.Entity<Booking>()
+                .Property(c => c.PricePerHour)
+                .HasColumnType("Money");
+
+            modelBuilder.Entity<Booking>()
+                .Property(c => c.PricePerMinute)
+                .HasColumnType("Money");
+
             modelBuilder
                 .Entity<Booking>()
                 .Property(e => e.BookingStatus)
@@ -107,9 +123,17 @@ namespace DriveHub.Data
                 .HasOne(c => c.Booking)
                 .WithOne(c => c.Invoice);
 
+            modelBuilder.Entity<Invoice>()
+                .Property(c => c.Amount)
+                .HasColumnType("Money");
+
             modelBuilder.Entity<Receipt>()
                 .HasOne(c => c.Booking)
                 .WithOne(c => c.Receipt);
+
+            modelBuilder.Entity<Receipt>()
+                .Property(c => c.Amount)
+                .HasColumnType("Money");
 
         }
     }
