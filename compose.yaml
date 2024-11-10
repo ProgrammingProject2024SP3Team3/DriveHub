@@ -1,7 +1,15 @@
+version: '3.8'
+
 services:
   drivehub:
     image: drivehub-image
     container_name: drivehub
     ports:
-      - 5555:8080
+      - "5555:8080"
     restart: unless-stopped
+    volumes:
+      - drivehub_data:/root/.aspnet/DataProtection-Keys
+
+volumes:
+  drivehub_data:
+    driver: local

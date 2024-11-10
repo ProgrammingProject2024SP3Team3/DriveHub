@@ -13,7 +13,7 @@ builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.json");
 var connection = builder.Configuration.GetConnectionString("DriveHubDb");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySQL(connection));
+    options.UseSqlServer(connection));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -26,7 +26,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Lockout.AllowedForNewUsers = true;
 });
 
-// Configure Data Protection to persist keys in a specific directory
+// Configure Data Protection to persist keys in a specific directory in docker
 builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys")).SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
