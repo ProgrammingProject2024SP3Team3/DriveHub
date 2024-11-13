@@ -2,7 +2,7 @@
 .hero-section {
     position: relative;
     background-color: #343a40;
-    background: url("https://drivehubstorage.blob.core.windows.net/website/bg-car.jpg") no-repeat center center;
+    background: url("/images/website/bg-car.jpg") no-repeat center center;
     background-size: cover;
     display: flex;
     align-items: center;
@@ -154,7 +154,7 @@ text-decoration: underline;
 
 /* Call to Action Section */
 .call-to-action {
-    background-image: url('https://drivehubstorage.blob.core.windows.net/website/subscribe.jpg');
+    background-image: url('/images/website/subscribe.jpg');
     background-size: cover;
     background-position: center;
     position: relative;
