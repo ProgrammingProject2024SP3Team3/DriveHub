@@ -6,18 +6,14 @@ using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var appConnection = String.Empty;
-var adminConnection = String.Empty;
-
 if (builder.Environment.IsDevelopment())
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
 
 else
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
 
-appConnection = builder.Configuration.GetConnectionString("DriveHubDb");
-adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
+var appConnection = builder.Configuration.GetConnectionString("DriveHubDb");
+var adminConnection = builder.Configuration.GetConnectionString("DriveHubAdminDb");
 
 // Configure logging
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
@@ -25,20 +21,22 @@ logger.LogInformation("Retrieved admin connection string: {ConnectionString}", a
 logger.LogInformation("Retrieved app connection string: {ConnectionString}", appConnection);
 
 builder.Services.AddDbContext<AdminDbContext>(options =>
-    options.UseSqlServer(adminConnection));
+    options.UseMySQL(adminConnection));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(appConnection));
+    options.UseMySQL(appConnection));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<AdminDbContext>();
+
+// Configure Data Protection to persist keys in a specific directory
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys")).SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 }
-// Configure Data Protection to persist keys in a specific directory in docker
-builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys")).SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+
 builder.Services.AddControllersWithViews();
 
 // Store in session
@@ -69,7 +67,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     DefaultRequestCulture = new RequestCulture("en-AU")
 });
 
-//app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 

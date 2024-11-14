@@ -1,21 +1,6 @@
 version: '3.8'
 
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
-    environment:
-      SA_PASSWORD: "SqlServer2022!"
-      ACCEPT_EULA: "Y"
-      TZ: "Australia/Melbourne"
-    ports:
-      - "1433:1433"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    networks:
-      - drivehub-network
 
   drivehub:
     image: drivehub-image
@@ -30,8 +15,6 @@ services:
       - drivehub_data:/root/.aspnet/DataProtection-Keys
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    networks:
-      - drivehub-network
 
   admin:
     image: admin-image
@@ -46,13 +29,7 @@ services:
       - drivehub_data:/root/.aspnet/DataProtection-Keys
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    networks:
-      - drivehub-network
-
-networks:
-  drivehub-network:
 
 volumes:
-  sqlserver_data:
   drivehub_data:
     driver: local
