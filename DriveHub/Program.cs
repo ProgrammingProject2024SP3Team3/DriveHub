@@ -9,16 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connection = String.Empty;
-if (builder.Environment.IsDevelopment())
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-else
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Production.json");
-
-connection = builder.Configuration.GetConnectionString("DriveHubDb");
+builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.json");
+var connection = builder.Configuration.GetConnectionString("DriveHubDb");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connection));
+    options.UseMySQL(connection));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -31,11 +26,8 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Lockout.AllowedForNewUsers = true;
 });
 
-// Configure Data Protection to persist keys in a specific directory in docker
+// Configure Data Protection to persist keys in a specific directory
 builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys")).SetDefaultKeyLifetime(TimeSpan.FromDays(90));
-
-//builder.Services.AddTransient<IEmailSender, EmailSender>();
-//builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 if (builder.Environment.IsDevelopment())
 {
@@ -100,7 +92,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     DefaultRequestCulture = new RequestCulture("en-AU")
 });
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
