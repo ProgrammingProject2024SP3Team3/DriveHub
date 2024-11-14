@@ -10,6 +10,7 @@ services:
       TZ: "Australia/Melbourne"
     ports:
       - "1433:1433"
+    restart: unless-stopped
     volumes:
       - sqlserver_data:/var/opt/mssql
       - /etc/localtime:/etc/localtime:ro
