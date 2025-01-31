@@ -7,6 +7,8 @@
                                              
                                              </pre>
 # DriveHub
+This is a software development project created by students at RMIT University for COSC2650 Programming Project. All web hosting has been decommissioned, and all keys are void. This code has been published as part of our portfolio of software development projects. 
+
 DriveHub is a comprehensive vehicle reservation and management system built on a robust technological stack to ensure high performance, scalability, and security. This application enables users to book vehicles, manage reservations, handle payments, and much more.
 
 ## Table of Contents
